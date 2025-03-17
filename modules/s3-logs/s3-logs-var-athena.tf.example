@@ -1,0 +1,26 @@
+# ==========================================================================
+#  Module S3 Logs: s3-logs-var-athena.tf
+# --------------------------------------------------------------------------
+#  Description:
+#    S3 Logs Variable Athena
+# --------------------------------------------------------------------------
+#    - Athena Configuration
+#    - Athena Create Sample Queries
+# ==========================================================================
+
+variable "athena_config" {
+  description = "Configuration for Athena log analysis"
+  type = object({
+    workgroup_name     = optional(string, "gxc-sbeacon-logs-analysis")
+    database_name      = optional(string, "gxc_sbeacon_logs")
+    enable_encryption  = optional(bool, true)
+    query_timeout_days = optional(number, 7)
+  })
+  default = {}
+}
+
+variable "create_sample_queries" {
+  description = "Whether to create sample Athena queries"
+  type        = bool
+  default     = true
+}

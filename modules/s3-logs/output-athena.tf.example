@@ -1,0 +1,42 @@
+# ==========================================================================
+#  Module S3 Logs: output-athena.tf
+# --------------------------------------------------------------------------
+#  Description
+#    Output Terraform Value for Athena
+# --------------------------------------------------------------------------
+#    - Athena Configuration
+# ==========================================================================
+
+output "athena_config" {
+  description = "Athena configuration details"
+  value = {
+    workgroup = {
+      name = aws_athena_workgroup.logs_analysis.name
+      arn  = aws_athena_workgroup.logs_analysis.arn
+    }
+    database = {
+      name = aws_glue_catalog_database.logs.name
+      arn  = aws_glue_catalog_database.logs.arn
+    }
+    tables = {
+      cloudfront = {
+        name     = aws_glue_catalog_table.cloudfront_logs.name
+        location = aws_glue_catalog_table.cloudfront_logs.storage_descriptor[0].location
+      }
+      lambda = {
+        name     = aws_glue_catalog_table.lambda_logs.name
+        location = aws_glue_catalog_table.lambda_logs.storage_descriptor[0].location
+      }
+    }
+    sample_queries = var.create_sample_queries ? {
+      error_rates = {
+        name = aws_athena_named_query.cloudfront_error_rates.name
+        id   = aws_athena_named_query.cloudfront_error_rates.id
+      }
+      lambda_errors = {
+        name = aws_athena_named_query.lambda_errors.name
+        id   = aws_athena_named_query.lambda_errors.id
+      }
+    } : null
+  }
+}

@@ -1,0 +1,26 @@
+# Core dependencies
+boto3>=1.34.0                # AWS SDK
+requests>=2.31.0             # HTTP client
+requests-aws4auth>=1.2.3     # AWS authentication for requests
+tenacity>=8.2.2              # Retry mechanism
+aws-xray-sdk>=2.12.0         # AWS X-Ray SDK
+
+# Enhanced error handling and validation
+jsonschema>=4.20.0           # JSON schema validation
+pydantic>=2.5.0              # Data validation
+
+# Date handling
+python-dateutil>=2.8.2       # Advanced date utilities
+
+# Type hints support
+typing-extensions>=4.9.0     # Enhanced typing support
+
+# AWS SDK extensions
+aws-requests-auth>=0.4.3     # AWS authentication
+
+# Compression
+gzip-stream>=1.1.1           # Streaming gzip compression
+
+# Monitoring and logging
+structlog>=24.1.0            # Structured logging
+watchtower>=3.0.1            # CloudWatch logging handler

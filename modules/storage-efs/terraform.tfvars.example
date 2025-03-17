@@ -1,0 +1,30 @@
+# AWS Configuration
+aws_region = "ap-southeast-3"
+aws_account_id_source = "1234567890"
+aws_account_id_destination = "0987654321"
+
+# Environment
+workspace_name = "staging"
+department = "devops"
+prefix_name = "devopscorner"
+
+# VPC Configuration
+vpc_id = "vpc-1234567890"
+vpc_cidr = "10.0.0.0/16"
+private_subnet_ids = ["subnet-123", "subnet-456"]
+
+# EFS Settings
+performance_mode = "generalPurpose"
+throughput_mode = "bursting"
+transition_to_ia = "AFTER_30_DAYS"
+enable_backup = true
+
+# Access Point
+create_access_point = true
+access_point_path = "shared"
+
+# Monitoring
+storage_bytes_threshold = 500000000000  # 500GB
+io_limit_threshold = 70
+create_dashboard = true
+sns_topic_arn = "arn:aws:sns:ap-southeast-3:1234567890:efs-alerts"
