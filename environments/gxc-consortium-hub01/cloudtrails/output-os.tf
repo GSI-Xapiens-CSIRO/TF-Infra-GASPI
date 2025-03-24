@@ -64,10 +64,10 @@ output "vpc_security_group_id" {
 }
 
 # CloudWatch Integration Outputs
-output "cloudwatch_kinesis_firehose_role_arn" {
-  description = "The ARN of the IAM role used for CloudWatch to Kinesis integration"
-  value       = module.cloudtrail.cloudwatch_kinesis_firehose_role_arn
-}
+# output "cloudwatch_kinesis_firehose_role_arn" {
+#   description = "The ARN of the IAM role used for CloudWatch to Kinesis integration"
+#   value       = module.cloudtrail.cloudwatch_kinesis_firehose_role_arn
+# }
 
 # Monitoring URLs
 output "cloudwatch_monitoring_url" {

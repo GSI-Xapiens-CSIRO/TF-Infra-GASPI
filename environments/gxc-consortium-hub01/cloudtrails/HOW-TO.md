@@ -1,4 +1,4 @@
-# Terraform CloudTrails with OpenSearch for 111122223333
+# Terraform CloudTrails with OpenSearch for 112233445566
 
 ## How-to-Use
 
@@ -39,7 +39,7 @@
   $HOME/.aws/config
   ---
   [profile GXC-TF-User-Executor-Hub01]
-  role_arn = arn:aws:iam::111122223333:role/TF-Central-Role_111122223333
+  role_arn = arn:aws:iam::112233445566:role/TF-Central-Role_112233445566
   source_profile = GXC-TF-User-Executor-Hub01
   region = ap-southeast-3
   output = json

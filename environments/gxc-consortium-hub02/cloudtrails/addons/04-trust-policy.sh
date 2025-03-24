@@ -17,7 +17,7 @@ cat > trust-policy.json << 'EOF'
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:sts::112233445566:assumed-role/cp-sts-grant-role/swift-ap-southeast-3-prod-222233334444"
+        "AWS": "arn:aws:sts::222233334444:assumed-role/cp-sts-grant-role/swift-ap-southeast-3-prod-222233334444"
       },
       "Action": "sts:AssumeRole"
     },

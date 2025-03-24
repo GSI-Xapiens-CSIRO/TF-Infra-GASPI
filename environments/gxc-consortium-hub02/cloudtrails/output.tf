@@ -35,10 +35,10 @@ output "cloudtrail_sns_topic_arn" {
   value       = module.cloudtrail.cloudtrail_sns_topic_arn
 }
 
-output "athena_database" {
-  description = "Name of the Athena database for CloudTrail analysis"
-  value       = module.cloudtrail.athena_database
-}
+# output "athena_database" {
+#   description = "Name of the Athena database for CloudTrail analysis"
+#   value       = module.cloudtrail.athena_database
+# }
 
 output "cloudwatch_log_groups_sbeacon" {
   description = "List of CloudWatch log groups for Lambda functions"

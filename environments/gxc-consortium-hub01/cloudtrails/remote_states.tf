@@ -1,5 +1,5 @@
 # ==========================================================================
-#  111122223333 - CloudTrail: remote_states.tf
+#  112233445566 - CloudTrail: remote_states.tf
 # --------------------------------------------------------------------------
 #  Description
 # --------------------------------------------------------------------------
@@ -16,8 +16,8 @@ data "terraform_remote_state" "core_state" {
   workspace = local.env
 
   config = {
-    bucket  = "tf-state-111122223333-ap-southeast-3"
-    key     = "gxc-consortium/111122223333/core/terraform.tfstate"
+    bucket  = "tf-state-112233445566-ap-southeast-3"
+    key     = "gxc-consortium/112233445566/core/terraform.tfstate"
     region  = var.aws_region
     profile = var.aws_account_profile_destination
     # access_key = var.aws_access_key
