@@ -39,7 +39,7 @@
   $HOME/.aws/config
   ---
   [profile AWS-Cloud-TF-User]
-  role_arn = arn:aws:iam::111122223333:role/TF-Central-Role_111122223333
+  role_arn = arn:aws:iam::112233445566:role/TF-Central-Role_112233445566
   source_profile = AWS-Cloud-TF-User
   region = ap-southeast-3
   output = json

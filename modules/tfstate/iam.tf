@@ -41,7 +41,7 @@ data "aws_iam_policy_document" "bucket_policy" {
         "arn:aws:iam::586794473955:root",
         "arn:aws:iam::307946671795:root",
         "arn:aws:iam::864899849921:root",
-        "arn:aws:iam::222233334444:root"
+        "arn:aws:iam::127214202110:root"
       ]
     }
 
@@ -89,7 +89,7 @@ data "aws_iam_policy_document" "dynamodb_policy" {
         "arn:aws:iam::586794473955:root",
         "arn:aws:iam::307946671795:root",
         "arn:aws:iam::864899849921:root",
-        "arn:aws:iam::222233334444:root"
+        "arn:aws:iam::127214202110:root"
       ]
     }
 
