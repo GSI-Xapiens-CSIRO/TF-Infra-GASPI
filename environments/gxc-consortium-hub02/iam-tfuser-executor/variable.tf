@@ -63,13 +63,13 @@ variable "aws_account_id_destination" {
 variable "aws_account_profile_source" {
   description = "The AWS Profile management"
   type        = string
-  default     = "GXC-TF-User-Executor"
+  default     = "GXC-TF-User-Executor-Hub02-UAT"
 }
 
 variable "aws_account_profile_destination" {
   description = "The AWS Profile to deploy the Budget in"
   type        = string
-  default     = "GXC-TF-User-Executor"
+  default     = "GXC-TF-User-Executor-Hub02-UAT"
 }
 
 variable "aws_access_key" {
