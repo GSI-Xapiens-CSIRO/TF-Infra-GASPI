@@ -10,7 +10,7 @@ variable "prefix_name" {
 variable "allowed_role_arns" {
   description = "List of IAM role ARNs allowed to access the bucket"
   type        = list(string)
-  default     = ["arn:aws:iam::222233334444:group/gxc-developer_222233334444_staging"]
+  default     = ["arn:aws:iam::127214202110:group/gxc-developer_127214202110_staging"]
 }
 
 variable "log_retention_days" {
@@ -40,7 +40,7 @@ variable "enable_replication" {
 variable "replication_role_arn" {
   description = "ARN of IAM role for replication"
   type        = string
-  default     = "arn:aws:iam::222233334444:group/gxc-developer_222233334444_staging"
+  default     = "arn:aws:iam::127214202110:group/gxc-developer_127214202110_staging"
 }
 
 variable "destination_bucket_arn" {
