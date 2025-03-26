@@ -32,15 +32,15 @@
   ```
   $HOME/.aws/credentials
   ---
-  [GXC-TF-User-Executor-Hub02-UAT-Hub02-UAT]
+  [GXC-TF-User-Executor-Hub02-UAT]
   aws_access_key_id =
   aws_secret_access_key =
 
   $HOME/.aws/config
   ---
-  [profile GXC-TF-User-Executor-Hub02-UAT-Hub02-UAT]
+  [profile GXC-TF-User-Executor-Hub02-UAT]
   role_arn = arn:aws:iam::127214202110:role/TF-Central-Role_127214202110
-  source_profile = GXC-TF-User-Executor-Hub02-UAT-Hub02-UAT
+  source_profile = GXC-TF-User-Executor-Hub02-UAT
   region = ap-southeast-3
   output = json
   ```
@@ -50,7 +50,7 @@
   ```
   unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
 
-  export AWS_PROFILE=GXC-TF-User-Executor-Hub02-UAT-Hub02-UAT
+  export AWS_PROFILE=GXC-TF-User-Executor-Hub02-UAT
   export AWS_DEFAULT_REGION=ap-southeast-3
 
   aws sts get-caller-identity --profile $AWS_PROFILE
