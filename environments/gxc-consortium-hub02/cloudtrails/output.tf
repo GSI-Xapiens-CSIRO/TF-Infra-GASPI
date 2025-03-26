@@ -1,5 +1,5 @@
 # ==========================================================================
-#  Outputs: CloudTails Hub02
+#  Outputs: CloudTails Hub02-UAT
 # --------------------------------------------------------------------------
 #  Description:
 #    Output values for CloudTails implementation

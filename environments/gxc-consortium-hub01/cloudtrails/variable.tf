@@ -21,10 +21,10 @@ variable "kms_key" {
   type        = map(string)
   description = "KMS Key References"
   default = {
-    default = "arn:aws:kms:ap-southeast-3:112233445566:key/4e8f681c-be57-406f-8265-5c4c13b243ac"
-    lab     = "arn:aws:kms:ap-southeast-3:112233445566:key/4e8f681c-be57-406f-8265-5c4c13b243ac"
-    staging = "arn:aws:kms:ap-southeast-3:112233445566:key/4e8f681c-be57-406f-8265-5c4c13b243ac"
-    prod    = "arn:aws:kms:ap-southeast-3:112233445566:key/4e8f681c-be57-406f-8265-5c4c13b243ac"
+    default = "arn:aws:kms:ap-southeast-3:438465168484:key/HASH_KEY_NUMBER"
+    lab     = "arn:aws:kms:ap-southeast-3:438465168484:key/HASH_KEY_NUMBER"
+    staging = "arn:aws:kms:ap-southeast-3:438465168484:key/HASH_KEY_NUMBER"
+    prod    = "arn:aws:kms:ap-southeast-3:438465168484:key/HASH_KEY_NUMBER"
   }
 }
 
@@ -62,13 +62,13 @@ variable "aws_account_id_destination" {
 variable "aws_account_profile_source" {
   description = "The AWS Profile management"
   type        = string
-  default     = "GXC-TF-User-Executor-Hub01"
+  default     = "GXC-TF-User-Executor-Hub01-UAT"
 }
 
 variable "aws_account_profile_destination" {
   description = "The AWS Profile to deploy the Budget in"
   type        = string
-  default     = "GXC-TF-User-Executor-Hub01"
+  default     = "GXC-TF-User-Executor-Hub01-UAT"
 }
 
 variable "aws_access_key" {

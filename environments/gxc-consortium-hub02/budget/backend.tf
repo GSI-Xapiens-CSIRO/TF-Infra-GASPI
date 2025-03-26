@@ -1,5 +1,5 @@
 # ==========================================================================
-#  222233334444 - Budget: backend.tf (Storing tfstate)
+#  127214202110 - Budget: backend.tf (Storing tfstate)
 # --------------------------------------------------------------------------
 #  Description
 # --------------------------------------------------------------------------
@@ -13,9 +13,9 @@
 terraform {
   backend "s3" {
     region         = "ap-southeast-3"
-    bucket         = "tf-state-222233334444-ap-southeast-3"
-    dynamodb_table = "ddb-tf-state-222233334444-ap-southeast-3"
-    key            = "gxc-consortium/222233334444/budget/terraform.tfstate"
+    bucket         = "tf-state-127214202110-ap-southeast-3"
+    dynamodb_table = "ddb-tf-state-127214202110-ap-southeast-3"
+    key            = "gxc-consortium/127214202110/budget/terraform.tfstate"
     encrypt        = true
   }
 }

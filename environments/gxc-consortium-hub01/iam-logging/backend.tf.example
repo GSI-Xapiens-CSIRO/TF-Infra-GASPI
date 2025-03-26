@@ -1,5 +1,5 @@
 # ==========================================================================
-#  111122223333 - IAM Logging: backend.tf
+#  438465168484 - IAM Logging: backend.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Store Terraform State to S3
@@ -16,7 +16,7 @@ terraform {
     region         = "ap-southeast-3"
     bucket         = "tf-state-112233445566-ap-southeast-3"
     dynamodb_table = "ddb-tf-state-112233445566-ap-southeast-3"
-    key            = "gxc-consortium/111122223333/iam-logging/terraform.tfstate"
+    key            = "gxc-consortium/438465168484/iam-logging/terraform.tfstate"
     encrypt        = true
   }
 }

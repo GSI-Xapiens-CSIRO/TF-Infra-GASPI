@@ -1,5 +1,5 @@
 # ==========================================================================
-#  222233334444 - IAM Logging: variable.tf
+#  127214202110 - IAM Logging: variable.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Global Variable
@@ -56,19 +56,19 @@ variable "aws_account_id_source" {
 variable "aws_account_id_destination" {
   description = "The AWS Account ID to deploy the Budget in"
   type        = string
-  default     = "222233334444"
+  default     = "127214202110"
 }
 
 variable "aws_account_profile_source" {
   description = "The AWS Profile management"
   type        = string
-  default     = "GXC-TF-User-Executor"
+  default     = "GXC-TF-User-Executor-Hub02-UAT"
 }
 
 variable "aws_account_profile_destination" {
   description = "The AWS Profile to deploy the Budget in"
   type        = string
-  default     = "GXC-TF-User-Executor-Hub01"
+  default     = "GXC-TF-User-Executor-Hub02-UAT-Hub01"
 }
 
 variable "aws_access_key" {

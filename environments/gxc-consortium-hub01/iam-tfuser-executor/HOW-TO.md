@@ -1,4 +1,4 @@
-# Terraform IAM TF-Executor-User for 111122223333
+# Terraform IAM TF-Executor-User for 438465168484
 
 ## How-to-Use
 
@@ -32,15 +32,15 @@
   ```
   $HOME/.aws/credentials
   ---
-  [GXC-TF-User-Executor]
+  [GXC-TF-User-Executor-Hub01-UAT]
   aws_access_key_id =
   aws_secret_access_key =
 
   $HOME/.aws/config
   ---
-  [profile GXC-TF-User-Executor]
-  role_arn = arn:aws:iam::111122223333:role/TF-Central-Role_111122223333
-  source_profile = GXC-TF-User-Executor
+  [profile GXC-TF-User-Executor-Hub01-UAT]
+  role_arn = arn:aws:iam::438465168484:role/TF-Central-Role_438465168484
+  source_profile = GXC-TF-User-Executor-Hub01-UAT
   region = ap-southeast-3
   output = json
   ```
@@ -50,7 +50,7 @@
   ```
   unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
 
-  export AWS_PROFILE=GXC-TF-User-Executor
+  export AWS_PROFILE=GXC-TF-User-Executor-Hub01-UAT
   export AWS_DEFAULT_REGION=ap-southeast-3
 
   aws sts get-caller-identity --profile $AWS_PROFILE
