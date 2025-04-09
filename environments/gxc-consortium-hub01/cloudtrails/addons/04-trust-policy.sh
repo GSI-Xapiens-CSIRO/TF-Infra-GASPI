@@ -17,14 +17,7 @@ cat > trust-policy.json << 'EOF'
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:sts::112233445566:assumed-role/cp-sts-grant-role/swift-ap-southeast-3-prod-127214202110"
-      },
-      "Action": "sts:AssumeRole"
-    },
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::127214202110:root"
+        "AWS": "arn:aws:iam::438465168484:root"
       },
       "Action": "sts:AssumeRole"
     }
@@ -56,7 +49,7 @@ cat > role-policy.json << 'EOF'
         "s3:ListBucketMultipartUploads",
         "s3:ListBucketVersions"
       ],
-      "Resource": "arn:aws:s3:::genomic-snapshot-127214202110"
+      "Resource": "arn:aws:s3:::genomic-snapshot-438465168484"
     },
     {
       "Effect": "Allow",
@@ -67,7 +60,7 @@ cat > role-policy.json << 'EOF'
         "s3:AbortMultipartUpload",
         "s3:ListMultipartUploadParts"
       ],
-      "Resource": "arn:aws:s3:::genomic-snapshot-127214202110/*"
+      "Resource": "arn:aws:s3:::genomic-snapshot-438465168484/*"
     }
   ]
 }
