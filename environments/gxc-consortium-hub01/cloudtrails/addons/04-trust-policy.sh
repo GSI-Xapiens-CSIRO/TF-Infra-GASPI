@@ -17,6 +17,13 @@ cat > trust-policy.json << 'EOF'
     {
       "Effect": "Allow",
       "Principal": {
+        "AWS": "arn:aws:sts::480756163420:assumed-role/cp-sts-grant-role/swift-ap-southeast-3-prod-438465168484"
+      },
+      "Action": "sts:AssumeRole"
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
         "AWS": "arn:aws:iam::438465168484:root"
       },
       "Action": "sts:AssumeRole"
@@ -50,13 +57,6 @@ cat > role-policy.json << 'EOF'
         "s3:ListBucketVersions"
       ],
       "Resource": "arn:aws:s3:::genomic-snapshot-438465168484"
-    },
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:sts::480756163420:assumed-role/cp-sts-grant-role/swift-ap-southeast-3-prod-438465168484"
-      },
-      "Action": "sts:AssumeRole"
     },
     {
       "Effect": "Allow",
