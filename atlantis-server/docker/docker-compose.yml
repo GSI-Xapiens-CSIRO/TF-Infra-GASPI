@@ -80,7 +80,7 @@ services:
       dockerfile: Dockerfile
       args:
         PYTHON_VERSION: 3.12
-    # image: ${ATLANTIS_IMAGE:-463470956521.dkr.ecr.ap-southeast-3.amazonaws.com/gxc/atlantis-sbeacon}:${ATLANTIS_VERSION:-latest}
+    # image: ${ATLANTIS_IMAGE:-YOUR_AWS_ACCOUNT.dkr.ecr.ap-southeast-3.amazonaws.com/gxc/atlantis-sbeacon}:${ATLANTIS_VERSION:-latest}
     container_name: ${CONTAINER_ATLANTIS:-gxc_atlantis}
     restart: unless-stopped
     ports:
@@ -127,13 +127,13 @@ services:
     environment:
       # GitHub Configuration
       - ATLANTIS_GH_HOSTNAME=github.com
-      - ATLANTIS_GH_USER=${ATLANTIS_GH_USER:-devopsxti}
+      - ATLANTIS_GH_USER=${ATLANTIS_GH_USER:-gxc-gh-user}
       - ATLANTIS_GH_TOKEN=${ATLANTIS_GH_TOKEN}
       - ATLANTIS_GH_WEBHOOK_SECRET=${ATLANTIS_GH_WEBHOOK_SECRET}
       # Web Configuration
-      - ATLANTIS_WEB_HOSTNAME=${ATLANTIS_WEB_HOSTNAME:-atlantis-gxc.xapiens.id}
+      - ATLANTIS_WEB_HOSTNAME=${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
       - ATLANTIS_PORT=${PORT_ATLANTIS:-4141}
-      - ATLANTIS_ATLANTIS_URL=https://${ATLANTIS_WEB_HOSTNAME:-atlantis-gxc.xapiens.id}
+      - ATLANTIS_ATLANTIS_URL=https://${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
       # AWS Configuration
       - AWS_REGION=${AWS_REGION:-ap-southeast-3}
       - AWS_SHARED_CREDENTIALS_FILE=/home/atlantis/.aws/credentials
@@ -204,7 +204,7 @@ services:
       - ${DATA_NGINX:-/opt/data/docker/nginx}/ssl:/etc/nginx/ssl
       - ${DATA_NGINX:-/opt/data/docker/nginx}/logs:/var/log/nginx
     environment:
-      - NGINX_HOST=${ATLANTIS_WEB_HOSTNAME:-atlantis-gxc.xapiens.id}
+      - NGINX_HOST=${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
       - NGINX_PORT=80
     depends_on:
       - atlantis
