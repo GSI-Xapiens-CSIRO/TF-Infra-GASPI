@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - IAM: variable.tf
+#  460722568061 - IAM: variable.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Global Variable
@@ -21,10 +21,10 @@ variable "kms_key" {
   type        = map(string)
   description = "KMS Key References"
   default = {
-    default = "arn:aws:kms:ap-southeast-3:YOUR_AWS_ACCOUNT:key/HASH_NUMBER"
-    lab     = "arn:aws:kms:ap-southeast-3:YOUR_AWS_ACCOUNT:key/HASH_NUMBER"
-    staging = "arn:aws:kms:ap-southeast-3:YOUR_AWS_ACCOUNT:key/HASH_NUMBER"
-    prod    = "arn:aws:kms:ap-southeast-3:YOUR_AWS_ACCOUNT:key/HASH_NUMBER"
+    default = "arn:aws:kms:ap-southeast-3:460722568061:key/HASH_NUMBER"
+    lab     = "arn:aws:kms:ap-southeast-3:460722568061:key/HASH_NUMBER"
+    staging = "arn:aws:kms:ap-southeast-3:460722568061:key/HASH_NUMBER"
+    prod    = "arn:aws:kms:ap-southeast-3:460722568061:key/HASH_NUMBER"
   }
 }
 
@@ -50,13 +50,13 @@ variable "aws_region" {
 variable "aws_account_id_source" {
   description = "The AWS Account ID management"
   type        = string
-  default     = "YOUR_AWS_ACCOUNT"
+  default     = "460722568061"
 }
 
 variable "aws_account_id_destination" {
   description = "The AWS Account ID to deploy the Budget in"
   type        = string
-  default     = "YOUR_AWS_ACCOUNT"
+  default     = "460722568061"
 }
 
 variable "aws_account_profile_source" {

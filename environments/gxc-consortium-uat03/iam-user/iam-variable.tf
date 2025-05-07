@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - IAM: iam-variable.tf
+#  460722568061 - IAM: iam-variable.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    IAM Variable
@@ -48,7 +48,7 @@ variable "policy_gxc_administrator" {
 variable "tf_user_executor" {
   description = "TF User Executor"
   type        = string
-  default     = "TF-User-Executor-YOUR_AWS_ACCOUNT"
+  default     = "TF-User-Executor-460722568061"
 }
 
 # --------------------------------------------------------------------------

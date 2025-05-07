@@ -11,7 +11,7 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::YOUR_AWS_ACCOUNT:root"
+        "AWS": "arn:aws:iam::460722568061:root"
       },
       "Action": "sts:AssumeRole"
     }

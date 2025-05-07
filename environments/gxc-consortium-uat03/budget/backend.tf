@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - Budget: backend.tf (Storing tfstate)
+#  460722568061 - Budget: backend.tf (Storing tfstate)
 # --------------------------------------------------------------------------
 #  Description
 # --------------------------------------------------------------------------
@@ -13,9 +13,9 @@
 terraform {
   backend "s3" {
     region         = "ap-southeast-3"
-    bucket         = "tf-state-YOUR_AWS_ACCOUNT-ap-southeast-3"
-    dynamodb_table = "ddb-tf-state-YOUR_AWS_ACCOUNT-ap-southeast-3"
-    key            = "gxc-consortium/YOUR_AWS_ACCOUNT/budget/terraform.tfstate"
+    bucket         = "tf-state-460722568061-ap-southeast-3"
+    dynamodb_table = "ddb-tf-state-460722568061-ap-southeast-3"
+    key            = "gxc-consortium/460722568061/budget/terraform.tfstate"
     encrypt        = true
   }
 }

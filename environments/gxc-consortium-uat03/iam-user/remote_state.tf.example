@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - IAM: remote_states.tf (Remote Terraform References)
+#  460722568061 - IAM: remote_states.tf (Remote Terraform References)
 # --------------------------------------------------------------------------
 #  Description
 # --------------------------------------------------------------------------
@@ -16,8 +16,8 @@ data "terraform_remote_state" "tfstate_remote" {
   workspace = local.env
 
   config = {
-    bucket  = "tf-state-YOUR_AWS_ACCOUNT-ap-southeast-3"
-    key     = "gxc-consortium/YOUR_AWS_ACCOUNT/tfstate/terraform.tfstate"
+    bucket  = "tf-state-460722568061-ap-southeast-3"
+    key     = "gxc-consortium/460722568061/tfstate/terraform.tfstate"
     region  = var.aws_region
     profile = var.aws_account_profile_source
   }

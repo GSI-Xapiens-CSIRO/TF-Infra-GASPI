@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - Budget: main.tf
+#  460722568061 - Budget: main.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Main Terraform Module
@@ -12,7 +12,7 @@
 #  Reuse Modules: Budget
 # --------------------------------------------------------------------------
 module "budget" {
-  source = "../../../../modules//budget"
+  source = "../../../modules//budget"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source

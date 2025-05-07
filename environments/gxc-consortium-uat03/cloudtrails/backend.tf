@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - CloudTrails: backend.tf
+#  460722568061 - CloudTrails: backend.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Store Terraform State to S3
@@ -14,9 +14,9 @@
 terraform {
   backend "s3" {
     region         = "ap-southeast-3"
-    bucket         = "tf-state-YOUR_AWS_ACCOUNT-ap-southeast-3"
-    dynamodb_table = "ddb-tf-state-YOUR_AWS_ACCOUNT-ap-southeast-3"
-    key            = "gxc-consortium/YOUR_AWS_ACCOUNT/cloudtrails/terraform.tfstate"
+    bucket         = "tf-state-460722568061-ap-southeast-3"
+    dynamodb_table = "ddb-tf-state-460722568061-ap-southeast-3"
+    key            = "gxc-consortium/460722568061/cloudtrails/terraform.tfstate"
     encrypt        = true
   }
 }

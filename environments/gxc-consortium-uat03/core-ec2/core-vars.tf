@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - Core: core-vars.tf
+#  460722568061 - Core: core-vars.tf
 # --------------------------------------------------------------------------
 #  Description
 #    Core Infrastructure Spesific Variable

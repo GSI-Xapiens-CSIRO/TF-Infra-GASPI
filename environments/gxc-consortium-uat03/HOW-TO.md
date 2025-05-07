@@ -1,4 +1,4 @@
-# Terraform Import AWS Account YOUR_AWS_ACCOUNT (Terraformer)
+# Terraform Import AWS Account 460722568061 (Terraformer)
 
 Reverse Engineer AWS Account Configuration using Terraform
 
@@ -41,7 +41,7 @@ Reverse Engineer AWS Account Configuration using Terraform
   $HOME/.aws/config
   ---
   [profile GXC-TF-User-Executor]
-  role_arn = arn:aws:iam::YOUR_AWS_ACCOUNT:role/TF-Central-Role_YOUR_AWS_ACCOUNT
+  role_arn = arn:aws:iam::460722568061:role/TF-Central-Role_460722568061
   source_profile = GXC-TF-User-Executor-UAT03
   region = ap-southeast-3
   output = json

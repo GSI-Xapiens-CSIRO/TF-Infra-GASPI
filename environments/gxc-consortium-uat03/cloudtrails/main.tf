@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - CloudTrails: main.tf
+#  460722568061 - CloudTrails: main.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Main Terraform Module
@@ -28,7 +28,7 @@ locals {
 }
 
 # module "cloudtrail" {
-#   source = "../../../../modules/audit/cloudtrails"
+#   source = "../../../modules/audit/cloudtrails"
 #   providers = {
 #     aws = aws
 #   }
@@ -51,7 +51,7 @@ locals {
 # }
 
 module "cloudtrail" {
-  source = "../../../../modules/audit//cloudtrails-opensearch"
+  source = "../../../modules/audit//cloudtrails-opensearch"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source
@@ -89,8 +89,8 @@ module "cloudtrail" {
   opensearch_instance_type   = local.env == "prod" ? "m5.large.search" : "t3.medium.search"
   opensearch_instance_count  = local.env == "prod" ? 3 : 2
   opensearch_master_user     = "gxc-admin"
-  opensearch_master_email    = "devops@xapiens.id"
-  opensearch_master_password = "GXC4dm1n-S3cr3t"
+  opensearch_master_email    = "devops@example.com"
+  opensearch_master_password = "R4nd0m-P4ssW0Rd"
   opensearch_volume_size     = local.env == "prod" ? 300 : 150
 
   allowed_ips = [
@@ -103,28 +103,28 @@ module "cloudtrail" {
   cognito_users = [
     {
       username = "gxc-admin"
-      password = "GXC4dm1n-S3cr3t"
+      password = "R4nd0m-P4ssW0Rd"
       groups   = ["Administrators"]
       attributes = {
-        email          = "devops@xapiens.id"
+        email          = "devops@example.com"
         email_verified = "true"
       }
     },
     {
-      username = "xti-denni"
-      password = "GXC4dm1n-S3cr3t"
+      username = "admin01"
+      password = "R4nd0m-P4ssW0Rd"
       groups   = ["Administrators"]
       attributes = {
-        email          = "dwi.denni@xapiens.id"
+        email          = "admin01@example.com"
         email_verified = "true"
       }
     },
     {
-      username = "xti-dian"
-      password = "GXC4dm1n-S3cr3t"
+      username = "admin02"
+      password = "R4nd0m-P4ssW0Rd"
       groups   = ["Administrators"]
       attributes = {
-        email          = "dian.larasaty@xapiens.id"
+        email          = "admin02@example.com"
         email_verified = "true"
       }
     }
@@ -132,7 +132,7 @@ module "cloudtrail" {
 }
 
 module "s3_snapshot" {
-  source = "../../../../modules//storage-s3"
+  source = "../../../modules//storage-s3"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source

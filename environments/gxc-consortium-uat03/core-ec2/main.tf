@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - Core: main.tf
+#  460722568061 - Core: main.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Main Terraform Module
@@ -32,7 +32,7 @@ locals {
 #  Reuse Module: Core
 # --------------------------------------------------------------------------
 module "core" {
-  source = "../../../../modules//core-igw-ec2"
+  source = "../../../modules//core-igw-ec2"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source

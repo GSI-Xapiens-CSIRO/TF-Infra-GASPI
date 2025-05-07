@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - IAM: main.tf
+#  460722568061 - IAM: main.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Main Terraform Module
@@ -31,7 +31,7 @@ locals {
 #  Reuse Module: IAM-User
 # --------------------------------------------------------------------------
 module "iam-user" {
-  source = "../../../../modules//iam-user"
+  source = "../../../modules//iam-user"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source

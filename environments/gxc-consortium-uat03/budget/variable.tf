@@ -1,5 +1,5 @@
 # ==========================================================================
-#  YOUR_AWS_ACCOUNT - Budget: variable.tf
+#  460722568061 - Budget: variable.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Global Variable
@@ -24,13 +24,13 @@ variable "aws_region" {
 variable "aws_account_id_source" {
   description = "The AWS Account ID management"
   type        = string
-  default     = "YOUR_AWS_ACCOUNT"
+  default     = "460722568061"
 }
 
 variable "aws_account_id_destination" {
   description = "The AWS Account ID to deploy the Budget in"
   type        = string
-  default     = "YOUR_AWS_ACCOUNT"
+  default     = "460722568061"
 }
 
 variable "aws_account_profile_source" {

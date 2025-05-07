@@ -3,7 +3,7 @@
 python ossrm-setup.py \
   --endpoint "https://search-opensearch-127214202110-ezdw7b4jcnjyrmsue6tc3x75n4.ap-southeast-3.es.amazonaws.com" \
   --username "gxc-admin" \
-  --password "GXC4dm1n-S3cr3t" \
+  --password "R4nd0m-P4ssW0Rd" \
   --role-arn "arn:aws:iam::127214202110:role/opensearch-master-role" \
   --no-verify-ssl
 
