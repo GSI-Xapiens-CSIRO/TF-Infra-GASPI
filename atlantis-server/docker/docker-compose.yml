@@ -96,34 +96,12 @@ services:
       # Atlantis configuration
       - ${DATA_ATLANTIS:-/opt/data/docker/atlantis}/atlantis.yaml:/atlantis/atlantis.yaml:ro
       - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/repo.yaml:/atlantis/repo.yaml:ro
-      # Project DEV configurations
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub01/backend.tf:/atlantis/sbeacon/hub01/backend.tf:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub01/backend.tfvars:/atlantis/sbeacon/hub01/backend.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub01/hub01.tfvars:/atlantis/sbeacon/hub01/hub01.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub02/backend.tf:/atlantis/sbeacon/hub02/backend.tf:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub02/backend.tfvars:/atlantis/sbeacon/hub02/backend.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub02/hub02.tfvars:/atlantis/sbeacon/hub02/hub02.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub03/backend.tf:/atlantis/sbeacon/hub03/backend.tf:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub03/backend.tfvars:/atlantis/sbeacon/hub03/backend.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub03/hub03.tfvars:/atlantis/sbeacon/hub03/hub03.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub04/backend.tf:/atlantis/sbeacon/hub04/backend.tf:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub04/backend.tfvars:/atlantis/sbeacon/hub04/backend.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/hub04/hub04.tfvars:/atlantis/sbeacon/hub04/hub04.tfvars:ro
-      # Project UAT configurations
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat01/backend.tf:/atlantis/sbeacon/uat01/backend.tf:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat01/backend.tfvars:/atlantis/sbeacon/uat01/backend.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat01/uat01.tfvars:/atlantis/sbeacon/uat01/uat01.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat02/backend.tf:/atlantis/sbeacon/uat02/backend.tf:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat02/backend.tfvars:/atlantis/sbeacon/uat02/backend.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat02/uat02.tfvars:/atlantis/sbeacon/uat02/uat02.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat03/backend.tf:/atlantis/sbeacon/uat03/backend.tf:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat03/backend.tfvars:/atlantis/sbeacon/uat03/backend.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat03/uat03.tfvars:/atlantis/sbeacon/uat03/uat03.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat04/backend.tf:/atlantis/sbeacon/uat04/backend.tf:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat04/backend.tfvars:/atlantis/sbeacon/uat04/backend.tfvars:ro
-      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/uat04/uat04.tfvars:/atlantis/sbeacon/uat04/uat04.tfvars:ro
-      # Data directory
-      - ${DATA_ATLANTIS:-/opt/data/docker/atlantis}/data:/atlantis-data
+      # Project configuration
+      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}:/atlantis/config:ro
+      # Atlantis CI/CD Path
+      - ${DATA_ATLANTIS_SRC:-/opt/data/docker/atlantis/src}:/home/atlantis/.atlantis/repos
+      # Atlantis Template
+      - ${DATA_ATLANTIS:-/opt/data/docker/atlantis}/template:/home/atlantis/.atlantis/repos/template
     environment:
       # GitHub Configuration
       - ATLANTIS_GH_HOSTNAME=github.com

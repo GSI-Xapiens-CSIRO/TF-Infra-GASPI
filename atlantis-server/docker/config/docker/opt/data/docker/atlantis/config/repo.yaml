@@ -27,46 +27,19 @@ workflows:
           aws sts get-caller-identity
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/hub01/backend.tf .
-          cp /atlantis/sbeacon/hub01/backend.tfvars .
-          cp /atlantis/sbeacon/hub01/hub01.tfvars .
+          cp /atlantis/config/hub01/backend.tf .
+          cp /atlantis/config/hub01/backend.tfvars .
+          cp /atlantis/config/hub01/hub01.tfvars .
 
-          echo "Initializing sBeacon & sVEP..."
-          bash ./init.sh
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
-
-          terraform plan -var-file=hub01.tfvars
-    apply:
-      steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-HUB01
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-          aws sts get-caller-identity --profile $AWS_PROFILE
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
-
-          echo "Using existing backend config..."
-          cp /atlantis/sbeacon/hub01/backend.tf .
-          cp /atlantis/sbeacon/hub01/backend.tfvars .
-          cp /atlantis/sbeacon/hub01/hub01.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          bash ./init.sh
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform apply -var-file=hub01.tfvars -auto-approve
 
   # HUB01 Account Workflows
   hub01-workflow:
@@ -85,15 +58,20 @@ workflows:
           aws sts get-caller-identity
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/hub01/backend.tf .
-          cp /atlantis/sbeacon/hub01/backend.tfvars .
-          cp /atlantis/sbeacon/hub01/hub01.tfvars .
+          cp /atlantis/config/hub01/backend.tf .
+          cp /atlantis/config/hub01/backend.tfvars .
+          cp /atlantis/config/hub01/hub01.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -111,15 +89,20 @@ workflows:
           aws sts get-caller-identity --profile $AWS_PROFILE
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/hub01/backend.tf .
-          cp /atlantis/sbeacon/hub01/backend.tfvars .
-          cp /atlantis/sbeacon/hub01/hub01.tfvars .
+          cp /atlantis/config/hub01/backend.tf .
+          cp /atlantis/config/hub01/backend.tfvars .
+          cp /atlantis/config/hub01/hub01.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -143,15 +126,20 @@ workflows:
           aws sts get-caller-identity
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/hub02/backend.tf .
-          cp /atlantis/sbeacon/hub02/backend.tfvars .
-          cp /atlantis/sbeacon/hub02/hub02.tfvars .
+          cp /atlantis/config/hub02/backend.tf .
+          cp /atlantis/config/hub02/backend.tfvars .
+          cp /atlantis/config/hub02/hub02.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -169,15 +157,20 @@ workflows:
           aws sts get-caller-identity --profile $AWS_PROFILE
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/hub02/backend.tf .
-          cp /atlantis/sbeacon/hub02/backend.tfvars .
-          cp /atlantis/sbeacon/hub02/hub02.tfvars .
+          cp /atlantis/config/hub02/backend.tf .
+          cp /atlantis/config/hub02/backend.tfvars .
+          cp /atlantis/config/hub02/hub02.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -201,15 +194,20 @@ workflows:
           aws sts get-caller-identity
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/hub03/backend.tf .
-          cp /atlantis/sbeacon/hub03/backend.tfvars .
-          cp /atlantis/sbeacon/hub03/hub03.tfvars .
+          cp /atlantis/config/hub03/backend.tf .
+          cp /atlantis/config/hub03/backend.tfvars .
+          cp /atlantis/config/hub03/hub03.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -227,15 +225,20 @@ workflows:
           aws sts get-caller-identity --profile $AWS_PROFILE
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/hub03/backend.tf .
-          cp /atlantis/sbeacon/hub03/backend.tfvars .
-          cp /atlantis/sbeacon/hub03/hub03.tfvars .
+          cp /atlantis/config/hub03/backend.tf .
+          cp /atlantis/config/hub03/backend.tfvars .
+          cp /atlantis/config/hub03/hub03.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -259,15 +262,20 @@ workflows:
           aws sts get-caller-identity
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/hub04/backend.tf .
-          cp /atlantis/sbeacon/hub04/backend.tfvars .
-          cp /atlantis/sbeacon/hub04/hub04.tfvars .
+          cp /atlantis/config/hub04/backend.tf .
+          cp /atlantis/config/hub04/backend.tfvars .
+          cp /atlantis/config/hub04/hub04.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -285,15 +293,20 @@ workflows:
           aws sts get-caller-identity --profile $AWS_PROFILE
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/hub04/backend.tf .
-          cp /atlantis/sbeacon/hub04/backend.tfvars .
-          cp /atlantis/sbeacon/hub04/hub04.tfvars .
+          cp /atlantis/config/hub04/backend.tf .
+          cp /atlantis/config/hub04/backend.tfvars .
+          cp /atlantis/config/hub04/hub04.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -317,15 +330,20 @@ workflows:
           aws sts get-caller-identity
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/uat01/backend.tf .
-          cp /atlantis/sbeacon/uat01/backend.tfvars .
-          cp /atlantis/sbeacon/uat01/uat01.tfvars .
+          cp /atlantis/config/uat01/backend.tf .
+          cp /atlantis/config/uat01/backend.tfvars .
+          cp /atlantis/config/uat01/uat01.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -343,15 +361,20 @@ workflows:
           aws sts get-caller-identity --profile $AWS_PROFILE
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/uat01/backend.tf .
-          cp /atlantis/sbeacon/uat01/backend.tfvars .
-          cp /atlantis/sbeacon/uat01/uat01.tfvars .
+          cp /atlantis/config/uat01/backend.tf .
+          cp /atlantis/config/uat01/backend.tfvars .
+          cp /atlantis/config/uat01/uat01.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -375,15 +398,20 @@ workflows:
           aws sts get-caller-identity
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/uat02/backend.tf .
-          cp /atlantis/sbeacon/uat02/backend.tfvars .
-          cp /atlantis/sbeacon/uat02/uat02.tfvars .
+          cp /atlantis/config/uat02/backend.tf .
+          cp /atlantis/config/uat02/backend.tfvars .
+          cp /atlantis/config/uat02/uat02.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -401,15 +429,20 @@ workflows:
           aws sts get-caller-identity --profile $AWS_PROFILE
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/uat02/backend.tf .
-          cp /atlantis/sbeacon/uat02/backend.tfvars .
-          cp /atlantis/sbeacon/uat02/uat02.tfvars .
+          cp /atlantis/config/uat02/backend.tf .
+          cp /atlantis/config/uat02/backend.tfvars .
+          cp /atlantis/config/uat02/uat02.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -433,15 +466,20 @@ workflows:
           aws sts get-caller-identity
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/uat03/backend.tf .
-          cp /atlantis/sbeacon/uat03/backend.tfvars .
-          cp /atlantis/sbeacon/uat03/uat03.tfvars .
+          cp /atlantis/config/uat03/backend.tf .
+          cp /atlantis/config/uat03/backend.tfvars .
+          cp /atlantis/config/uat03/uat03.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -459,15 +497,20 @@ workflows:
           aws sts get-caller-identity --profile $AWS_PROFILE
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/uat03/backend.tf .
-          cp /atlantis/sbeacon/uat03/backend.tfvars .
-          cp /atlantis/sbeacon/uat03/uat03.tfvars .
+          cp /atlantis/config/uat03/backend.tf .
+          cp /atlantis/config/uat03/backend.tfvars .
+          cp /atlantis/config/uat03/uat03.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -491,15 +534,20 @@ workflows:
           aws sts get-caller-identity
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/uat04/backend.tf .
-          cp /atlantis/sbeacon/uat04/backend.tfvars .
-          cp /atlantis/sbeacon/uat04/uat04.tfvars .
+          cp /atlantis/config/uat04/backend.tf .
+          cp /atlantis/config/uat04/backend.tfvars .
+          cp /atlantis/config/uat04/uat04.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
@@ -517,15 +565,20 @@ workflows:
           aws sts get-caller-identity --profile $AWS_PROFILE
 
           echo "Initializing submodule sbeacon & svep ..."
-          git submodule update --init --recursive
+          git submodule init
+          git submodule update
 
           echo "Using existing backend config..."
-          cp /atlantis/sbeacon/uat04/backend.tf .
-          cp /atlantis/sbeacon/uat04/backend.tfvars .
-          cp /atlantis/sbeacon/uat04/uat04.tfvars .
+          cp /atlantis/config/uat04/backend.tf .
+          cp /atlantis/config/uat04/backend.tfvars .
+          cp /atlantis/config/uat04/uat04.tfvars .
 
           echo "Initializing sBeacon & sVEP..."
+          echo ">> Running at: $(pwd)"
           bash ./init.sh
+
+          echo "Check Path..."
+          echo ">> Running at: $(pwd)"
 
           echo "Initializing Terraform..."
           terraform init -backend-config=backend.tfvars
