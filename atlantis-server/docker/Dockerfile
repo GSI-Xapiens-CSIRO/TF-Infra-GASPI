@@ -181,6 +181,8 @@ RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.
 
 COPY config/docker/home /home
 COPY config/docker/etc /etc
+COPY config/docker/opt /opt
+COPY config/docker/usr /usr
 COPY docker-entrypoint.sh /home/atlantis
 
 # Switch to atlantis user

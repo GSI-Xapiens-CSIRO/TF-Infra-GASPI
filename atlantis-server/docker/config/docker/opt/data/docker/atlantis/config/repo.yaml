@@ -6,581 +6,79 @@ repos:
   allowed_overrides: [workflow, plan_requirements, apply_requirements]
   allow_custom_workflows: true
   delete_source_branch_on_merge: true
-  workflow: default
+  workflow: dynamic-workflow
 
-# Workflow definitions
 workflows:
-  # Base Workflow Template
-  default:
+  dynamic-workflow:
     plan:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-HUB01
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
+      - run: atlantis-deploy hub01 plan
+    apply:
+      steps:
+      - run: atlantis-deploy hub01 apply
 
-          # Get AWS credentials
-          eval $(aws configure export-credentials --profile $AWS_PROFILE --format env)
-          aws sts get-caller-identity
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/hub01/backend.tf .
-          cp /atlantis/config/hub01/backend.tfvars .
-          cp /atlantis/config/hub01/hub01.tfvars .
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-  # HUB01 Account Workflows
+  # HUB Workflows
   hub01-workflow:
     plan:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-HUB01
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-
-          # Get AWS credentials
-          eval $(aws configure export-credentials --profile $AWS_PROFILE --format env)
-          aws sts get-caller-identity
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/hub01/backend.tf .
-          cp /atlantis/config/hub01/backend.tfvars .
-          cp /atlantis/config/hub01/hub01.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform plan -var-file=hub01.tfvars
+      - run: atlantis-deploy hub01 plan
     apply:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-HUB01
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-          aws sts get-caller-identity --profile $AWS_PROFILE
+      - run: atlantis-deploy hub01 apply
 
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/hub01/backend.tf .
-          cp /atlantis/config/hub01/backend.tfvars .
-          cp /atlantis/config/hub01/hub01.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform apply -var-file=hub01.tfvars -auto-approve
-
-  # HUB02 Account Workflows
   hub02-workflow:
     plan:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-HUB02
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-
-          # Get AWS credentials
-          eval $(aws configure export-credentials --profile $AWS_PROFILE --format env)
-          aws sts get-caller-identity
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/hub02/backend.tf .
-          cp /atlantis/config/hub02/backend.tfvars .
-          cp /atlantis/config/hub02/hub02.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform plan -var-file=hub02.tfvars
+      - run: atlantis-deploy hub02 plan
     apply:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-HUB02
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-          aws sts get-caller-identity --profile $AWS_PROFILE
+      - run: atlantis-deploy hub02 apply
 
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/hub02/backend.tf .
-          cp /atlantis/config/hub02/backend.tfvars .
-          cp /atlantis/config/hub02/hub02.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform apply -var-file=hub02.tfvars -auto-approve
-
-  # HUB03 Account Workflows
   hub03-workflow:
     plan:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-HUB03
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-
-          # Get AWS credentials
-          eval $(aws configure export-credentials --profile $AWS_PROFILE --format env)
-          aws sts get-caller-identity
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/hub03/backend.tf .
-          cp /atlantis/config/hub03/backend.tfvars .
-          cp /atlantis/config/hub03/hub03.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform plan -var-file=hub03.tfvars
+      - run: atlantis-deploy hub03 plan
     apply:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-HUB03
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-          aws sts get-caller-identity --profile $AWS_PROFILE
+      - run: atlantis-deploy hub03 apply
 
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/hub03/backend.tf .
-          cp /atlantis/config/hub03/backend.tfvars .
-          cp /atlantis/config/hub03/hub03.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform apply -var-file=hub03.tfvars -auto-approve
-
-  # HUB04 Account Workflows
   hub04-workflow:
     plan:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-HUB04
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-
-          # Get AWS credentials
-          eval $(aws configure export-credentials --profile $AWS_PROFILE --format env)
-          aws sts get-caller-identity
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/hub04/backend.tf .
-          cp /atlantis/config/hub04/backend.tfvars .
-          cp /atlantis/config/hub04/hub04.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform plan -var-file=hub04.tfvars
+      - run: atlantis-deploy hub04 plan
     apply:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-HUB04
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-          aws sts get-caller-identity --profile $AWS_PROFILE
+      - run: atlantis-deploy hub04 apply
 
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/hub04/backend.tf .
-          cp /atlantis/config/hub04/backend.tfvars .
-          cp /atlantis/config/hub04/hub04.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform apply -var-file=hub04.tfvars -auto-approve
-
-  # UAT01 Account Workflows
+  # UAT Workflows
   uat01-workflow:
     plan:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-UAT01
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-
-          # Get AWS credentials
-          eval $(aws configure export-credentials --profile $AWS_PROFILE --format env)
-          aws sts get-caller-identity
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/uat01/backend.tf .
-          cp /atlantis/config/uat01/backend.tfvars .
-          cp /atlantis/config/uat01/uat01.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform plan -var-file=uat01.tfvars
+      - run: atlantis-deploy uat01 plan
     apply:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-UAT01
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-          aws sts get-caller-identity --profile $AWS_PROFILE
+      - run: atlantis-deploy uat01 apply
 
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/uat01/backend.tf .
-          cp /atlantis/config/uat01/backend.tfvars .
-          cp /atlantis/config/uat01/uat01.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform apply -var-file=uat01.tfvars -auto-approve
-
-  # UAT02 Account Workflows
   uat02-workflow:
     plan:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-UAT02
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-
-          # Get AWS credentials
-          eval $(aws configure export-credentials --profile $AWS_PROFILE --format env)
-          aws sts get-caller-identity
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/uat02/backend.tf .
-          cp /atlantis/config/uat02/backend.tfvars .
-          cp /atlantis/config/uat02/uat02.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform plan -var-file=uat02.tfvars
+      - run: atlantis-deploy uat02 plan
     apply:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-UAT02
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-          aws sts get-caller-identity --profile $AWS_PROFILE
+      - run: atlantis-deploy uat02 apply
 
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/uat02/backend.tf .
-          cp /atlantis/config/uat02/backend.tfvars .
-          cp /atlantis/config/uat02/uat02.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform apply -var-file=uat02.tfvars -auto-approve
-
-  # UAT03 Account Workflows
   uat03-workflow:
     plan:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-UAT03
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-
-          # Get AWS credentials
-          eval $(aws configure export-credentials --profile $AWS_PROFILE --format env)
-          aws sts get-caller-identity
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/uat03/backend.tf .
-          cp /atlantis/config/uat03/backend.tfvars .
-          cp /atlantis/config/uat03/uat03.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform plan -var-file=uat03.tfvars
+      - run: atlantis-deploy uat03 plan
     apply:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-UAT03
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-          aws sts get-caller-identity --profile $AWS_PROFILE
+      - run: atlantis-deploy uat03 apply
 
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/uat03/backend.tf .
-          cp /atlantis/config/uat03/backend.tfvars .
-          cp /atlantis/config/uat03/uat03.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform apply -var-file=uat03.tfvars -auto-approve
-
-  # UAT04 Account Workflows
   uat04-workflow:
     plan:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-UAT04
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-
-          # Get AWS credentials
-          eval $(aws configure export-credentials --profile $AWS_PROFILE --format env)
-          aws sts get-caller-identity
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/uat04/backend.tf .
-          cp /atlantis/config/uat04/backend.tfvars .
-          cp /atlantis/config/uat04/uat04.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform plan -var-file=uat04.tfvars
+      - run: atlantis-deploy uat04 plan
     apply:
       steps:
-      - env:
-          name: AWS_PROFILE
-          value: GXC-TF-User-Executor-UAT04
-      - run: |
-          set -euxo pipefail
-          echo "Checking AWS identity..."
-          unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-          aws sts get-caller-identity --profile $AWS_PROFILE
-
-          echo "Initializing submodule sbeacon & svep ..."
-          git submodule init
-          git submodule update
-
-          echo "Using existing backend config..."
-          cp /atlantis/config/uat04/backend.tf .
-          cp /atlantis/config/uat04/backend.tfvars .
-          cp /atlantis/config/uat04/uat04.tfvars .
-
-          echo "Initializing sBeacon & sVEP..."
-          echo ">> Running at: $(pwd)"
-          bash ./init.sh
-
-          echo "Check Path..."
-          echo ">> Running at: $(pwd)"
-
-          echo "Initializing Terraform..."
-          terraform init -backend-config=backend.tfvars
-
-          terraform apply -var-file=uat04.tfvars -auto-approve
+      - run: atlantis-deploy uat04 apply
