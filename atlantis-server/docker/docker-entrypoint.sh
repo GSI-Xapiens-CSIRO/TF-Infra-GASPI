@@ -1,6 +1,6 @@
 #!/usr/bin/env -S dumb-init --single-child /bin/bash
 
-set -euxo pipefail
+set -euo pipefail
 
 # Function to check if we have docker socket access
 check_docker_socket() {
@@ -48,9 +48,23 @@ if [ "${1:0:1}" = '-' ]; then
     set -- atlantis "$@"
 fi
 
-# Check if running a atlantis subcommand
-if atlantis help "$1" 2>&1 | grep -q "atlantis $1"; then
-    set -- atlantis "$@"
+# Check if running a atlantis subcommand and prepend atlantis if needed
+if [ $# -gt 0 ]; then
+    case "$1" in
+        server|version|testdrive)
+            # These are valid atlantis subcommands, prepend atlantis
+            set -- atlantis "$@"
+            ;;
+        atlantis)
+            # Already has atlantis, leave as is
+            ;;
+        *)
+            # Check if it's a valid atlantis subcommand
+            if atlantis help "$1" 2>&1 | grep -q "atlantis $1"; then
+                set -- atlantis "$@"
+            fi
+            ;;
+    esac
 fi
 
 # Create user in /etc/passwd if running without user
@@ -98,6 +112,9 @@ else
     echo " -> Docker version: Not available (no socket access)"
 fi
 echo "==============================================================================="
+
+# Debug: Show what we're about to execute
+echo "🔍 About to execute: $*"
 
 # Execute the main command
 exec "$@"

@@ -132,23 +132,32 @@ RUN echo "docker:x:999:" >> /etc/group && \
     mkdir -p /home/atlantis && \
     echo "atlantis:x:100:100:atlantis:/home/atlantis:/bin/bash" >> /etc/passwd && \
     echo "atlantis:x:100:" >> /etc/group && \
-    sed -i 's/docker:x:999:/docker:x:999:100/' /etc/group && \
-    chown -R 100:100 /home/atlantis
+    sed -i 's/docker:x:999:/docker:x:999:100/' /etc/group
 
-# Setup directory structure with proper permissions
-RUN mkdir -p /home/atlantis/.aws && \
-    mkdir -p /home/atlantis/.docker && \
-    mkdir -p /home/atlantis/.local/share/pnpm && \
+# Ensure proper permissions for atlantis user home directory
+RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis} && \
+    mkdir -p /home/atlantis/.config/git && \
     mkdir -p /atlantis-data && \
     mkdir -p /atlantis && \
-    chown -R 100:100 /home/atlantis/.aws && \
-    chown -R 100:100 /home/atlantis/.docker && \
-    chown -R 100:100 /home/atlantis/.local && \
+    # Set ownership for all atlantis home directory
+    chown -R 100:100 /home/atlantis && \
     chown -R 100:100 /atlantis-data && \
     chown -R 100:100 /atlantis && \
+    # Set proper permissions
+    chmod 755 /home/atlantis && \
+    chmod 700 /home/atlantis/.ssh && \
     chmod 700 /home/atlantis/.aws && \
-    chmod 700 /home/atlantis/.docker && \
-    chmod 700 /home/atlantis/.local
+    chmod 755 /home/atlantis/.local && \
+    chmod 755 /home/atlantis/.config && \
+    chmod 755 /home/atlantis/.config/git && \
+    # Create .gitconfig with proper permissions
+    touch /home/atlantis/.gitconfig && \
+    chown 100:100 /home/atlantis/.gitconfig && \
+    chmod 644 /home/atlantis/.gitconfig && \
+    # Create .bash_profile and .bashrc with proper ownership
+    touch /home/atlantis/.bash_profile /home/atlantis/.bashrc && \
+    chown 100:100 /home/atlantis/.bash_profile /home/atlantis/.bashrc && \
+    chmod 644 /home/atlantis/.bash_profile /home/atlantis/.bashrc
 
 # Install dumb-init
 RUN pip install --no-cache-dir dumb-init && \
@@ -173,17 +182,23 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
     chmod +x /usr/local/bin/atlantis && \
     chown -R 100:100 /usr/local/bin/atlantis && \
     # Ensure atlantis user can access required directories
-    mkdir -p /atlantis-data && \
-    chown -R 100:100 /atlantis-data
+    mkdir -p /atlantis/config && \
+    chown -R 100:100 /atlantis/config
 
 RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis} && \
     chown -R 100:100 /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis}
 
+# Copy configuration files
 COPY config/docker/home /home
 COPY config/docker/etc /etc
 COPY config/docker/opt /opt
-COPY config/docker/usr /usr
-COPY docker-entrypoint.sh /home/atlantis
+
+# Fix ownership after copying files
+RUN chown -R 100:100 /home/atlantis && \
+    chmod 755 /home/atlantis && \
+    chmod 644 /home/atlantis/.gitconfig && \
+    chmod 644 /home/atlantis/.bash_profile && \
+    chmod 644 /home/atlantis/.bashrc
 
 # Switch to atlantis user
 USER 100
@@ -204,6 +219,10 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | b
 
 # Install Python requirements
 COPY requirements.txt ./
+COPY docker-entrypoint.sh /home/atlantis
+COPY atlantis-server/scripts/atlantis-deploy /usr/local/bin/atlantis-deploy
+COPY atlantis-server/scripts/install-atlantis-deploy /usr/local/bin/install-atlantis-deploy
+
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 

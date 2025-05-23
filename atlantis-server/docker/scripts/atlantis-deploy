@@ -14,6 +14,9 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+PURPLE='\033[0;35m'
+BOLD='\033[1m'
 NC='\033[0m'
 
 # Logging functions
@@ -23,14 +26,57 @@ log_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 log_error() { echo -e "${RED}❌ $1${NC}"; }
 
 # Script metadata
-SCRIPT_VERSION="1.0.0"
+SCRIPT_VERSION="1.0.3"
 SCRIPT_NAME="atlantis-deploy"
+SCRIPT_AUTHOR="GXC DevOps-Team"
+SCRIPT_COMPANY="GXC Consortium"
+SCRIPT_LICENSE="Apache v2"
+SCRIPT_DATE="May, 2025"
+
+# Display logo and version
+show_logo() {
+    cat << 'EOF'
+
+        __  .__                 __  .__
+_____ _/  |_|  | _____    _____/  |_|__| ______
+\__  \\   __\  | \__  \  /    \   __\  |/  ___/
+ / __ \|  | |  |__/ __ \|   |  \  | |  |\___ \
+(____  /__| |____(____  /___|  /__| |__/____  >
+     \/               \/     \/             \/
+     .___            .__
+   __| _/____ ______ |  |   ____ ___.__.
+  / __ |/ __ \\____ \|  |  /  _ <   |  |
+ / /_/ \  ___/|  |_> >  |_(  <_> )___  |
+ \____ |\___  >   __/|____/\____// ____|
+      \/    \/|__|               \/
+
+EOF
+
+    echo "================================================================"
+    echo "    Atlantis Schema Deploy - Infrastructure as Code"
+    echo "================================================================"
+    echo "Version    : $SCRIPT_VERSION"
+    echo "Author     : $SCRIPT_AUTHOR"
+    echo "Company    : $SCRIPT_COMPANY"
+    echo "Build      : $SCRIPT_DATE"
+    echo "License    : $SCRIPT_LICENSE"
+    echo "================================================================"
+    echo ""
+}
+
+# Show version info
+show_version() {
+    show_logo
+    echo -e "${GREEN}$SCRIPT_NAME version $SCRIPT_VERSION${NC}"
+    echo -e "${BLUE}Build for Terraform Infrastructure Automation${NC}"
+    echo -e "${BLUE}Supports environments: hub01-04, uat01-04${NC}"
+    echo ""
+}
 
 # Show help
 show_help() {
+    show_logo
     cat << EOF
-$SCRIPT_NAME v$SCRIPT_VERSION - Atlantis Dynamic Deployment Script
-
 USAGE:
     $SCRIPT_NAME <environment> [operation]
 
@@ -45,9 +91,9 @@ EXAMPLES:
 
 ENVIRONMENT VARIABLES:
     GITHUB_TOKEN                     Required: GitHub Personal Access Token
-    GIT_USER_NAME                    Git user name (default: DevOps XTI)
-    GIT_USER_EMAIL                   Git user email (default: devops@xapiens.id)
-    GITHUB_USERNAME                  GitHub username (default: DevOps-XTI)
+    GIT_USER_NAME                    Git commit author name (default: DevOps XTI)
+    GIT_USER_EMAIL                   Git commit author email (default: devops@xapiens.id)
+    GITHUB_USERNAME                  GitHub username for authentication (default: devopsxti)
     ATLANTIS_CONFIG_PATH             Config path (default: /atlantis/config)
     ATLANTIS_WORKSPACE               Current workspace directory
     ATLANTIS_PROJECT_NAME            Current project name
@@ -56,6 +102,10 @@ ENVIRONMENT VARIABLES:
 SUPPORTED ENVIRONMENTS:
     HUB environments: hub01, hub02, hub03, hub04
     UAT environments: uat01, uat02, uat03, uat04
+
+OPTIONS:
+    -h, --help      Show this help message
+    -v, --version   Show version information
 
 EOF
 }
@@ -68,12 +118,15 @@ parse_arguments() {
             exit 0
             ;;
         -v|--version)
-            echo "$SCRIPT_NAME v$SCRIPT_VERSION"
+            show_version
             exit 0
             ;;
         "")
+            show_logo
             log_error "Environment argument is required"
-            show_help
+            echo ""
+            echo -e "${YELLOW}Usage: $SCRIPT_NAME <environment> [operation]${NC}"
+            echo -e "${YELLOW}Try '$SCRIPT_NAME --help' for more information.${NC}"
             exit 1
             ;;
         *)
@@ -111,9 +164,9 @@ setup_environment_variables() {
     CONFIG_PATH="${CONFIG_BASE_PATH}/${ENVIRONMENT}"
 
     # Git configuration
-    GIT_USER_NAME="${GIT_USER_NAME:-DevOps XTI}"
-    GIT_USER_EMAIL="${GIT_USER_EMAIL:-devops@xapiens.id}"
-    GITHUB_USERNAME="${GITHUB_USERNAME:-DevOps-XTI}"
+    GIT_USER_NAME="${GIT_USER_NAME:-DevOps XTI}"           # Display name for commits
+    GIT_USER_EMAIL="${GIT_USER_EMAIL:-devops@xapiens.id}"  # Email for commits
+    GITHUB_USERNAME="${GITHUB_USERNAME:-devopsxti}"        # Actual GitHub username for auth
 
     log_info "Environment Type: $ENV_TYPE, Number: $ENV_NUMBER"
     log_info "AWS Profile: $AWS_PROFILE"
@@ -148,16 +201,79 @@ validate_prerequisites() {
     log_success "Prerequisites validated"
 }
 
+# Fix Git configuration permissions
+fix_git_permissions() {
+    local git_config_file="$HOME/.gitconfig"
+    local git_config_dir="$(dirname "$git_config_file")"
+    local git_config_global_dir="$HOME/.config/git"
+
+    log_info "Checking Git configuration permissions"
+    log_info "Current user: $(whoami) ($(id))"
+    log_info "Home directory: $HOME"
+
+    # Ensure the home directory exists and has proper permissions
+    if [ ! -d "$HOME" ]; then
+        log_error "Home directory $HOME does not exist"
+        exit 1
+    fi
+
+    # Check if we can write to home directory
+    if [ ! -w "$HOME" ]; then
+        log_error "Cannot write to home directory: $HOME"
+        log_error "Directory permissions: $(ls -ld "$HOME")"
+        exit 1
+    fi
+
+    # Remove existing .gitconfig if it has wrong permissions
+    if [ -f "$git_config_file" ] && [ ! -w "$git_config_file" ]; then
+        log_warning "Removing non-writable .gitconfig file"
+        rm -f "$git_config_file" 2>/dev/null || {
+            log_error "Cannot remove .gitconfig file with wrong permissions"
+            log_error "File permissions: $(ls -l "$git_config_file")"
+            # Force use local config
+            GIT_CONFIG_SCOPE="--local"
+            return 0
+        }
+    fi
+
+    # Create new .gitconfig with proper permissions
+    if [ ! -f "$git_config_file" ]; then
+        touch "$git_config_file" && chmod 644 "$git_config_file"
+    fi
+
+    # Test if we can write to .gitconfig
+    if [ -w "$git_config_file" ]; then
+        GIT_CONFIG_SCOPE="--global"
+        log_success "Using global Git configuration"
+    else
+        log_warning "Cannot write to $git_config_file, will use local git config only"
+        GIT_CONFIG_SCOPE="--local"
+    fi
+}
+
 # Setup Git configuration
 setup_git_config() {
     log_info "Setting up Git configuration"
 
-    git config --global user.name "$GIT_USER_NAME"
-    git config --global user.email "$GIT_USER_EMAIL"
-    git config --global init.defaultBranch main
-    git config --global pull.rebase false
+    # Fix permissions first
+    fix_git_permissions
 
-    log_success "Git configuration completed"
+    # Configure git with appropriate scope
+    git config $GIT_CONFIG_SCOPE user.name "$GIT_USER_NAME" || {
+        log_warning "Failed to set global git config, trying local config"
+        git config --local user.name "$GIT_USER_NAME"
+        git config --local user.email "$GIT_USER_EMAIL"
+        git config --local init.defaultBranch main
+        git config --local pull.rebase false
+        log_success "Git configuration completed (local scope)"
+        return 0
+    }
+
+    git config $GIT_CONFIG_SCOPE user.email "$GIT_USER_EMAIL"
+    git config $GIT_CONFIG_SCOPE init.defaultBranch main
+    git config $GIT_CONFIG_SCOPE pull.rebase false
+
+    log_success "Git configuration completed (global scope)"
 }
 
 # Setup GitHub authentication
@@ -165,7 +281,11 @@ setup_github_auth() {
     log_info "Configuring GitHub authentication"
 
     # Configure GitHub authentication using URL rewriting
-    git config --global url."https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+    # Try global first, fall back to local if needed
+    if ! git config --global url."https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" 2>/dev/null; then
+        log_warning "Failed to set global GitHub auth, using local config"
+        git config --local url."https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+    fi
 
     log_success "GitHub authentication configured"
 }
@@ -260,17 +380,42 @@ setup_terraform_config() {
 
 # Run initialization script
 run_initialization_script() {
-    log_info "Running environment initialization script"
+    log_info "Running environment initialization scripts"
 
-    if [ -f "./init.sh" ]; then
-        log_info "Executing init.sh..."
-        bash ./init.sh
-        log_success "Initialization script completed"
+    local current_dir=$(pwd)
+    local init_script="./init.sh"
+
+    log_info "Current working directory: $current_dir"
+
+    # Check if main init.sh exists in current directory
+    if [ -f "$init_script" ]; then
+        log_info "Found init.sh in current directory"
+
+        # Check if script is executable, make it executable if needed
+        if [ ! -x "$init_script" ]; then
+            log_info "Making init.sh executable"
+            chmod +x "$init_script" || {
+                log_error "Failed to make init.sh executable"
+                exit 1
+            }
+        fi
+
+        # Execute the script
+        log_info "Executing init.sh"
+        if bash "$init_script"; then
+            log_success "Successfully executed init.sh"
+        else
+            log_error "Failed to execute init.sh"
+            exit 1
+        fi
     else
-        log_warning "init.sh not found, skipping initialization"
-    fi
+        log_warning "init.sh not found in current directory: $current_dir"
+        log_info "Checking if this is expected for this project structure..."
 
-    log_info "Current working directory: $(pwd)"
+        # List contents to help with debugging
+        log_info "Directory contents:"
+        ls -la . || true
+    fi
 }
 
 # Initialize Terraform
@@ -327,14 +472,16 @@ cleanup_sensitive_files() {
     # Remove credentials file if it exists
     [ -f ~/.git-credentials ] && rm -f ~/.git-credentials
 
-    # Clear Git credential cache
+    # Clear Git credential cache (ignore errors)
     git config --global --unset credential.helper 2>/dev/null || true
+    git config --local --unset credential.helper 2>/dev/null || true
 
     log_success "Cleanup completed"
 }
 
 # Main execution function
 main() {
+    show_logo
     log_info "Starting Atlantis $OPERATION for environment: $ENVIRONMENT"
     log_info "============================================================"
 
@@ -349,6 +496,8 @@ main() {
     # Repository initialization
     initialize_submodules
     setup_terraform_config
+
+    # Init submodules
     run_initialization_script
 
     # Terraform operations
@@ -373,6 +522,9 @@ main() {
 
     log_success "============================================================"
     log_success "Atlantis $OPERATION completed successfully for $ENVIRONMENT!"
+    echo ""
+    echo -e "${CYAN}${BOLD}Thank you for using Atlantis Schema Deploy${NC}"
+    echo -e "${BLUE}© $SCRIPT_DATE $SCRIPT_COMPANY${NC}"
 }
 
 # Parse arguments

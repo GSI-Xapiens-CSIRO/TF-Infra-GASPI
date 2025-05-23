@@ -1,5 +1,5 @@
 #!/bin/bash
-# install-atlantis-deploy.sh
+# install-atlantis-deploy
 
 set -euo pipefail
 

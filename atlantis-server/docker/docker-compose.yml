@@ -49,7 +49,7 @@ services:
   #================================================================================================
   portainer:
     # image: dockerframework/portainer:${PORTAINER_VERSION:-2.9}
-    image: portainer/portainer-ce:${PORTAINER_VERSION:-2.20.3-alpine}
+    image: portainer/portainer-ce:${PORTAINER_VERSION:-2.30.1-alpine}
     container_name: ${CONTAINER_PORTAINER:-gxc_portainer}
     restart: unless-stopped
     ports:
@@ -60,7 +60,7 @@ services:
       - /opt/data/docker/portainer2.20:/data
     environment:
       - PORTAINER_TEMPLATE=generic
-      - PORTAINER_VERSION=${PORTAINER_VERSION:-2.20.3-alpine}
+      - PORTAINER_VERSION=${PORTAINER_VERSION:-2.30.1-alpine}
     privileged: true
     networks:
       atlantis_net:
@@ -108,6 +108,12 @@ services:
       - ATLANTIS_GH_USER=${ATLANTIS_GH_USER:-gxc-gh-user}
       - ATLANTIS_GH_TOKEN=${ATLANTIS_GH_TOKEN}
       - ATLANTIS_GH_WEBHOOK_SECRET=${ATLANTIS_GH_WEBHOOK_SECRET}
+      # Git Configuration (separate from GitHub username)
+      - GITHUB_USERNAME=${ATLANTIS_GH_USER:-gxc-gh-user}
+      - GITHUB_TOKEN=${ATLANTIS_GH_TOKEN}
+      - GIT_USER_NAME=${GIT_USER_NAME:-GXC DevOps}
+      - GIT_USER_EMAIL=${ATLANTIS_GH_EMAIL:-devops@example.com}
+      - CONFIG_PATH=${ATLANTIS_CONFIG_PATH:-/atlantis/config}
       # Web Configuration
       - ATLANTIS_WEB_HOSTNAME=${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
       - ATLANTIS_PORT=${PORT_ATLANTIS:-4141}
@@ -118,6 +124,7 @@ services:
       - AWS_CONFIG_FILE=/home/atlantis/.aws/config
       # Project Configuration
       - ATLANTIS_CONFIG=/atlantis/atlantis.yaml
+      - ATLANTIS_CONFIG_PATH=/atlantis/config
       - ATLANTIS_ALLOW_COMMANDS=version,plan,apply,unlock,approve_policies
       - ATLANTIS_REPO_ALLOWLIST=${ATLANTIS_REPO_ALLOWLIST:-github.com/GSI-Xapiens-CSIRO/*}
       - ATLANTIS_REPO_CONFIG=/atlantis/repo.yaml
