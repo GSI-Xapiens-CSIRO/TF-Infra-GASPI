@@ -2,6 +2,16 @@
 
 Terraform Infra for Genetic Analysis Support Platform Indonesia (GASPI)
 
+[![ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/GSI-Xapiens-CSIRO/TF-Infra-GASPI)
+![all contributors](https://img.shields.io/github/contributors/GSI-Xapiens-CSIRO/TF-Infra-GASPI)
+![tags](https://img.shields.io/github/v/tag/GSI-Xapiens-CSIRO/TF-Infra-GASPI?sort=semver)
+![view](https://views.whatilearened.today/views/github/GSI-Xapiens-CSIRO/TF-Infra-GASPI.svg)
+![issues](https://img.shields.io/github/issues/GSI-Xapiens-CSIRO/TF-Infra-GASPI)
+![pull requests](https://img.shields.io/github/issues-pr/GSI-Xapiens-CSIRO/TF-Infra-GASPI)
+![forks](https://img.shields.io/github/forks/GSI-Xapiens-CSIRO/TF-Infra-GASPI)
+![stars](https://img.shields.io/github/stars/GSI-Xapiens-CSIRO/TF-Infra-GASPI)
+[![license](https://img.shields.io/github/license/GSI-Xapiens-CSIRO/TF-Infra-GASPI)](https://img.shields.io/github/license/GSI-Xapiens-CSIRO/TF-Infra-GASPI)
+
 ## AWS Control Tower
 
 <div align="center">

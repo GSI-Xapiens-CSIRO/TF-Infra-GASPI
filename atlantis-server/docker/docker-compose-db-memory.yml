@@ -39,62 +39,11 @@ volumes:
       o: bind
       type: none
       device: ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}
-  vol_atlantis_data:
-    driver: ${VOLUMES_DRIVER:-local}
-    driver_opts:
-      o: bind
-      type: none
-      device: ${DATA_ATLANTIS_DATA:-/opt/data/docker/atlantis/data}
-  vol_atlantis_repos:
-    driver: ${VOLUMES_DRIVER:-local}
-    driver_opts:
-      o: bind
-      type: none
-      device: ${DATA_ATLANTIS_REPOS:-/opt/data/docker/atlantis/repos}
-  vol_atlantis_db:
-    driver: ${VOLUMES_DRIVER:-local}
-    driver_opts:
-      o: bind
-      type: none
-      device: ${DATA_ATLANTIS_DB:-/opt/data/docker/atlantis/db}
 
 #================================================================================================
 # SERVICES
 #================================================================================================
 services:
-  #================================================================================================
-  # POSTGRESQL DATABASE FOR ATLANTIS
-  #================================================================================================
-  atlantis-db:
-    image: postgres:15-alpine
-    container_name: ${CONTAINER_ATLANTIS_DB:-gxc_atlantis_db}
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=${ATLANTIS_DB_USER:-atlantis}
-      - POSTGRES_PASSWORD=${ATLANTIS_DB_PASSWORD:-atlantis_secure_password}
-      - POSTGRES_DB=${ATLANTIS_DB_NAME:-atlantis}
-      - PGDATA=/var/lib/postgresql/data/pgdata
-    volumes:
-      - /etc/localtime:/etc/localtime:ro          ## Do not use it in mac
-      - /var/run/docker.sock:/var/run/docker.sock ## Do not use it in k8s
-      - vol_atlantis_db:/var/lib/postgresql/data
-    networks:
-      atlantis_net:
-        ipv4_address: ${CONTAINER_IP_ATLANTIS_DB:-172.149.149.4}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${ATLANTIS_DB_USER:-atlantis} -d ${ATLANTIS_DB_NAME:-atlantis}"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    deploy:
-      resources:
-        limits:
-          cpus: '1.00'
-          memory: 1G
-        reservations:
-          cpus: '0.25'
-          memory: 256M
-
   #================================================================================================
   # PORTAINER
   #================================================================================================
@@ -149,9 +98,8 @@ services:
       - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/repo.yaml:/atlantis/repo.yaml:ro
       # Project configuration
       - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}:/atlantis/config:ro
-      # Persistent data volumes
-      - vol_atlantis_data:/atlantis/data
-      - vol_atlantis_repos:/home/atlantis/.atlantis/repos
+      # Atlantis CI/CD Path
+      - ${DATA_ATLANTIS_SRC:-/opt/data/docker/atlantis/src}:/home/atlantis/.atlantis/repos
       # Atlantis Template
       - ${DATA_ATLANTIS:-/opt/data/docker/atlantis}/template:/home/atlantis/.atlantis/repos/template
     environment:
@@ -160,7 +108,7 @@ services:
       - ATLANTIS_GH_USER=${ATLANTIS_GH_USER:-gxc-gh-user}
       - ATLANTIS_GH_TOKEN=${ATLANTIS_GH_TOKEN}
       - ATLANTIS_GH_WEBHOOK_SECRET=${ATLANTIS_GH_WEBHOOK_SECRET}
-      # Git Configuration
+      # Git Configuration (separate from GitHub username)
       - GITHUB_USERNAME=${ATLANTIS_GH_USER:-gxc-gh-user}
       - GITHUB_TOKEN=${ATLANTIS_GH_TOKEN}
       - GIT_USER_NAME=${GIT_USER_NAME:-GXC DevOps}
@@ -170,19 +118,6 @@ services:
       - ATLANTIS_WEB_HOSTNAME=${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
       - ATLANTIS_PORT=${PORT_ATLANTIS:-4141}
       - ATLANTIS_ATLANTIS_URL=https://${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
-      - ATLANTIS_WEB_BASIC_AUTH=${ATLANTIS_WEB_BASIC_AUTH:-true}
-      - ATLANTIS_WEB_USERNAME=${NGINX_BASIC_AUTH_USER:-gxc-admin}
-      - ATLANTIS_WEB_PASSWORD=${NGINX_BASIC_AUTH_PASSWORD:-B4s1c-4uth}
-      # Database Configuration
-      - ATLANTIS_DB_TYPE=postgres
-      - ATLANTIS_DB_HOST=${CONTAINER_IP_ATLANTIS_DB:-172.149.149.4}
-      - ATLANTIS_DB_PORT=5432
-      - ATLANTIS_DB_NAME=${ATLANTIS_DB_NAME:-atlantis}
-      - ATLANTIS_DB_USER=${ATLANTIS_DB_USER:-atlantis}
-      - ATLANTIS_DB_PASSWORD=${ATLANTIS_DB_PASSWORD:-atlantis_secure_password}
-      - ATLANTIS_DB_SSL_MODE=disable
-      # Data Directory
-      - ATLANTIS_DATA_DIR=/atlantis/data
       # AWS Configuration
       - AWS_REGION=${AWS_REGION:-ap-southeast-3}
       - AWS_SHARED_CREDENTIALS_FILE=/home/atlantis/.aws/credentials
@@ -218,9 +153,6 @@ services:
       - PYTHONPATH=/usr/local/lib/python3.12/site-packages
     user: "100:100" # atlantis:atlantis
     privileged: true
-    depends_on:
-      atlantis-db:
-        condition: service_healthy
     networks:
       atlantis_net:
         ipv4_address: ${CONTAINER_IP_ATLANTIS:-172.149.149.6}
