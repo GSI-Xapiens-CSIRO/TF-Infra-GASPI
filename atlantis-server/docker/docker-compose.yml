@@ -164,8 +164,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.50'
-          memory: 2G
+          cpus: '2.50'
+          memory: 10G
         reservations:
           cpus: '0.30'
           memory: 256M
@@ -208,8 +208,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.30'
-          memory: 512M
+          cpus: '1.50'
+          memory: 2G
         reservations:
           cpus: '0.10'
           memory: 128M
