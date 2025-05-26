@@ -1,0 +1,169 @@
+#!/bin/bash
+
+# Initialize Atlantis with Basic Authentication
+# This script sets up all required directories and configurations
+
+set -e
+
+echo "🚀 Initializing Atlantis with Basic Authentication..."
+
+# Load environment variables
+if [[ -f .env ]]; then
+    source .env
+    echo "✅ Loaded environment variables from .env"
+else
+    echo "⚠️  No .env file found. Using default values."
+fi
+
+# Set default values
+DATA_ATLANTIS="${DATA_ATLANTIS:-/opt/data/docker/atlantis}"
+DATA_NGINX="${DATA_NGINX:-/opt/data/docker/nginx}"
+NGINX_BASIC_AUTH_USER="${NGINX_BASIC_AUTH_USER:-atlantis}"
+NGINX_BASIC_AUTH_PASSWORD="${NGINX_BASIC_AUTH_PASSWORD:-atlantis123}"
+
+echo "📁 Creating required directories..."
+
+# Create Atlantis directories
+mkdir -p "$DATA_ATLANTIS"/{aws,src,config,template}
+mkdir -p "$DATA_ATLANTIS_AWS"
+mkdir -p "$DATA_ATLANTIS_SRC"
+mkdir -p "$DATA_ATLANTIS_CONFIG"
+
+# Create Nginx directories
+mkdir -p "$DATA_NGINX"/{conf.d,ssl,logs,auth}
+
+echo "✅ Directories created successfully!"
+
+# Set up basic authentication
+echo "🔐 Setting up Basic Authentication..."
+if [[ ! -f "$DATA_NGINX/auth/.htpasswd" ]]; then
+    ./setup-basic-auth.sh "$NGINX_BASIC_AUTH_USER" "$NGINX_BASIC_AUTH_PASSWORD"
+else
+    echo "⚠️  htpasswd file already exists. Skipping creation."
+fi
+
+# Copy nginx configuration
+echo "📝 Setting up Nginx configuration..."
+if [[ ! -f "$DATA_NGINX/conf.d/atlantis.conf" ]]; then
+    cp atlantis-nginx.conf "$DATA_NGINX/conf.d/atlantis.conf"
+    echo "✅ Nginx configuration copied"
+else
+    echo "⚠️  Nginx configuration already exists. Please review manually."
+fi
+
+# Set proper permissions
+echo "🔒 Setting up permissions..."
+sudo chown -R $USER:$USER "$DATA_ATLANTIS"
+sudo chown -R $USER:$USER "$DATA_NGINX"
+chmod -R 755 "$DATA_ATLANTIS"
+chmod -R 755 "$DATA_NGINX"
+chmod 644 "$DATA_NGINX/auth/.htpasswd"
+
+# Check SSL certificates
+echo "🔍 Checking SSL certificates..."
+if [[ ! -f "$DATA_NGINX/ssl/server.crt" ]] || [[ ! -f "$DATA_NGINX/ssl/server.key" ]]; then
+    echo "⚠️  SSL certificates not found!"
+    echo "Please add your SSL certificates to:"
+    echo "  - $DATA_NGINX/ssl/server.crt"
+    echo "  - $DATA_NGINX/ssl/server.key"
+    echo ""
+    echo "For development, you can generate self-signed certificates:"
+    echo "openssl req -x509 -nodes -days 365 -newkey rsa:2048 \\"
+    echo "  -keyout $DATA_NGINX/ssl/server.key \\"
+    echo "  -out $DATA_NGINX/ssl/server.crt \\"
+    echo "  -subj '/CN=atlantis-gxc.xapiens.id'"
+else
+    echo "✅ SSL certificates found"
+fi
+
+# Verify AWS credentials
+echo "🔍 Checking AWS credentials..."
+if [[ ! -f "$DATA_ATLANTIS/aws/credentials" ]] || [[ ! -f "$DATA_ATLANTIS/aws/config" ]]; then
+    echo "⚠️  AWS credentials not found!"
+    echo "Please configure AWS credentials in:"
+    echo "  - $DATA_ATLANTIS/aws/credentials"
+    echo "  - $DATA_ATLANTIS/aws/config"
+else
+    echo "✅ AWS credentials found"
+fi
+
+# Create sample Atlantis configuration if it doesn't exist
+if [[ ! -f "$DATA_ATLANTIS/atlantis.yaml" ]]; then
+    echo "📝 Creating sample Atlantis configuration..."
+    cat > "$DATA_ATLANTIS/atlantis.yaml" << 'EOF'
+version: 3
+automerge: true
+delete_source_branch_on_merge: true
+parallel_plan: true
+parallel_apply: true
+abort_on_execution_order_fail: true
+
+projects:
+- name: terraform-infrastructure
+  dir: .
+  workspace: default
+  terraform_version: v1.6.0
+  delete_source_branch_on_merge: true
+  apply_requirements: [approved, mergeable]
+  import_requirements: [approved, mergeable]
+
+workflows:
+  default:
+    plan:
+      steps:
+      - init
+      - plan
+    apply:
+      steps:
+      - apply
+EOF
+    echo "✅ Sample Atlantis configuration created"
+fi
+
+# Create sample repo configuration if it doesn't exist
+if [[ ! -f "$DATA_ATLANTIS_CONFIG/repo.yaml" ]]; then
+    echo "📝 Creating sample repo configuration..."
+    cat > "$DATA_ATLANTIS_CONFIG/repo.yaml" << 'EOF'
+version: 3
+repos:
+- id: /.*/
+  apply_requirements: [approved, mergeable]
+  import_requirements: [approved, mergeable]
+  allowed_overrides: [apply_requirements, workflow, delete_source_branch_on_merge]
+  allow_custom_workflows: true
+  delete_source_branch_on_merge: true
+
+workflows:
+  default:
+    plan:
+      steps:
+      - init
+      - plan
+    apply:
+      steps:
+      - apply
+EOF
+    echo "✅ Sample repo configuration created"
+fi
+
+echo ""
+echo "🎉 Atlantis initialization complete!"
+echo ""
+echo "📋 Summary:"
+echo "  - Data directory: $DATA_ATLANTIS"
+echo "  - Nginx directory: $DATA_NGINX"
+echo "  - Basic Auth User: $NGINX_BASIC_AUTH_USER"
+echo ""
+echo "🚀 Next steps:"
+echo "1. Review and update your .env file"
+echo "2. Configure AWS credentials"
+echo "3. Add SSL certificates (if not using self-signed)"
+echo "4. Run: docker-compose up -d"
+echo ""
+echo "🌐 Access URLs:"
+echo "  - Atlantis UI: https://atlantis-gxc.xapiens.id"
+echo "  - Portainer: http://localhost:5212"
+echo ""
+echo "🔐 Basic Auth Credentials:"
+echo "  - Username: $NGINX_BASIC_AUTH_USER"
+echo "  - Password: $NGINX_BASIC_AUTH_PASSWORD"

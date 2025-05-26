@@ -66,7 +66,7 @@ services:
       atlantis_net:
         ipv4_address: ${CONTAINER_IP_PORTAINER:-172.149.149.5}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5212/api/status"]
+      test: ["CMD", "curl", "-f", "http://${CONTAINER_IP_PORTAINER:-172.149.149.5}:5212/api/status"]
       interval: 60s
       timeout: 5s
       retries: 5
@@ -157,7 +157,7 @@ services:
       atlantis_net:
         ipv4_address: ${CONTAINER_IP_ATLANTIS:-172.149.149.6}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4141/healthz"]
+      test: ["CMD", "curl", "-f", "http://${CONTAINER_IP_ATLANTIS:-172.149.149.6}:4141/healthz"]
       interval: 60s
       timeout: 5s
       retries: 5
@@ -188,16 +188,20 @@ services:
       - ${DATA_NGINX:-/opt/data/docker/nginx}/conf.d:/etc/nginx/conf.d
       - ${DATA_NGINX:-/opt/data/docker/nginx}/ssl:/etc/nginx/ssl
       - ${DATA_NGINX:-/opt/data/docker/nginx}/logs:/var/log/nginx
+      - ${DATA_NGINX:-/opt/data/docker/nginx}/auth:/etc/nginx/auth
     environment:
       - NGINX_HOST=${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
       - NGINX_PORT=80
+      # Basic Auth Configuration
+      - NGINX_BASIC_AUTH_USER=${NGINX_BASIC_AUTH_USER:-gxc-admin}
+      - NGINX_BASIC_AUTH_PASSWORD=${NGINX_BASIC_AUTH_PASSWORD:-B4s1c-4uth}
     depends_on:
       - atlantis
     networks:
       atlantis_net:
         ipv4_address: ${CONTAINER_IP_NGINX:-172.149.149.7}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
+      test: ["CMD", "curl", "-f", "http://${CONTAINER_IP_NGINX:-172.149.149.7}/healthz"]
       interval: 60s
       timeout: 5s
       retries: 5
