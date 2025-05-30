@@ -1,0 +1,334 @@
+# CloudFront SSL Setup Configuration Template
+# Copy this file to cloudfront-config.conf and customize for your environment
+# For Xignals Observability Platform and general CloudFront deployments
+
+# ================================
+# BASIC DOMAIN CONFIGURATION
+# ================================
+
+# Primary domain (must have Route 53 hosted zone)
+DOMAIN="xapiens.id"
+
+# Subdomain for the CloudFront distribution
+# Examples: rscm-dev.xapiens.id, xignals.xapiens.id, api.xapiens.id
+SUBDOMAIN="rscm-dev.xapiens.id"
+
+# ================================
+# AWS REGIONS CONFIGURATION
+# ================================
+
+# Region for SSL certificate (MUST be us-east-1 for CloudFront)
+CERT_REGION="us-east-1"
+
+# Region where your ALB/EC2 instances are located
+ALB_REGION="ap-southeast-1"
+
+# ================================
+# ORIGIN CONFIGURATION
+# ================================
+
+# Your Application Load Balancer DNS name
+# Example: alb-123456789.ap-southeast-1.elb.amazonaws.com
+# For EC2: ec2-instance.region.compute.amazonaws.com
+# For custom origin: your-server.example.com
+ALB_DNS_NAME=""
+
+# Security Group ID attached to your ALB/origin
+# Example: sg-0123456789abcdef0
+SECURITY_GROUP_ID=""
+
+# Origin protocol policy
+# Options: http-only, https-only, match-viewer
+ORIGIN_PROTOCOL_POLICY="https-only"
+
+# Origin SSL protocols
+# Options: SSLv3, TLSv1, TLSv1.1, TLSv1.2
+ORIGIN_SSL_PROTOCOLS="TLSv1.2"
+
+# ================================
+# CLOUDFRONT DISTRIBUTION SETTINGS
+# ================================
+
+# CloudFront price class (affects geographic coverage and cost)
+# PriceClass_100: US, Canada, Europe
+# PriceClass_200: US, Canada, Europe, Asia, Middle East, Africa
+# PriceClass_All: All global edge locations
+PRICE_CLASS="PriceClass_All"
+
+# HTTP version support
+# Options: http1.1, http2, http2and3
+HTTP_VERSION="http2"
+
+# Minimum TLS protocol version for viewers
+# Options: TLSv1, TLSv1_2016, TLSv1.1_2016, TLSv1.2_2018, TLSv1.2_2019, TLSv1.2_2021
+MIN_PROTOCOL_VERSION="TLSv1.2_2021"
+
+# Enable IPv6 support
+IPV6_ENABLED="true"
+
+# Default root object (for website distributions)
+DEFAULT_ROOT_OBJECT="index.html"
+
+# Comment for the distribution
+DISTRIBUTION_COMMENT="CloudFront distribution for ${SUBDOMAIN} - Xignals Platform"
+
+# ================================
+# CACHING CONFIGURATION
+# ================================
+
+# Cache TTL settings (in seconds)
+DEFAULT_TTL="86400"        # 24 hours
+MIN_TTL="0"               # No minimum caching
+MAX_TTL="31536000"        # 1 year maximum
+
+# Enable compression
+COMPRESS="true"
+
+# Query string forwarding
+# Options: true, false
+QUERY_STRING="true"
+
+# Cookie forwarding
+# Options: none, whitelist, all
+FORWARD_COOKIES="all"
+
+# Headers to forward to origin (comma-separated)
+# Common headers: Host,Authorization,CloudFront-Forwarded-Proto,User-Agent,Referer
+FORWARD_HEADERS="Host,Authorization,CloudFront-Forwarded-Proto"
+
+# Viewer protocol policy
+# Options: allow-all, https-only, redirect-to-https
+VIEWER_PROTOCOL_POLICY="redirect-to-https"
+
+# ================================
+# SECURITY CONFIGURATION
+# ================================
+
+# Custom header name for origin protection
+CUSTOM_HEADER_NAME="X-CloudFront-Secret"
+
+# Custom header value (will be auto-generated if empty)
+# Leave empty for automatic generation, or set your own secret
+# Recommendation: Use auto-generation for security
+CUSTOM_HEADER_VALUE=""
+
+# WAF Web ACL ID (optional)
+# Example: arn:aws:wafv2:us-east-1:123456789012:global/webacl/ExampleWebACL/473e64fd-f30b-4765-81a0-62ad96dd167a
+WEB_ACL_ID=""
+
+# Geo restriction settings
+GEO_RESTRICTION_TYPE="none"  # Options: none, whitelist, blacklist
+GEO_RESTRICTION_LOCATIONS=""  # Country codes: US,CA,GB (comma-separated)
+
+# ================================
+# OBSERVABILITY & XIGNALS SPECIFIC
+# ================================
+
+# Optimized headers for observability platforms
+# Add observability-specific headers for better monitoring
+OBSERVABILITY_HEADERS="X-Observability-Source,X-Trace-Id,X-Request-Id,X-API-Key"
+
+# Metrics endpoints that should not be cached
+NO_CACHE_PATTERNS="/api/v1/metrics,/api/v1/logs,/health,/status"
+
+# Static assets that can be cached longer
+LONG_CACHE_PATTERNS="/static/*,/assets/*,/images/*,/css/*,/js/*"
+
+# API rate limiting considerations
+API_RATE_LIMIT_PATHS="/api/*"
+
+# ================================
+# MONITORING CONFIGURATION
+# ================================
+
+# Enable CloudWatch monitoring
+ENABLE_MONITORING="true"
+
+# CloudWatch alarm thresholds
+ERROR_RATE_THRESHOLD="10"        # Percentage (4xx + 5xx errors)
+HIGH_ERROR_RATE_THRESHOLD="20"   # Critical threshold
+REQUEST_THRESHOLD="1000"         # Requests per period for scaling alerts
+LATENCY_THRESHOLD="5000"         # Origin latency in milliseconds
+
+# Alarm evaluation periods
+ALARM_EVALUATION_PERIODS="2"
+ALARM_PERIOD="300"  # 5 minutes
+
+# ================================
+# NOTIFICATION CONFIGURATION
+# ================================
+
+# SNS Topic ARN for alerts (optional)
+# If empty, will create a new topic
+SNS_TOPIC_ARN=""
+
+# Email for notifications (will create SNS topic if SNS_TOPIC_ARN is empty)
+NOTIFICATION_EMAIL=""
+
+# Slack webhook for alerts (optional)
+SLACK_WEBHOOK_URL=""
+
+# ================================
+# LOGGING CONFIGURATION
+# ================================
+
+# Enable CloudFront access logs
+ENABLE_ACCESS_LOGS="true"
+
+# S3 bucket for access logs (will be created if not exists)
+# Leave empty for auto-generated bucket name
+LOG_BUCKET=""
+
+# Log prefix (helps organize logs)
+LOG_PREFIX="cloudfront-logs/"
+
+# Include cookies in logs
+LOG_INCLUDE_COOKIES="false"
+
+# ================================
+# ADVANCED CACHE BEHAVIORS
+# ================================
+
+# Custom cache behaviors for different path patterns
+# Format: path_pattern:ttl:compress:query_string:cookies
+# Example: "/api/*:0:true:true:none,/static/*:86400:true:false:none"
+CUSTOM_CACHE_BEHAVIORS=""
+
+# Origin groups configuration (for failover)
+ORIGIN_GROUPS_CONFIG=""
+
+# ================================
+# ENVIRONMENT-SPECIFIC OVERRIDES
+# ================================
+
+# Development Environment Settings
+# Uncomment and modify for development
+# SUBDOMAIN="dev.xapiens.id"
+# PRICE_CLASS="PriceClass_100"
+# DEFAULT_TTL="300"
+# ERROR_RATE_THRESHOLD="15"
+# ENABLE_ACCESS_LOGS="false"
+
+# Staging Environment Settings
+# Uncomment and modify for staging
+# SUBDOMAIN="staging.xapiens.id"
+# PRICE_CLASS="PriceClass_200"
+# DEFAULT_TTL="3600"
+# ERROR_RATE_THRESHOLD="10"
+# NOTIFICATION_EMAIL="staging-alerts@xapiens.id"
+
+# Production Environment Settings
+# Uncomment and modify for production
+# SUBDOMAIN="www.xapiens.id"
+# PRICE_CLASS="PriceClass_All"
+# DEFAULT_TTL="86400"
+# ERROR_RATE_THRESHOLD="5"
+# HIGH_ERROR_RATE_THRESHOLD="10"
+# ENABLE_ACCESS_LOGS="true"
+# NOTIFICATION_EMAIL="alerts@xapiens.id"
+# WEB_ACL_ID="arn:aws:wafv2:us-east-1:123456789012:global/webacl/Production/473e64fd"
+
+# ================================
+# XIGNALS PLATFORM OPTIMIZATIONS
+# ================================
+
+# Specific settings for Xignals Observability Platform
+# Uncomment if deploying for Xignals
+
+# SUBDOMAIN="xignals.xapiens.id"
+# FORWARD_HEADERS="Host,Authorization,X-API-Key,X-Observability-Source,X-Trace-Id,Content-Type"
+# FORWARD_COOKIES="none"
+# QUERY_STRING="true"
+# DEFAULT_TTL="300"  # 5 minutes for real-time observability data
+# COMPRESS="true"    # Compress metrics and logs
+# NO_CACHE_PATTERNS="/api/v1/metrics,/api/v1/logs,/api/v1/traces,/health,/status"
+# LONG_CACHE_PATTERNS="/static/*,/assets/*,/docs/*"
+# ERROR_RATE_THRESHOLD="2"  # Stricter for observability platform
+# NOTIFICATION_EMAIL="sre@xapiens.id"
+
+# ================================
+# PERFORMANCE TUNING
+# ================================
+
+# Origin request timeout (seconds)
+ORIGIN_REQUEST_TIMEOUT="30"
+
+# Origin keep-alive timeout (seconds)
+ORIGIN_KEEPALIVE_TIMEOUT="5"
+
+# Smooth streaming
+SMOOTH_STREAMING="false"
+
+# Field level encryption profile ID (optional)
+FIELD_LEVEL_ENCRYPTION_ID=""
+
+# ================================
+# CUSTOM ORIGINS CONFIGURATION
+# ================================
+
+# Multiple origins configuration (JSON format)
+# Example for API + Static content setup:
+# MULTIPLE_ORIGINS='{
+#   "api": {
+#     "domain": "api-alb.region.elb.amazonaws.com",
+#     "path": "/api/*",
+#     "ttl": 0
+#   },
+#   "static": {
+#     "domain": "static-bucket.s3.amazonaws.com",
+#     "path": "/static/*",
+#     "ttl": 86400
+#   }
+# }'
+
+# ================================
+# DEBUGGING AND DEVELOPMENT
+# ================================
+
+# Enable debug mode (more verbose logging)
+DEBUG_MODE="false"
+
+# Dry run mode (validate configuration without making changes)
+DRY_RUN="false"
+
+# Skip certain steps for testing
+# Options: prereq,cert,security,distribution,dns,monitoring
+SKIP_STEPS=""
+
+# Force recreation of existing resources
+FORCE_RECREATE="false"
+
+# ================================
+# BACKUP AND RECOVERY
+# ================================
+
+# Backup directory for configuration snapshots
+BACKUP_DIR="./backups"
+
+# Retain backup files (number of versions to keep)
+BACKUP_RETENTION="5"
+
+# ================================
+# TEMPLATE METADATA
+# ================================
+
+# Template version
+TEMPLATE_VERSION="2.0.0"
+
+# Last updated
+TEMPLATE_UPDATED="2025-01-30"
+
+# Compatible script versions
+COMPATIBLE_SCRIPT_VERSIONS="2.0.0+"
+
+# ================================
+# VALIDATION RULES
+# ================================
+
+# These are used by the script for validation
+# Do not modify unless you understand the implications
+
+REQUIRED_FIELDS="DOMAIN,SUBDOMAIN,ALB_DNS_NAME,SECURITY_GROUP_ID,ALB_REGION"
+OPTIONAL_FIELDS="WEB_ACL_ID,SNS_TOPIC_ARN,LOG_BUCKET,CUSTOM_HEADER_VALUE"
+BOOLEAN_FIELDS="IPV6_ENABLED,COMPRESS,QUERY_STRING,ENABLE_MONITORING,ENABLE_ACCESS_LOGS"
+NUMERIC_FIELDS="DEFAULT_TTL,MIN_TTL,MAX_TTL,ERROR_RATE_THRESHOLD,REQUEST_THRESHOLD"
