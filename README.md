@@ -40,8 +40,24 @@ Terraform Infra for Genetic Analysis Support Platform Indonesia (GASPI)
 tree -L 3    # three-levels show
 ---
 .
-├── LICENSE
-├── README.md
+├── atlantis-server
+│   ├── assets
+│   │   ├── atlantis-pr-github-webhook.png
+│   │   ├── atlantis-pr-state-diagram.png
+│   │   ├── atlantis-sequence-gaspi-process.png
+│   │   ├── atlantis-sequence-process.png
+│   │   └── atlantis-state-diagram-process.png
+│   ├── atlantis-nginx-basic-auth.conf
+│   ├── atlantis-nginx.conf
+│   ├── docker
+│   │   ├── config
+│   │   ├── docker-compose-db-memory.yml
+│   │   ├── docker-compose-db-psql.yml
+│   │   ├── docker-compose.yml
+│   │   ├── docker-entrypoint.sh
+│   │   ├── Dockerfile
+│   │   └── scripts
+│   └── HOW-TO.md
 ├── docs
 │   └── assets
 │       └── ct.png
@@ -62,6 +78,28 @@ tree -L 3    # three-levels show
 │   │   ├── iam-logging
 │   │   ├── iam-tfuser-executor
 │   │   └── iam-user
+│   ├── gxc-consortium-uat03
+│   │   ├── _tfstate
+│   │   ├── budget
+│   │   ├── cloudtrails
+│   │   ├── core-ec2
+│   │   ├── HOW-TO.md
+│   │   ├── iam-tfuser-executor
+│   │   ├── iam-user
+│   │   ├── provider.tf
+│   │   ├── README.md
+│   │   └── variable.tf
+│   ├── gxc-consortium-uat04
+│   │   ├── _tfstate
+│   │   ├── budget
+│   │   ├── cloudtrails
+│   │   ├── core-ec2
+│   │   ├── HOW-TO.md
+│   │   ├── iam-tfuser-executor
+│   │   ├── iam-user
+│   │   ├── provider.tf
+│   │   ├── README.md
+│   │   └── variable.tf
 │   └── gxc-management
 │       ├── _kms_cmk-gxc-staging
 │       ├── _tfstate
@@ -69,6 +107,7 @@ tree -L 3    # three-levels show
 │       ├── core-ec2
 │       ├── iam-tfuser-executor
 │       └── iam-user
+├── LICENSE
 ├── modules
 │   ├── audit
 │   │   └── cloudtrails-opensearch
@@ -81,12 +120,12 @@ tree -L 3    # three-levels show
 │   ├── storage-efs
 │   ├── storage-s3
 │   └── tfstate
+├── README.md
 └── scripts
-    └── cleanup-resources
-        ├── cleanup.py
-        └── requirements.txt
+    ├── cleanup-resources
+    └── cloudfront-ssl
 
-42 directories, 113 files
+65 directories, 143 files
 ```
 
 ## Copyright
