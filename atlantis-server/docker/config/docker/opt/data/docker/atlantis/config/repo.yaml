@@ -82,3 +82,11 @@ workflows:
     apply:
       steps:
       - run: atlantis-deploy uat04 apply
+
+  uat05-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy uat05 plan
+    apply:
+      steps:
+      - run: atlantis-deploy uat05 apply
