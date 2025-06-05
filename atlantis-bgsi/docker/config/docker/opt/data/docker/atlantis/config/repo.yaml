@@ -1,0 +1,92 @@
+# Repository configurations
+repos:
+- id: github.com/bgsi-id/satusehat-research
+  branch: /.*/
+  apply_requirements: [approved, mergeable]
+  allowed_overrides: [workflow, plan_requirements, apply_requirements]
+  allow_custom_workflows: true
+  delete_source_branch_on_merge: true
+  workflow: dynamic-workflow
+
+workflows:
+  dynamic-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy hub01 plan
+    apply:
+      steps:
+      - run: atlantis-deploy hub01 apply
+
+  # HUB Workflows
+  hub01-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy hub01 plan
+    apply:
+      steps:
+      - run: atlantis-deploy hub01 apply
+
+  hub02-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy hub02 plan
+    apply:
+      steps:
+      - run: atlantis-deploy hub02 apply
+
+  hub03-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy hub03 plan
+    apply:
+      steps:
+      - run: atlantis-deploy hub03 apply
+
+  hub04-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy hub04 plan
+    apply:
+      steps:
+      - run: atlantis-deploy hub04 apply
+
+  # UAT Workflows
+  uat01-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy uat01 plan
+    apply:
+      steps:
+      - run: atlantis-deploy uat01 apply
+
+  uat02-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy uat02 plan
+    apply:
+      steps:
+      - run: atlantis-deploy uat02 apply
+
+  uat03-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy uat03 plan
+    apply:
+      steps:
+      - run: atlantis-deploy uat03 apply
+
+  uat04-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy uat04 plan
+    apply:
+      steps:
+      - run: atlantis-deploy uat04 apply
+
+  uat05-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy uat05 plan
+    apply:
+      steps:
+      - run: atlantis-deploy uat05 apply

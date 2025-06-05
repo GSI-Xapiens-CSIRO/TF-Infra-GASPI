@@ -1,4 +1,4 @@
-# Atlantis Dynamic Deployment System
+# Atlantis Dynamic Deployment System for GXC
 
 A comprehensive, dynamic deployment system for managing multiple AWS environments using Atlantis, Terraform, and OpenTelemetry-based infrastructure.
 
