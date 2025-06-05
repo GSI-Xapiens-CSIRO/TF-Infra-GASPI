@@ -47,7 +47,7 @@
   $HOME/.aws/config
   ---
   [profile GXC-TF-User-Executor]
-  role_arn = arn:aws:iam::463470956521:role/TF-Central-Role_463470956521
+  role_arn = arn:aws:iam::112233445566:role/TF-Central-Role_112233445566
   source_profile = GXC-TF-User-Executor
   region = ap-southeast-3
   output = json
