@@ -30,25 +30,12 @@ projects:
   apply_requirements: [approved]
   workflow: hub01-workflow
 
-- name: gxc-xapiens
-  branch: /xapiens/
-  dir: .
-  workspace: default
-  terraform_version: *tf_version
-  execution_order_group: 2
-  autoplan:
-    when_modified: *tf_files
-    enabled: true
-  plan_requirements: [approved]
-  apply_requirements: [approved]
-  workflow: hub02-workflow
-
 - name: gxc-hub01
   branch: /hub01/
   dir: .
   workspace: default
   terraform_version: *tf_version
-  execution_order_group: 3
+  execution_order_group: 2
   autoplan:
     when_modified: *tf_files
   workflow: hub01-workflow
@@ -58,7 +45,7 @@ projects:
   dir: .
   workspace: default
   terraform_version: *tf_version
-  execution_order_group: 4
+  execution_order_group: 3
   autoplan:
     when_modified: *tf_files
   workflow: hub02-workflow
@@ -68,7 +55,7 @@ projects:
   dir: .
   workspace: default
   terraform_version: *tf_version
-  execution_order_group: 5
+  execution_order_group: 4
   autoplan:
     when_modified: *tf_files
   workflow: hub03-workflow
@@ -78,10 +65,20 @@ projects:
   dir: .
   workspace: default
   terraform_version: *tf_version
-  execution_order_group: 6
+  execution_order_group: 5
   autoplan:
     when_modified: *tf_files
   workflow: hub04-workflow
+
+- name: gxc-hub05
+  branch: /hub05/
+  dir: .
+  workspace: default
+  terraform_version: *tf_version
+  execution_order_group: 6
+  autoplan:
+    when_modified: *tf_files
+  workflow: hub05-workflow
 
 - name: gxc-uat01
   branch: /uat01/

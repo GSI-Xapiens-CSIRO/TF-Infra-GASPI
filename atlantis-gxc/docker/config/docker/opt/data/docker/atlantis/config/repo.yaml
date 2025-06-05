@@ -1,6 +1,6 @@
 # Repository configurations
 repos:
-- id: github.com/GSI-Xapiens-CSIRO/BGSI-GeneticAnalysisSupportPlatformIndonesia-GASPI
+- id: github.com/bgsi-id/satusehat-research
   branch: /.*/
   apply_requirements: [approved, mergeable]
   allowed_overrides: [workflow, plan_requirements, apply_requirements]
