@@ -6,9 +6,9 @@ common-tags = {
 
 # cognito users
 gaspi-guest-username = "guest@example.com"
-gaspi-guest-password = "guest1234"
+gaspi-guest-password = "Guest@Example123!"
 gaspi-admin-username = "admin@example.com"
-gaspi-admin-password = "admin1234"
+gaspi-admin-password = "Admin@Example123!"
 gaspi-admin-email    = "devops@example.com"
 
 # buckets
@@ -17,12 +17,15 @@ metadata-bucket-prefix      = "gasi-metadata-"
 lambda-layers-bucket-prefix = "gasi-lambda-layers-"
 dataportal-bucket-prefix    = "gasi-dataportal-"
 
+max-request-rate-per-5mins      = 1000
+sbeacon-method-queue-size       = 100
+sbeacon-method-max-request-rate = 10
+svep-method-max-request-rate    = 10
+svep-method-queue-size          = 100
+
 ses-source-email = "devops@example.com"
-
 enable-inspector = false
-
-hub_name = "RSCM"
-
+hub_name         = "RSCM"
 svep-filters = {
   clinvar_exclude = [
     "Benign",
