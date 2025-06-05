@@ -65,6 +65,7 @@ tree -L 3    # three-levels show
 │   ├── gxc-consortium-hub01
 │   │   ├── _tfstate
 │   │   ├── budget
+│   │   ├── cloudfront-ssl
 │   │   ├── cloudtrails
 │   │   ├── core-ec2
 │   │   ├── iam-logging
@@ -73,6 +74,7 @@ tree -L 3    # three-levels show
 │   ├── gxc-consortium-hub02
 │   │   ├── _tfstate
 │   │   ├── budget
+│   │   ├── cloudfront-ssl
 │   │   ├── cloudtrails
 │   │   ├── core-ec2
 │   │   ├── iam-logging
@@ -81,6 +83,7 @@ tree -L 3    # three-levels show
 │   ├── gxc-consortium-uat03
 │   │   ├── _tfstate
 │   │   ├── budget
+│   │   ├── cloudfront-ssl
 │   │   ├── cloudtrails
 │   │   ├── core-ec2
 │   │   ├── HOW-TO.md
@@ -92,6 +95,7 @@ tree -L 3    # three-levels show
 │   ├── gxc-consortium-uat04
 │   │   ├── _tfstate
 │   │   ├── budget
+│   │   ├── cloudfront-ssl
 │   │   ├── cloudtrails
 │   │   ├── core-ec2
 │   │   ├── HOW-TO.md
@@ -112,6 +116,7 @@ tree -L 3    # three-levels show
 │   ├── audit
 │   │   └── cloudtrails-opensearch
 │   ├── budget
+│   ├── cloudfront-ssl
 │   ├── core-igw-ec2
 │   ├── core-nat-ec2
 │   ├── iam-tfuser-executor
@@ -125,7 +130,7 @@ tree -L 3    # three-levels show
     ├── cleanup-resources
     └── cloudfront-ssl
 
-65 directories, 143 files
+67 directories, 156 files
 ```
 
 ## Copyright
