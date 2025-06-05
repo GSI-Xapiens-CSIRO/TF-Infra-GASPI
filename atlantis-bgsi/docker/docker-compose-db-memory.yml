@@ -126,7 +126,7 @@ services:
       - ATLANTIS_CONFIG=/atlantis/atlantis.yaml
       - ATLANTIS_CONFIG_PATH=/atlantis/config
       - ATLANTIS_ALLOW_COMMANDS=version,plan,apply,unlock,approve_policies
-      - ATLANTIS_REPO_ALLOWLIST=${ATLANTIS_REPO_ALLOWLIST:-github.com/GSI-Xapiens-CSIRO/*}
+      - ATLANTIS_REPO_ALLOWLIST=${ATLANTIS_REPO_ALLOWLIST:-github.com/bgsi-id/satusehat-research/*}
       - ATLANTIS_REPO_CONFIG=/atlantis/repo.yaml
       - ATLANTIS_AUTOMERGE=true
       - ATLANTIS_AUTODISCOVER_MODE=auto
