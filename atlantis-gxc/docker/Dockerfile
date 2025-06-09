@@ -220,8 +220,8 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | b
 # Install Python requirements
 COPY requirements.txt ./
 COPY docker-entrypoint.sh /home/atlantis
-COPY atlantis-server/scripts/atlantis-deploy /usr/local/bin/atlantis-deploy
-COPY atlantis-server/scripts/install-atlantis-deploy /usr/local/bin/install-atlantis-deploy
+COPY scripts/atlantis-deploy /usr/local/bin/atlantis-deploy
+COPY scripts/install-atlantis-deploy /usr/local/bin/install-atlantis-deploy
 
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
