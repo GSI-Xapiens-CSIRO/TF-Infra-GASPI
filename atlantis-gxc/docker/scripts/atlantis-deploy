@@ -32,12 +32,16 @@ log_error() {
 }
 
 # Script metadata
-SCRIPT_VERSION="2.0.1"
+SCRIPT_VERSION="2.1.0"
 SCRIPT_NAME="atlantis-deploy"
 SCRIPT_AUTHOR="GXC DevOps-Team"
+SCRIPT_EMAIL="devops@example.com"
 SCRIPT_COMPANY="GXC Consortium"
 SCRIPT_LICENSE="Apache v2"
 SCRIPT_DATE="June, 2025"
+SCRIPT_PATTERN="GXC"
+SCRIPT_GH_USER="gxc-devops"
+SCRIPT_GH_REPO="GSI-Xapiens-CSIRO"
 
 # Display logo and version
 show_logo() {
@@ -98,9 +102,9 @@ EXAMPLES:
 
 ENVIRONMENT VARIABLES:
     GITHUB_TOKEN                     Required: GitHub Personal Access Token
-    GIT_USER_NAME                    Git commit author name (default: GXC-DevOps)
-    GIT_USER_EMAIL                   Git commit author email (default: devops@example.com)
-    GITHUB_USERNAME                  GitHub username for authentication (default: gxc-devops)
+    GIT_USER_NAME                    Git commit author name (default: $SCRIPT_AUTHOR)
+    GIT_USER_EMAIL                   Git commit author email (default: $SCRIPT_EMAIL)
+    GITHUB_USERNAME                  GitHub username for authentication (default: $SCRIPT_GH_USER)
     ATLANTIS_CONFIG_PATH             Config path (default: /atlantis/config)
     ATLANTIS_WORKSPACE               Current workspace directory
     ATLANTIS_PROJECT_NAME            Current project name
@@ -177,7 +181,7 @@ setup_environment_variables() {
     ENV_NUMBER=$(echo $ENVIRONMENT | sed 's/^[a-z]*//')
 
     # AWS Profile
-    AWS_PROFILE="GXC-TF-User-Executor-${ENVIRONMENT^^}"
+    AWS_PROFILE="$SCRIPT_PATTERN-TF-User-Executor-${ENVIRONMENT^^}"
 
     # Configuration paths
     CONFIG_BASE_PATH="${ATLANTIS_CONFIG_PATH:-/atlantis/config}"
@@ -336,7 +340,7 @@ setup_github_auth() {
 test_github_access() {
     log_info "Testing GitHub repository access"
 
-    local test_repo="GSI-Xapiens-CSIRO/report_templates"
+    local test_repo="$SCRIPT_GH_REPO/report_templates"
     local timeout_duration=30
 
     if timeout $timeout_duration git ls-remote --exit-code "https://github.com/${test_repo}.git" > /dev/null 2>&1; then
