@@ -149,7 +149,7 @@ RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.config/git,.
     chmod 755 /home/atlantis/{.local,.config,.config/git} && \
     # Create .gitconfig with proper permissions
     touch /home/atlantis/.gitconfig && \
-    chown -R 100:100 /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlanti,.gitconfig} && \
+    chown -R 100:100 /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis,.gitconfig} && \
     chmod 644 /home/atlantis/.gitconfig && \
     # Create .bash_profile and .bashrc with proper ownership
     touch /home/atlantis/.bash_profile /home/atlantis/.bashrc && \
