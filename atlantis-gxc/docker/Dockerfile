@@ -103,6 +103,7 @@ RUN dnf update -y --allowerasing && \
         intltool \
         glibc-langpack-en \
         zlib-devel && \
+        java-17-amazon-corretto-headless \
     dnf clean all && \
     rm -rf /var/cache/dnf/*
 
