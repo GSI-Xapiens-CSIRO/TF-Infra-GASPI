@@ -206,12 +206,12 @@ max_size      = 10
 Configure AWS profiles in `~/.aws/config`:
 
 ```ini
-[profile GXC-TF-User-Executor-HUB01]
+[profile BGSI-TF-User-Executor-HUB01]
 region = ap-southeast-3
 role_arn = arn:aws:iam::ACCOUNT-ID:role/TerraformExecutionRole
 source_profile = default
 
-[profile GXC-TF-User-Executor-HUB02]
+[profile BGSI-TF-User-Executor-HUB02]
 region = ap-southeast-3
 role_arn = arn:aws:iam::ACCOUNT-ID:role/TerraformExecutionRole
 source_profile = default
@@ -285,8 +285,8 @@ atlantis-deploy hub01 --help
 
 3. **Atlantis Commands**: Use Atlantis commands in PR comments
    ```
-   atlantis plan -p gxc-hub01
-   atlantis apply -p gxc-hub01
+   atlantis plan -p bgsi-hub01
+   atlantis apply -p bgsi-hub01
    ```
 
 #### Automatic Triggers
@@ -340,7 +340,7 @@ git ls-remote https://github.com/GSI-Xapiens-CSIRO/report_templates.git
 aws configure list-profiles
 
 # Test AWS access
-aws sts get-caller-identity --profile GXC-TF-User-Executor-HUB01
+aws sts get-caller-identity --profile BGSI-TF-User-Executor-HUB01
 
 # Verify IAM role permissions
 ```
@@ -453,7 +453,7 @@ atlantis-deploy --version
 3. **Update Atlantis Configuration**:
    ```yaml
    # Add to atlantis.yaml
-   - name: gxc-hub05
+   - name: bgsi-hub05
      branch: /hub05/
      workflow: hub05-workflow
    ```

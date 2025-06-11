@@ -132,7 +132,7 @@ services:
     #   args:
     #     PYTHON_VERSION: 3.12
     # image: ${ATLANTIS_IMAGE:-YOUR_AWS_ACCOUNT.dkr.ecr.ap-southeast-3.amazonaws.com/bgsi/atlantis-sbeacon}:${ATLANTIS_VERSION:-latest}
-    image: devopsxti/atlantis-gxc:latest
+    image: devopsxti/atlantis-bgsi:latest
     container_name: ${CONTAINER_ATLANTIS:-bgsi_atlantis}
     restart: unless-stopped
     ports:

@@ -1,17 +1,17 @@
-# Atlantis sBeacon Dockerfile Documentation
+# Atlantis BGSI Dockerfile Documentation
 
 ## Overview
 
 This Dockerfile creates a specialized container image for running Atlantis with AWS integration, Python 3.12 support, and Docker-in-Docker capabilities. It uses a multi-stage build process to optimize image size and enhance security while providing all necessary tools for modern DevOps workflows.
 
 Deployment tested under Amazon EKS (Kubernetes) Atlantis sBeacon
-- Docker Images: `devopsxti/atlantis-gxc:latest`
+- Docker Images: `devopsxti/atlantis-bgsi:latest`
 
 ## Reference
 
 - [sBeacon](https://aehrc.csiro.au/research/cloud-native-genomics/sbeacon-making-genomic-data-sharing-future-ready/)
 
-## Dockerfile `atlantis-gxc:20250611`
+## Dockerfile `atlantis-bgsi:20250611`
 
 ```
 # syntax=docker/dockerfile:1@sha256:865e5dd094beca432e8c0a1d5e1c465db5f998dca4e439981029b3b81fb39ed5
@@ -328,7 +328,7 @@ services:
   #================================================================================================
   atlantis-db:
     image: postgres:15-alpine
-    container_name: ${CONTAINER_ATLANTIS_DB:-gxc_atlantis_db}
+    container_name: ${CONTAINER_ATLANTIS_DB:-bgsi_atlantis_db}
     restart: unless-stopped
     environment:
       - POSTGRES_USER=${ATLANTIS_DB_USER:-atlantis}
@@ -362,7 +362,7 @@ services:
   portainer:
     # image: dockerframework/portainer:${PORTAINER_VERSION:-2.9}
     image: portainer/portainer-ce:${PORTAINER_VERSION:-2.30.1-alpine}
-    container_name: ${CONTAINER_PORTAINER:-gxc_portainer}
+    container_name: ${CONTAINER_PORTAINER:-bgsi_portainer}
     restart: unless-stopped
     ports:
       - "${PORT_PORTAINER:-5212}:9000"
@@ -392,8 +392,8 @@ services:
       dockerfile: Dockerfile
       args:
         PYTHON_VERSION: 3.12
-    # image: ${ATLANTIS_IMAGE:-YOUR_AWS_ACCOUNT.dkr.ecr.ap-southeast-3.amazonaws.com/gxc/atlantis-gxc}:${ATLANTIS_VERSION:-latest}
-    container_name: ${CONTAINER_ATLANTIS:-gxc_atlantis}
+    # image: ${ATLANTIS_IMAGE:-YOUR_AWS_ACCOUNT.dkr.ecr.ap-southeast-3.amazonaws.com/bgsi/atlantis-bgsi}:${ATLANTIS_VERSION:-latest}
+    container_name: ${CONTAINER_ATLANTIS:-bgsi_atlantis}
     restart: unless-stopped
     ports:
       - "${PORT_ATLANTIS:-4141}:4141"
@@ -418,13 +418,13 @@ services:
     environment:
       # GitHub Configuration
       - ATLANTIS_GH_HOSTNAME=github.com
-      - ATLANTIS_GH_USER=${ATLANTIS_GH_USER:-gxc-gh-user}
+      - ATLANTIS_GH_USER=${ATLANTIS_GH_USER:-bgsi-gh-user}
       - ATLANTIS_GH_TOKEN=${ATLANTIS_GH_TOKEN}
       - ATLANTIS_GH_WEBHOOK_SECRET=${ATLANTIS_GH_WEBHOOK_SECRET}
       # Git Configuration
-      - GITHUB_USERNAME=${ATLANTIS_GH_USER:-gxc-gh-user}
+      - GITHUB_USERNAME=${ATLANTIS_GH_USER:-bgsi-gh-user}
       - GITHUB_TOKEN=${ATLANTIS_GH_TOKEN}
-      - GIT_USER_NAME=${GIT_USER_NAME:-GXC DevOps}
+      - GIT_USER_NAME=${GIT_USER_NAME:-BGSI DevOps}
       - GIT_USER_EMAIL=${ATLANTIS_GH_EMAIL:-devops@example.com}
       - CONFIG_PATH=${ATLANTIS_CONFIG_PATH:-/atlantis/config}
       # Web Configuration
@@ -432,7 +432,7 @@ services:
       - ATLANTIS_PORT=${PORT_ATLANTIS:-4141}
       - ATLANTIS_ATLANTIS_URL=https://${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
       - ATLANTIS_WEB_BASIC_AUTH=${ATLANTIS_WEB_BASIC_AUTH:-true}
-      - ATLANTIS_WEB_USERNAME=${NGINX_BASIC_AUTH_USER:-gxc-admin}
+      - ATLANTIS_WEB_USERNAME=${NGINX_BASIC_AUTH_USER:-bgsi-admin}
       - ATLANTIS_WEB_PASSWORD=${NGINX_BASIC_AUTH_PASSWORD:-B4s1c-4uth}
       # Database Configuration
       - ATLANTIS_DB_TYPE=postgres
@@ -461,20 +461,20 @@ services:
       - ATLANTIS_PARALLEL_APPLY=true
       - ATLANTIS_ABORT_ON_EXECUTION_ORDER_FAIL=true
       # Organization Structure
-      - GXC_MANAGEMENT_ACCOUNT=${GXC_MANAGEMENT_ACCOUNT}
-      - GXC_SECURITY_ACCOUNT=${GXC_SECURITY_ACCOUNT}
-      - GXC_LOGS_ACCOUNT=${GXC_LOGS_ACCOUNT}
-      - GXC_BILLING_ACCOUNT=${GXC_BILLING_ACCOUNT}
-      - GXC_HUB01_ACCOUNT=${GXC_HUB01_ACCOUNT}
-      - GXC_HUB02_ACCOUNT=${GXC_HUB02_ACCOUNT}
-      - GXC_HUB03_ACCOUNT=${GXC_HUB03_ACCOUNT}
-      - GXC_HUB04_ACCOUNT=${GXC_HUB04_ACCOUNT}
-      - GXC_HUB05_ACCOUNT=${GXC_HUB05_ACCOUNT}
-      - GXC_UAT01_ACCOUNT=${GXC_UAT01_ACCOUNT}
-      - GXC_UAT02_ACCOUNT=${GXC_UAT02_ACCOUNT}
-      - GXC_UAT03_ACCOUNT=${GXC_UAT03_ACCOUNT}
-      - GXC_UAT04_ACCOUNT=${GXC_UAT04_ACCOUNT}
-      - GXC_UAT05_ACCOUNT=${GXC_UAT05_ACCOUNT}
+      - BGSI_MANAGEMENT_ACCOUNT=${BGSI_MANAGEMENT_ACCOUNT}
+      - BGSI_SECURITY_ACCOUNT=${BGSI_SECURITY_ACCOUNT}
+      - BGSI_LOGS_ACCOUNT=${BGSI_LOGS_ACCOUNT}
+      - BGSI_BILLING_ACCOUNT=${BGSI_BILLING_ACCOUNT}
+      - BGSI_HUB01_ACCOUNT=${BGSI_HUB01_ACCOUNT}
+      - BGSI_HUB02_ACCOUNT=${BGSI_HUB02_ACCOUNT}
+      - BGSI_HUB03_ACCOUNT=${BGSI_HUB03_ACCOUNT}
+      - BGSI_HUB04_ACCOUNT=${BGSI_HUB04_ACCOUNT}
+      - BGSI_HUB05_ACCOUNT=${BGSI_HUB05_ACCOUNT}
+      - BGSI_UAT01_ACCOUNT=${BGSI_UAT01_ACCOUNT}
+      - BGSI_UAT02_ACCOUNT=${BGSI_UAT02_ACCOUNT}
+      - BGSI_UAT03_ACCOUNT=${BGSI_UAT03_ACCOUNT}
+      - BGSI_UAT04_ACCOUNT=${BGSI_UAT04_ACCOUNT}
+      - BGSI_UAT05_ACCOUNT=${BGSI_UAT05_ACCOUNT}
       # Other Configuration
       - DEFAULT_CONFTEST_VERSION=${CONFTEST_VERSION:-0.56.0}
       - TZ=Asia/Jakarta
@@ -510,7 +510,7 @@ services:
   #================================================================================================
   nginx:
     image: nginx:1.25.3-alpine
-    container_name: ${CONTAINER_NGINX:-gxc_nginx}
+    container_name: ${CONTAINER_NGINX:-bgsi_nginx}
     restart: unless-stopped
     ports:
       - "80:80"
@@ -524,7 +524,7 @@ services:
       - NGINX_HOST=${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
       - NGINX_PORT=80
       # Basic Auth Configuration
-      - NGINX_BASIC_AUTH_USER=${NGINX_BASIC_AUTH_USER:-gxc-admin}
+      - NGINX_BASIC_AUTH_USER=${NGINX_BASIC_AUTH_USER:-bgsi-admin}
       - NGINX_BASIC_AUTH_PASSWORD=${NGINX_BASIC_AUTH_PASSWORD:-B4s1c-4uth}
     depends_on:
       - atlantis
@@ -708,18 +708,18 @@ DATA_ATLANTIS_CONFIG=/opt/data/docker/atlantis/config
 # CONTAINER CONFIGURATION
 #================================================================================================
 # Portainer Container
-CONTAINER_PORTAINER=gxc_portainer
+CONTAINER_PORTAINER=bgsi_portainer
 CONTAINER_IP_PORTAINER=172.149.149.5
 PORT_PORTAINER=5212
 
 # Atlantis Container
-CONTAINER_ATLANTIS=gxc_atlantis
+CONTAINER_ATLANTIS=bgsi_atlantis
 CONTAINER_IP_ATLANTIS=172.149.149.6
 CONTAINER_IP_ATLANTIS_DB=172.149.149.4
 PORT_ATLANTIS=4141
 
 # Nginx Container
-CONTAINER_NGINX=gxc_nginx
+CONTAINER_NGINX=bgsi_nginx
 DATA_NGINX=/opt/data/docker/nginx
 CONTAINER_IP_NGINX=172.149.149.7
 
@@ -728,7 +728,7 @@ CONTAINER_IP_NGINX=172.149.149.7
 #================================================================================================
 # Atlantis
 ATLANTIS_VERSION=latest
-ATLANTIS_IMAGE=devopsxti/atlantis-gxc:latest
+ATLANTIS_IMAGE=devopsxti/atlantis-bgsi:latest
 
 # Version tags
 PORTAINER_VERSION=2.20.3-alpine
@@ -738,13 +738,13 @@ PORTAINER_TEMPLATE=generic
 # GITHUB CONFIGURATION
 #================================================================================================
 ATLANTIS_GH_HOSTNAME=github.com
-ATLANTIS_GH_USER=gxc-gh-user
+ATLANTIS_GH_USER=bgsi-gh-user
 ATLANTIS_GH_EMAIL=devops@example.com
 ATLANTIS_WEB_HOSTNAME=atlantis.example.com
 ATLANTIS_REPO_ALLOWLIST=github.com/GSI-Xapiens-CSIRO/BGSI-GeneticAnalysisSupportPlatformIndonesia-GASPI/*
 ATLANTIS_REPO_CONFIG=/atlantis/repo.yaml
 ATLANTIS_CONFIG_PATH=/atlantis/config
-GIT_USER_NAME="GXC DevOps"
+GIT_USER_NAME="BGSI DevOps"
 
 # Security Secrets (DO NOT COMMIT - Set these in .env local)
 # ATLANTIS_GH_TOKEN=your-github-token
@@ -757,26 +757,26 @@ GIT_USER_NAME="GXC DevOps"
 AWS_REGION=ap-southeast-3
 
 # Account Structure (replace with your account IDs)
-GXC_MANAGEMENT_ACCOUNT=
-GXC_SECURITY_ACCOUNT=
-GXC_LOGS_ACCOUNT=
-GXC_BILLING_ACCOUNT=
-GXC_HUB01_ACCOUNT=
-GXC_HUB02_ACCOUNT=
-GXC_HUB03_ACCOUNT=
-GXC_HUB04_ACCOUNT=
-GXC_HUB05_ACCOUNT=
-GXC_UAT01_ACCOUNT=
-GXC_UAT02_ACCOUNT=
-GXC_UAT03_ACCOUNT=
-GXC_UAT04_ACCOUNT=
-GXC_UAT05_ACCOUNT=
+BGSI_MANAGEMENT_ACCOUNT=
+BGSI_SECURITY_ACCOUNT=
+BGSI_LOGS_ACCOUNT=
+BGSI_BILLING_ACCOUNT=
+BGSI_HUB01_ACCOUNT=
+BGSI_HUB02_ACCOUNT=
+BGSI_HUB03_ACCOUNT=
+BGSI_HUB04_ACCOUNT=
+BGSI_HUB05_ACCOUNT=
+BGSI_UAT01_ACCOUNT=
+BGSI_UAT02_ACCOUNT=
+BGSI_UAT03_ACCOUNT=
+BGSI_UAT04_ACCOUNT=
+BGSI_UAT05_ACCOUNT=
 
 #================================================================================================
 # SECURITY CONFIGURATION
 #================================================================================================
 # Basic Auth
-NGINX_BASIC_AUTH_USER=gxc-admin
+NGINX_BASIC_AUTH_USER=bgsi-admin
 NGINX_BASIC_AUTH_PASS=B4s1c-4uth
 
 #================================================================================================

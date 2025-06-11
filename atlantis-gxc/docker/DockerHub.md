@@ -1,4 +1,4 @@
-# Atlantis sBeacon Dockerfile Documentation
+# Atlantis GXC Dockerfile Documentation
 
 ## Overview
 
