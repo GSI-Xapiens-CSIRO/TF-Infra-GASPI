@@ -118,8 +118,8 @@ RUN dnf update -y --allowerasing && \
         autoconf \
         intltool \
         glibc-langpack-en \
-        zlib-devel && \
-        java-17-amazon-corretto-headless \
+        zlib-devel \
+        java-17-amazon-corretto-headless && \
     dnf clean all && \
     rm -rf /var/cache/dnf/*
 
@@ -152,8 +152,7 @@ RUN echo "docker:x:999:" >> /etc/group && \
     sed -i 's/docker:x:999:/docker:x:999:100/' /etc/group
 
 # Ensure proper permissions for atlantis user home directory
-RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis} && \
-    mkdir -p /home/atlantis/.config/git && \
+RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.config/git,.pyenv,.npm,.pnpm,.atlantis} && \
     mkdir -p /atlantis-data && \
     mkdir -p /atlantis && \
     # Set ownership for all atlantis home directory
@@ -162,14 +161,11 @@ RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.
     chown -R 100:100 /atlantis && \
     # Set proper permissions
     chmod 755 /home/atlantis && \
-    chmod 700 /home/atlantis/.ssh && \
-    chmod 700 /home/atlantis/.aws && \
-    chmod 755 /home/atlantis/.local && \
-    chmod 755 /home/atlantis/.config && \
-    chmod 755 /home/atlantis/.config/git && \
+    chmod 700 /home/atlantis/{.ssh,.aws} && \
+    chmod 755 /home/atlantis/{.local,.config,.config/git} && \
     # Create .gitconfig with proper permissions
     touch /home/atlantis/.gitconfig && \
-    chown 100:100 /home/atlantis/.gitconfig && \
+    chown -R 100:100 /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlanti,.gitconfig} && \
     chmod 644 /home/atlantis/.gitconfig && \
     # Create .bash_profile and .bashrc with proper ownership
     touch /home/atlantis/.bash_profile /home/atlantis/.bashrc && \
