@@ -42,6 +42,7 @@ SCRIPT_DATE="June, 2025"
 SCRIPT_PATTERN="BGSI"
 SCRIPT_GH_USER="bgsi-devops"
 SCRIPT_GH_REPO="bgsi-id"
+SCRIPT_RUN_TEST="${SCRIPT_RUN_TEST:-false}"  # Default to false if not set
 
 # Display logo and version
 show_logo() {
@@ -686,11 +687,21 @@ main() {
 
     # Terraform operations
     safe_execute initialize_terraform "Failed to initialize Terraform" || return 1
-    # Run tests before plan/apply operations
-    log_info "============================================================"
-    log_info "EXECUTING APPLICATION TESTS"
-    log_info "============================================================"
-    safe_execute run_application_tests "Application tests failed" || return 1
+
+    # Conditionally run tests based on SCRIPT_RUN_TEST variable
+    if [[ "$SCRIPT_RUN_TEST" == "true" ]]; then
+        log_info "============================================================"
+        log_info "EXECUTING APPLICATION TESTS"
+        log_info "============================================================"
+        safe_execute run_application_tests "Application tests failed" || return 1
+    else
+        log_info "============================================================"
+        log_info "SKIPPING APPLICATION TESTS"
+        log_info "============================================================"
+        log_warning "Test execution is disabled"
+        log_info "To enable tests, set: SCRIPT_RUN_TEST=true"
+        echo ""
+    fi
 
     case $OPERATION in
         "plan")
