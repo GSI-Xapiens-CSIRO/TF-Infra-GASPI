@@ -40,111 +40,76 @@ Terraform Infra for Genetic Analysis Support Platform Indonesia (GASPI)
 tree -L 3    # three-levels show
 ---
 .
-├── atlantis-bgsi
-│   ├── assets
-│   │   ├── atlantis-pr-github-webhook.png
-│   │   ├── atlantis-pr-state-diagram.png
-│   │   ├── atlantis-sequence-gaspi-process.png
-│   │   ├── atlantis-sequence-process.png
-│   │   └── atlantis-state-diagram-process.png
-│   ├── atlantis-nginx-basic-auth.conf
-│   ├── atlantis-nginx.conf
-│   ├── docker
-│   │   ├── config
-│   │   ├── docker-compose-db-memory.yml
-│   │   ├── docker-compose-db-psql.yml
-│   │   ├── docker-compose-nonginx.yml
-│   │   ├── docker-compose.yml
-│   │   ├── docker-entrypoint.sh
-│   │   ├── Dockerfile
-│   │   └── scripts
-│   └── HOW-TO.md
-├── atlantis-gxc
-│   ├── assets
-│   ├── atlantis-nginx-basic-auth.conf
-│   ├── atlantis-nginx.conf
-│   ├── docker
-│   │   ├── config
-│   │   ├── docker-compose-db-memory.yml
-│   │   ├── docker-compose-db-psql.yml
-│   │   ├── docker-compose.yml
-│   │   ├── docker-entrypoint.sh
-│   │   ├── Dockerfile
-│   │   └── scripts
-│   └── HOW-TO.md
-├── docs
-│   └── assets
-│       └── ct.png
-├── environments
-│   ├── gxc-consortium-hub01
-│   │   ├── _tfstate
-│   │   ├── budget
-│   │   ├── cloudtrails
-│   │   ├── core-ec2
-│   │   ├── iam-logging
-│   │   ├── iam-tfuser-executor
-│   │   └── iam-user
-│   ├── gxc-consortium-hub02
-│   │   ├── _tfstate
-│   │   ├── budget
-│   │   ├── cloudtrails
-│   │   ├── core-ec2
-│   │   ├── iam-logging
-│   │   ├── iam-tfuser-executor
-│   │   └── iam-user
-│   ├── gxc-consortium-uat03
-│   │   ├── _tfstate
-│   │   ├── budget
-│   │   ├── cloudtrails
-│   │   ├── core-ec2
-│   │   ├── HOW-TO.md
-│   │   ├── iam-tfuser-executor
-│   │   ├── iam-user
-│   │   ├── provider.tf
-│   │   ├── README.md
-│   │   └── variable.tf
-│   ├── gxc-consortium-uat04
-│   │   ├── _tfstate
-│   │   ├── budget
-│   │   ├── cloudtrails
-│   │   ├── core-ec2
-│   │   ├── HOW-TO.md
-│   │   ├── iam-tfuser-executor
-│   │   ├── iam-user
-│   │   ├── provider.tf
-│   │   ├── README.md
-│   │   └── variable.tf
-│   └── gxc-management
-│       ├── _kms_cmk-gxc-staging
-│       ├── _tfstate
-│       ├── budget
-│       ├── core-ec2
-│       ├── iam-tfuser-executor
-│       └── iam-user
-├── gen-docs.sh
 ├── LICENSE
-├── modules
-│   ├── audit
-│   │   └── cloudtrails-opensearch
-│   ├── budget
-│   ├── cloudfront-ssl
-│   ├── core-igw-ec2
-│   ├── core-nat-ec2
-│   ├── iam-tfuser-executor
-│   ├── iam-user
-│   ├── s3-logs
-│   ├── storage-efs
-│   ├── storage-s3
-│   └── tfstate
 ├── README.md
-├── scripts
-│   ├── cleanup-resources
-│   │   ├── cleanup.py
-│   │   └── requirements.txt
-│   └── cloudfront-ssl
-└── structure.md
+├── atlantis-bgsi
+│   ├── HOW-TO.md
+│   ├── assets
+│   ├── atlantis-nginx-basic-auth.conf
+│   ├── atlantis-nginx.conf
+│   └── docker
+│       ├── DockerHub.md
+│       ├── Dockerfile
+│       ├── config
+│       ├── docker-compose-db-memory.yml
+│       ├── docker-compose-db-psql.yml
+│       ├── docker-compose-nonginx.yml
+│       ├── docker-compose.yml
+│       ├── docker-entrypoint.sh
+│       ├── package-lock.json
+│       ├── package.json
+│       ├── requirements.txt
+│       └── scripts
+├── atlantis-gxc
+│   ├── HOW-TO.md
+│   ├── assets
+│   ├── atlantis-nginx-basic-auth.conf
+│   ├── atlantis-nginx.conf
+│   └── docker
+│       ├── DockerHub.md
+│       ├── Dockerfile
+│       ├── config
+│       ├── docker-compose-db-memory.yml
+│       ├── docker-compose-db-psql.yml
+│       ├── docker-compose.yml
+│       ├── docker-entrypoint.sh
+│       ├── package-lock.json
+│       ├── package.json
+│       ├── requirements.txt
+│       └── scripts
+├── docs
+│   └── assets
+│       └── ct.png
+├── environments
+│   ├── ct
+│   │   └── gxc-management
+│   ├── dev
+│   │   ├── gxc-consortium-hub01
+│   │   └── gxc-consortium-hub02
+│   └── uat
+│       ├── gxc-consortium-uat03
+│       └── gxc-consortium-uat04
+├── gen-docs.sh
+├── modules
+│   ├── audit
+│   │   └── cloudtrails-opensearch
+│   ├── budget
+│   ├── cloudfront-ssl
+│   ├── core-igw-ec2
+│   ├── core-nat-ec2
+│   ├── iam-tfuser-executor
+│   ├── iam-user
+│   ├── s3-logs
+│   ├── storage-efs
+│   ├── storage-s3
+│   └── tfstate
+└── scripts
+    ├── cleanup-resources
+    │   ├── cleanup.py
+    │   └── requirements.txt
+    └── cloudfront-ssl
 
-72 directories, 172 files
+43 directories, 171 files
 ```
 
 ## Copyright
