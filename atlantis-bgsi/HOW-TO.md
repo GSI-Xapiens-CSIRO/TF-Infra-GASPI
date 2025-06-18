@@ -79,10 +79,10 @@ cd BGSI-GeneticAnalysisSupportPlatformIndonesia-GASPI
 
 ```bash
 # Make installation script executable
-chmod +x install-atlantis-deploy.sh
+chmod +x install-atlantis-deploy
 
 # Install as root/sudo
-sudo ./install-atlantis-deploy.sh
+sudo ./install-atlantis-deploy
 ```
 
 **Expected Output:**
@@ -118,8 +118,8 @@ atlantis-deploy hub01 --help
 ```
 repository/
 ├── scripts/
-│   ├── atlantis-deploy.sh              # Source script
-│   └── install-atlantis-deploy.sh      # Installation script
+│   ├── atlantis-deploy              # Source script
+│   └── install-atlantis-deploy      # Installation script
 ├── atlantis.yaml                       # Project configuration
 ├── repo.yaml                           # Repository workflows
 ├── README.md                           # This documentation
@@ -428,7 +428,7 @@ kubectl logs -f deployment/atlantis | grep "hub01-workflow"
 vim scripts/atlantis-deploy
 
 # Reinstall system-wide
-sudo ./install-atlantis-deploy.sh
+sudo ./install-atlantis-deploy
 
 # Verify update
 atlantis-deploy --version
@@ -529,7 +529,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install atlantis-deploy
-        run: sudo ./install-atlantis-deploy.sh
+        run: sudo ./install-atlantis-deploy
       - name: Test script
         run: atlantis-deploy --version
 ```
@@ -560,13 +560,13 @@ git push origin feature/new-enhancement
 
 ```bash
 # Run tests
-./scripts/test-atlantis-deploy.sh
+./scripts/test-atlantis-deploy
 
 # Lint script
 shellcheck scripts/atlantis-deploy
 
 # Test installation
-sudo ./install-atlantis-deploy.sh
+sudo ./install-atlantis-deploy
 ```
 
 ### Code Style

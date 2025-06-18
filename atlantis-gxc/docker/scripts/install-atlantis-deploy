@@ -12,7 +12,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Source and destination paths
-SOURCE_SCRIPT="./scripts/atlantis-deploy.sh"
+SOURCE_SCRIPT="./scripts/atlantis-deploy"
 DEST_PATH="/usr/local/bin/atlantis-deploy"
 
 # Check if source script exists
