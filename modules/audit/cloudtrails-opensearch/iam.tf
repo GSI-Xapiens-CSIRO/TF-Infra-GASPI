@@ -153,6 +153,63 @@ resource "aws_iam_role_policy" "cloudtrail_cloudwatch_policy" {
           "arn:aws:lambda:${var.aws_region}:${var.aws_account_id_destination}:function:svep-*"
         ]
       }
+      ## Bucket Policy ##
+      # {
+      #   Sid    = "AWSCloudTrailAclCheck"
+      #   Effect = "Allow"
+      #   Principal = {
+      #     Service = "cloudtrail.amazonaws.com"
+      #   }
+      #   Action   = "s3:GetBucketAcl"
+      #   Resource = aws_s3_bucket.cloudtrail.arn
+      # },
+      # {
+      #   Sid    = "AWSCloudTrailMultiRegionWrite"
+      #   Effect = "Allow"
+      #   Principal = {
+      #     Service = "cloudtrail.amazonaws.com"
+      #   }
+      #   Action   = "s3:PutObject"
+      #   Resource = "${aws_s3_bucket.cloudtrail.arn}/AWSLogs/${var.aws_account_id_destination}/*"
+      #   Condition = {
+      #     StringEquals = {
+      #       "s3:x-amz-acl" = "bucket-owner-full-control"
+      #     }
+      #     StringLike = {
+      #       "aws:SourceArn" = "arn:aws:cloudtrail:*:${var.aws_account_id_destination}:trail/genomic-services-trail-${var.aws_account_id_destination}"
+      #     }
+      #   }
+      # },
+      # {
+      #   Sid    = "AWSCloudTrailWrite"
+      #   Effect = "Allow"
+      #   Principal = {
+      #     Service = "cloudtrail.amazonaws.com"
+      #   }
+      #   Action   = "s3:PutObject"
+      #   Resource = "${aws_s3_bucket.cloudtrail.arn}/AWSLogs/${var.aws_account_id_destination}/*"
+      #   Condition = {
+      #     StringEquals = {
+      #       "s3:x-amz-acl"  = "bucket-owner-full-control"
+      #       "aws:SourceArn" = "arn:aws:cloudtrail:${var.aws_region}:${var.aws_account_id_destination}:trail/genomic-services-trail-${var.aws_account_id_destination}"
+      #     }
+      #   }
+      # },
+      # {
+      #   Sid       = "AllowSSLRequestsOnly"
+      #   Effect    = "Deny"
+      #   Principal = "*"
+      #   Action    = "s3:*"
+      #   Resource = [
+      #     aws_s3_bucket.cloudtrail.arn,
+      #     "${aws_s3_bucket.cloudtrail.arn}/*"
+      #   ]
+      #   Condition = {
+      #     Bool = {
+      #       "aws:SecureTransport" = "false"
+      #     }
+      #   }
+      # }
     ]
   })
 }

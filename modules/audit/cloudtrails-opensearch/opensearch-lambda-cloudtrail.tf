@@ -1,5 +1,3 @@
-# opensearch-lambda-cloudtrail.tf
-
 # Lambda Insights configuration
 locals {
   lambda_insights_versions = {
@@ -17,7 +15,6 @@ locals {
   lambda_insights_layer_arn = contains(keys(local.lambda_insights_versions), var.aws_region) ? "arn:aws:lambda:${var.aws_region}:${var.aws_account_id_destination}:layer:LambdaInsightsExtension:${local.lambda_insights_versions[var.aws_region]}" : null
 }
 
-
 # Create build directory
 resource "null_resource" "create_build_dir" {
   provisioner "local-exec" {
@@ -25,46 +22,83 @@ resource "null_resource" "create_build_dir" {
   }
 }
 
-# Build Lambda layer
+# Enhanced Lambda layer build process
 resource "null_resource" "build_layer" {
   depends_on = [null_resource.create_build_dir]
 
   provisioner "local-exec" {
     command = <<EOF
       cd ${path.module}
-      python -m venv venv
+      rm -rf venv build/layer build/lambda_layer_cloudtrail.zip
+
+      # Create virtual environment
+      python3 -m venv venv
       source venv/bin/activate
-      pip install -r requirements.txt --target build/layer/python
+
+      # Upgrade pip and install wheel for better compatibility
+      pip install --upgrade pip setuptools wheel
+
+      # Install dependencies with all subdependencies
+      pip install -r requirements.txt --target build/layer/python --no-cache-dir --force-reinstall
+
+      # FIXED: Explicitly install missing dependencies that might not be auto-resolved
+      pip install idna>=3.4 charset-normalizer>=3.3.0 certifi>=2023.0.0 urllib3>=1.26.0 --target build/layer/python --no-cache-dir --force-reinstall
+
+      # Clean up unnecessary files to reduce layer size
+      find build/layer/python -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+      find build/layer/python -name "*.pyc" -delete 2>/dev/null || true
+      find build/layer/python -name "*.pyo" -delete 2>/dev/null || true
+      find build/layer/python -type d -name "*.dist-info" -exec rm -rf {} + 2>/dev/null || true
+      find build/layer/python -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
+
+      # Create the layer zip
       cd build/layer
-      zip -r ../lambda_layer_cloudtrail.zip python/
-      deactivate
-      rm -rf ${path.module}/venv
+      zip -r ../lambda_layer_cloudtrail.zip python/ -x "*.pyc" "*/__pycache__/*" "*.pyo" "*/*.dist-info/*" "*/*.egg-info/*"
+
+      # Cleanup
+      cd ${path.module}
+      deactivate 2>/dev/null || true
+      rm -rf venv
     EOF
   }
 
-  # Trigger rebuild if layer contents change
   triggers = {
     requirements_hash = filesha256("${path.module}/requirements.txt")
+    timestamp         = timestamp()
   }
 }
 
-# Lambda layer for dependencies
+# Archive file for layer to ensure consistent hashing
+data "archive_file" "lambda_layer" {
+  type        = "zip"
+  source_dir  = "${path.module}/build/layer"
+  output_path = "${path.module}/build/lambda_layer_cloudtrail.zip"
+
+  depends_on = [null_resource.build_layer]
+}
+
+# Lambda layer with enhanced error handling
 resource "aws_lambda_layer_version" "cloudtrail_dependencies" {
   filename            = "${path.module}/build/lambda_layer_cloudtrail.zip"
   layer_name          = "genomic-cloudtrail-dependencies-${var.aws_account_id_destination}"
-  description         = "Dependencies for CloudTrail processing Lambda function"
+  description         = "Dependencies for CloudTrail processing Lambda function - Fixed IDNA issue"
   compatible_runtimes = ["python3.12"]
 
-  # Ensure consistent hash calculation
-  source_code_hash = fileexists("${path.module}/build/lambda_layer_cloudtrail.zip") ? filebase64sha256("${path.module}/build/lambda_layer_cloudtrail.zip") : null
+  # Use data archive file for consistent hashing
+  source_code_hash = data.archive_file.lambda_layer.output_base64sha256
 
   depends_on = [null_resource.build_layer]
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.build_layer
+    ]
+  }
 }
 
 # --------------------------------------------------------------------------
 #  Lambda Function
 # --------------------------------------------------------------------------
-# Lambda Function Code
 data "archive_file" "cloudtrail_processor" {
   type        = "zip"
   source_file = "${path.module}/src/opensearch_handler.py"
@@ -79,45 +113,53 @@ resource "null_resource" "build_function" {
     command = <<EOF
       cp ${path.module}/src/opensearch_handler.py ${path.module}/build/lambda/
       cd ${path.module}/build/lambda
+      rm -f cloudtrail_processor.zip
       zip cloudtrail_processor.zip opensearch_handler.py
     EOF
   }
 
-  # Trigger rebuild if layer contents change
   triggers = {
     source_hash = filesha256("${path.module}/src/opensearch_handler.py")
   }
 }
 
-# Lambda function
+# Lambda function with better dependency management
 resource "aws_lambda_function" "cloudtrail_processor" {
-  filename      = "${path.module}/build/lambda/cloudtrail_processor.zip"
+  filename      = data.archive_file.cloudtrail_processor.output_path
   function_name = "genomic-cloudtrail-processor-${var.aws_account_id_destination}"
-  description   = "Capture all CloudTrail logs to Kinesis and send to OpenSearch"
+  description   = "Capture all CloudTrail logs to Kinesis and send to OpenSearch with intelligent batching - Fixed Dependencies"
   role          = aws_iam_role.lambda_transform.arn
   handler       = "opensearch_handler.handler"
   runtime       = "python3.12"
-  timeout       = 120
-  memory_size   = 256
+  timeout       = 900  # 15 minutes
+  memory_size   = 3008 # 3GB
 
   # This ensures the function is updated when the code changes
-  source_code_hash = fileexists(data.archive_file.cloudtrail_processor.output_path) ? data.archive_file.cloudtrail_processor.output_base64sha256 : null
+  source_code_hash = data.archive_file.cloudtrail_processor.output_base64sha256
+
   layers = [
     aws_lambda_layer_version.cloudtrail_dependencies.arn,
   ]
 
-  # vpc_config {
-  #   subnet_ids         = var.private_subnet_ids
-  #   security_group_ids = [aws_security_group.lambda.id]
-  # }
+  # Add reserved concurrency to prevent overwhelming OpenSearch
+  reserved_concurrent_executions = var.environment[local.env] == "prod" ? 10 : 5
 
   environment {
     variables = {
       OPENSEARCH_DOMAIN_ENDPOINT = aws_opensearch_domain.cloudtrail.endpoint
       REGION                     = var.aws_region
+      ENVIRONMENT                = var.environment[local.env]
       LOG_LEVEL                  = upper(var.environment[local.env])
       ERROR_SNS_TOPIC            = aws_sns_topic.cloudtrail_alerts.arn
       PYTHONWARNINGS             = "ignore:Unverified HTTPS request"
+
+      # Batching configuration variables
+      OPENSEARCH_BATCH_SIZE          = var.opensearch_batch_size
+      OPENSEARCH_MAX_REQUEST_SIZE_MB = var.opensearch_max_request_size_mb
+      ENABLE_BATCH_SPLITTING         = "true"
+
+      # Add Python path to ensure all modules are found
+      PYTHONPATH = "/opt/python:/var/runtime:/var/task"
     }
   }
 
@@ -125,11 +167,17 @@ resource "aws_lambda_function" "cloudtrail_processor" {
     mode = "Active" # Enables X-Ray tracing
   }
 
+  # Add dead letter queue for failed batches
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_dlq.arn
+  }
+
   tags = merge(
     local.common_tags,
     {
-      Name      = "CloudTrail Log Processor"
+      Name      = "CloudTrail Log Processor with Batching"
       Function  = "Log Processing and Index Management"
+      Version   = "1.4.35" # Updated version
       UpdatedAt = timestamp()
     }
   )
@@ -139,15 +187,48 @@ resource "aws_lambda_function" "cloudtrail_processor" {
     aws_opensearch_domain.cloudtrail,
     aws_cloudwatch_log_group.cloudtrail_processor,
     aws_iam_role_policy.lambda_transform,
-    aws_iam_role_policy_attachment.lambda_logging
+    aws_iam_role_policy_attachment.lambda_logging,
+    aws_lambda_layer_version.cloudtrail_dependencies
   ]
+}
+
+# --------------------------------------------------------------------------
+#  Dead Letter Queue for Failed Batches
+# --------------------------------------------------------------------------
+resource "aws_sqs_queue" "lambda_dlq" {
+  name                       = "genomic-cloudtrail-lambda-dlq-${var.aws_account_id_destination}"
+  message_retention_seconds  = 1209600 # 14 days
+  visibility_timeout_seconds = 60
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "Lambda DLQ for failed batches"
+    }
+  )
+}
+
+# --------------------------------------------------------------------------
+#  CloudWatch Monitoring
+# --------------------------------------------------------------------------
+resource "aws_cloudwatch_log_metric_filter" "batch_errors" {
+  name           = "opensearch-batch-errors"
+  pattern        = "ERROR" # Simple pattern
+  log_group_name = aws_cloudwatch_log_group.cloudtrail_processor.name
+
+  metric_transformation {
+    name          = "BatchErrors"
+    namespace     = "GenomicServices/OpenSearch"
+    value         = "1"
+    default_value = "0"
+  }
 }
 
 # --------------------------------------------------------------------------
 #  Lambda Permissions to access OpenSearch
 # --------------------------------------------------------------------------
 resource "aws_lambda_permission" "allow_firehose" {
-  statement_id  = "AllowExecutionFromFirehoseStream" # Changed from AllowExecutionFromFirehose
+  statement_id  = "AllowExecutionFromFirehoseStream"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cloudtrail_processor.function_name
   principal     = "firehose.amazonaws.com"
@@ -159,14 +240,13 @@ resource "aws_lambda_permission" "allow_firehose" {
   ]
 }
 
-# Update this permission with specific statement ID and source ARN
 resource "aws_lambda_permission" "allow_firehose_invoke" {
-  statement_id   = "AllowExecutionFromFirehoseAccount" # Changed from AllowExecutionFromFirehose
+  statement_id   = "AllowExecutionFromFirehoseAccount"
   action         = "lambda:InvokeFunction"
   function_name  = aws_lambda_function.cloudtrail_processor.function_name
   principal      = "firehose.amazonaws.com"
   source_account = var.aws_account_id_destination
-  source_arn     = aws_kinesis_firehose_delivery_stream.opensearch.arn # Added source_arn
+  source_arn     = aws_kinesis_firehose_delivery_stream.opensearch.arn
 
   depends_on = [
     aws_lambda_function.cloudtrail_processor,

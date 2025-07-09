@@ -6,14 +6,18 @@ from datetime import datetime
 import boto3
 import requests
 from requests_aws4auth import AWS4Auth
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, Iterator
 from io import BytesIO
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
-__version__ = "1.4.34"
+__version__ = "1.4.35"
 __standard_index__ = "logs-cloudtrail"
+
+class BatchSizeError(Exception):
+    """Custom exception for batch size issues"""
+    pass
 
 class CloudWatchLogProcessor:
     def __init__(self):
@@ -213,8 +217,16 @@ class OpenSearchManager:
         self.domain = os.environ['OPENSEARCH_DOMAIN_ENDPOINT']
         self.region = os.environ.get('REGION', 'ap-southeast-3')
         self.environment = os.environ.get('ENVIRONMENT', 'dev')
+
+        # Configurable batch settings
+        self.max_batch_size = int(os.environ.get('OPENSEARCH_BATCH_SIZE', '500'))
+        self.max_request_size_mb = int(os.environ.get('OPENSEARCH_MAX_REQUEST_SIZE_MB', '30'))
+        self.max_payload_size = self.max_request_size_mb * 1024 * 1024  # Convert to bytes
+
         self.auth = self._get_aws_auth()
         self._ensure_index_template()
+
+        print(f"OpenSearch Manager initialized - Batch size: {self.max_batch_size}, Max payload: {self.max_request_size_mb}MB")
 
     @xray_recorder.capture('get_aws_auth')
     def _get_aws_auth(self) -> AWS4Auth:
@@ -241,7 +253,7 @@ class OpenSearchManager:
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10),
-        retry=retry_if_exception_type(requests.exceptions.RequestException)
+        retry=retry_if_exception_type((requests.exceptions.RequestException, requests.exceptions.Timeout))
     )
     def _make_request(self, method: str, endpoint: str, data: str = None) -> requests.Response:
         """Make HTTP request to OpenSearch with X-Ray tracing"""
@@ -253,6 +265,10 @@ class OpenSearchManager:
             subsegment.put_annotation('endpoint', endpoint)
             subsegment.put_annotation('method', method)
 
+            # Check payload size before making request
+            if data and len(data.encode('utf-8')) > self.max_payload_size:
+                raise BatchSizeError(f"Request payload too large: {len(data.encode('utf-8'))/1024/1024:.2f}MB > {self.max_request_size_mb}MB")
+
             response = requests.request(
                 method=method,
                 url=url,
@@ -260,7 +276,7 @@ class OpenSearchManager:
                 headers=headers,
                 data=data,
                 verify=True,
-                timeout=30
+                timeout=60  # Increased timeout
             )
 
             subsegment.put_annotation('status_code', response.status_code)
@@ -290,7 +306,9 @@ class OpenSearchManager:
             "template": {
                 "settings": {
                     "number_of_shards": 1,
-                    "number_of_replicas": 1
+                    "number_of_replicas": 1,
+                    "refresh_interval": "30s",
+                    "max_result_window": 50000
                 },
                 "mappings": {
                     "dynamic_templates": [
@@ -426,12 +444,53 @@ class OpenSearchManager:
             # Return original document if normalization fails
             return doc
 
-    @xray_recorder.capture('opensearch_bulk_index')
-    def bulk_index(self, documents: List[Dict]) -> Dict:
+    @xray_recorder.capture('opensearch_create_batches')
+    def _create_batches(self, documents: List[Dict]) -> Iterator[List[Dict]]:
+        """Split documents into smaller batches based on size and count"""
+        if not documents:
+            return
+
+        current_batch = []
+        current_batch_size = 0
+
+        # Estimate average document size from first few documents
+        sample_size = min(10, len(documents))
+        sample_docs = documents[:sample_size]
+        avg_doc_size = sum(len(json.dumps(doc).encode('utf-8')) for doc in sample_docs) // sample_size
+
+        # Calculate safe batch size with 50% safety margin
+        safe_max_size = int(self.max_payload_size * 0.5)
+        estimated_max_docs = safe_max_size // (avg_doc_size * 2)  # Account for bulk metadata
+        dynamic_batch_size = min(self.max_batch_size, estimated_max_docs, 2000)
+
+        print(f"Batch strategy: avg_doc_size={avg_doc_size}B, dynamic_batch_size={dynamic_batch_size}")
+
+        for doc in documents:
+            doc_json = json.dumps(doc)
+            doc_size = len(doc_json.encode('utf-8'))
+
+            # Check if adding this document would exceed limits
+            if (len(current_batch) >= dynamic_batch_size or
+                current_batch_size + doc_size > safe_max_size):
+
+                if current_batch:
+                    yield current_batch
+                    current_batch = []
+                    current_batch_size = 0
+
+            current_batch.append(doc)
+            current_batch_size += doc_size
+
+        # Yield remaining batch
+        if current_batch:
+            yield current_batch
+
+    @xray_recorder.capture('opensearch_bulk_index_batch')
+    def _bulk_index_single_batch(self, documents: List[Dict], batch_num: int = 0) -> Dict:
+        """Index a single batch of documents"""
         if not documents:
             return {"took": 0, "errors": False, "items": []}
 
-        subsegment = xray_recorder.begin_subsegment('bulk_index_preparation')
         try:
             bulk_body = []
             current_date = datetime.now().strftime('%Y.%m.%d')
@@ -457,11 +516,9 @@ class OpenSearchManager:
                 ])
 
             bulk_request = "\n".join(bulk_body) + "\n"
-            print(f"Attempting to bulk index {len(documents)} documents to {index_name}")
+            payload_size_mb = len(bulk_request.encode('utf-8')) / 1024 / 1024
 
-            # Add trace metadata
-            subsegment.put_metadata('document_count', len(documents))
-            subsegment.put_metadata('index_name', index_name)
+            print(f"Batch {batch_num}: {len(documents)} docs, {payload_size_mb:.2f}MB -> {index_name}")
 
             response = self._make_request('POST', '_bulk', data=bulk_request)
             result = response.json()
@@ -470,19 +527,78 @@ class OpenSearchManager:
                 failed_items = [item for item in result.get('items', [])
                               if item.get('index', {}).get('status', 200) >= 400]
                 if failed_items:
-                    error_summary = f"Bulk indexing errors: {len(failed_items)} failures out of {len(documents)} documents"
-                    subsegment.put_annotation('indexing_errors', error_summary)
-                    print(f"{error_summary}. First few failures: {json.dumps(failed_items[:2], indent=2)}")
+                    error_summary = f"Batch {batch_num} errors: {len(failed_items)}/{len(documents)} failures"
+                    print(f"{error_summary}. Sample failures: {json.dumps(failed_items[:2], indent=2)}")
 
             return result
 
         except Exception as e:
-            if subsegment:
-                subsegment.put_annotation('error', str(e))
+            print(f"Error in batch {batch_num}: {str(e)}")
+            raise
+
+    @xray_recorder.capture('opensearch_bulk_index')
+    def bulk_index(self, documents: List[Dict]) -> Dict:
+        """Index documents with intelligent batching"""
+        if not documents:
+            return {"took": 0, "errors": False, "items": []}
+
+        total_docs = len(documents)
+        print(f"Starting bulk index of {total_docs} documents with batching")
+
+        # Tracking variables
+        successful_batches = 0
+        failed_batches = 0
+        total_indexed = 0
+        total_errors = 0
+
+        try:
+            # Process in batches
+            for batch_num, batch in enumerate(self._create_batches(documents), 1):
+                try:
+                    result = self._bulk_index_single_batch(batch, batch_num)
+
+                    if result.get('errors', False):
+                        error_count = sum(1 for item in result.get('items', [])
+                                        if item.get('index', {}).get('status', 200) >= 400)
+                        total_errors += error_count
+
+                        # If more than 50% of batch failed, consider it a failed batch
+                        if error_count > len(batch) * 0.5:
+                            failed_batches += 1
+                        else:
+                            successful_batches += 1
+                    else:
+                        successful_batches += 1
+
+                    total_indexed += len(batch)
+
+                except Exception as e:
+                    print(f"Batch {batch_num} completely failed: {str(e)}")
+                    failed_batches += 1
+                    # Continue with next batch instead of failing entirely
+
+            # Summary
+            print(f"Bulk index complete: {total_indexed}/{total_docs} docs, "
+                  f"{successful_batches} successful batches, {failed_batches} failed batches, "
+                  f"{total_errors} document errors")
+
+            # Return summary result
+            return {
+                "took": 0,
+                "errors": total_errors > 0,
+                "items": [],
+                "batch_summary": {
+                    "total_documents": total_docs,
+                    "indexed_documents": total_indexed,
+                    "successful_batches": successful_batches,
+                    "failed_batches": failed_batches,
+                    "document_errors": total_errors
+                }
+            }
+
+        except Exception as e:
             print(f"Error in bulk_index: {str(e)}")
             raise
-        finally:
-            xray_recorder.end_subsegment()
 
 @xray_recorder.capture('kinisis_record_processing')
 def process_kinesis_record(record: Dict) -> List[Dict]:
@@ -532,7 +648,8 @@ def handler(event: Dict, context: Any) -> Dict:
                 processed_logs.extend(process_kinesis_record(record))
 
             if processed_logs:
-                opensearch.bulk_index(processed_logs)
+                result = opensearch.bulk_index(processed_logs)
+                print(f"Bulk index result: {result.get('batch_summary', {})}")
 
             return {
                 'statusCode': 200,
@@ -572,9 +689,10 @@ def handler(event: Dict, context: Any) -> Dict:
                         'data': record['data']
                     })
 
-            # Index processed logs
+            # Index processed logs with batching
             if processed_logs:
-                opensearch.bulk_index(processed_logs)
+                result = opensearch.bulk_index(processed_logs)
+                print(f"Bulk index result: {result.get('batch_summary', {})}")
 
             # Print execution duration and stats
             duration_ms = (datetime.now() - start_time).total_seconds() * 1000

@@ -82,6 +82,20 @@ resource "aws_cloudtrail" "genomic_trail" {
     }
   }
 
+  # event_selector {
+  #   read_write_type           = "All"
+  #   include_management_events = true
+
+  #   data_resource {
+  #     type   = "AWS::Lambda::Function"
+  #     values = local.sbeacon_functions
+  #   }
+  #   data_resource {
+  #     type   = "AWS::Lambda::Function"
+  #     values = local.svep_functions
+  #   }
+  # }
+
   insight_selector {
     insight_type = "ApiCallRateInsight"
   }

@@ -1,4 +1,10 @@
 locals {
+  # CloudWatch Logs filter pattern for CloudTrail events
+  # filter_pattern = <<PATTERN
+  # [version, useridentity.type, useridentity.principalid, useridentity.arn, useridentity.accountid, useridentity.accesskeyid, useridentity.username, useridentity.sessioncontext.attributes.mfaauthenticated, useridentity.sessioncontext.attributes.creationdate, useridentity.sessioncontext.sessionissuer.type, useridentity.sessioncontext.sessionissuer.principalid, useridentity.sessioncontext.sessionissuer.arn, useridentity.sessioncontext.sessionissuer.accountid, useridentity.sessioncontext.sessionissuer.username, eventtime, eventsource, eventname, awsregion, sourceipaddress, useragent, errorcode, errormessage, requestparameters, responseelements, requestid, eventid, resources.*.resourcetype, resources.*.resourcename, resources.*.resourcearn, eventtype, apiversion, readonly, recipientaccountid]
+  # --- OR ---
+  # [eventVersion, userIdentity, eventTime, eventSource, eventName, awsRegion, sourceIPAddress, userAgent, errorCode, errorMessage, requestParameters, responseElements, requestID, eventID, readOnly, eventType, apiVersion, managementEvent, eventCategory, tlsDetails, recipientAccountId, sharedEventID, resources, sessionCredentialFromConsole]
+  # PATTERN
   filter_pattern = "" # no_filter
 }
 

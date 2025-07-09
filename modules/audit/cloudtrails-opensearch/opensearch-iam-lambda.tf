@@ -1,7 +1,7 @@
 # IAM Role for Lambda function
 resource "aws_iam_role" "lambda_transform" {
   name        = "genomic-cloudtrail-lambda-transform-${var.aws_account_id_destination}"
-  description = "IAM role for Lambda function to transform CloudTrail logs"
+  description = "IAM role for Lambda function to transform CloudTrail logs with batching support"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -19,7 +19,7 @@ resource "aws_iam_role" "lambda_transform" {
   tags = local.common_tags
 }
 
-# Lambda permissions for OpenSearch
+# Enhanced Lambda permissions for OpenSearch with batching
 resource "aws_iam_role_policy" "lambda_transform" {
   name = "genomic-cloudtrail-lambda-transform-policy"
   role = aws_iam_role.lambda_transform.id
@@ -52,7 +52,9 @@ resource "aws_iam_role_policy" "lambda_transform" {
           "kinesis:GetShardIterator",
           "kinesis:GetRecords",
           "kinesis:DescribeStream",
-          "kinesis:ListShards"
+          "kinesis:ListShards",
+          "kinesis:DescribeStreamSummary",
+          "kinesis:ListStreamConsumers"
         ]
         Resource = "${aws_kinesis_stream.cloudtrail.arn}"
       },
@@ -61,7 +63,9 @@ resource "aws_iam_role_policy" "lambda_transform" {
         Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
-          "logs:PutLogEvents"
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams"
         ]
         Resource = [
           "arn:aws:logs:${var.aws_region}:${var.aws_account_id_destination}:log-group:/aws/lambda/*",
@@ -92,6 +96,40 @@ resource "aws_iam_role_policy" "lambda_transform" {
           "xray:PutTelemetryRecords"
         ]
         Resource = "*"
+      },
+      {
+        # NEW: SQS permissions for Dead Letter Queue
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl"
+        ]
+        Resource = "arn:aws:sqs:${var.aws_region}:${var.aws_account_id_destination}:genomic-cloudtrail-lambda-dlq-${var.aws_account_id_destination}"
+      },
+      {
+        # NEW: CloudWatch custom metrics permissions
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:PutMetricData"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "cloudwatch:namespace" = [
+              "GenomicServices/OpenSearch",
+              "AWS/Lambda"
+            ]
+          }
+        }
+      },
+      {
+        # NEW: SNS permissions for error notifications
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ]
+        Resource = aws_sns_topic.cloudtrail_alerts.arn
       }
     ]
   })
@@ -150,6 +188,74 @@ resource "aws_iam_role_policy" "firehose_kms" {
           "kms:DescribeKey"
         ]
         Resource = [aws_kms_key.cloudtrail.arn]
+      }
+    ]
+  })
+}
+
+# --------------------------------------------------------------------------
+# CloudWatch Monitoring
+# --------------------------------------------------------------------------
+resource "aws_iam_role" "cloudwatch_monitoring" {
+  name = "genomic-cloudtrail-monitoring-${var.aws_account_id_destination}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = [
+            "cloudwatch.amazonaws.com",
+            "events.amazonaws.com"
+          ]
+        }
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy" "cloudwatch_monitoring" {
+  name = "genomic-cloudtrail-monitoring-policy"
+  role = aws_iam_role.cloudwatch_monitoring.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+          "logs:GetLogEvents",
+          "logs:FilterLogEvents"
+        ]
+        Resource = [
+          "arn:aws:logs:${var.aws_region}:${var.aws_account_id_destination}:log-group:/aws/lambda/*",
+          "arn:aws:logs:${var.aws_region}:${var.aws_account_id_destination}:log-group:/aws/cloudtrail/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:PutMetricData",
+          "cloudwatch:GetMetricStatistics",
+          "cloudwatch:ListMetrics"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ]
+        Resource = aws_sns_topic.cloudtrail_alerts.arn
       }
     ]
   })
