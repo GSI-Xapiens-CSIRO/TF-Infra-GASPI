@@ -197,6 +197,11 @@ RUN chown -R 100:100 /home/atlantis && \
     chmod 644 /home/atlantis/.bash_profile && \
     chmod 644 /home/atlantis/.bashrc
 
+# Install Python requirements
+COPY requirements.txt ./
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
 # Switch to atlantis user
 USER 100
 
