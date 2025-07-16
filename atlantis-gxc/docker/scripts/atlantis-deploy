@@ -42,7 +42,7 @@ SCRIPT_DATE="June, 2025"
 SCRIPT_PATTERN="GXC"
 SCRIPT_GH_USER="devopsxti"
 SCRIPT_GH_REPO="GSI-Xapiens-CSIRO"
-SCRIPT_RUN_TEST="${SCRIPT_RUN_TEST:-false}"  # Default to false if not set
+SCRIPT_RUN_TEST="${SCRIPT_RUN_TEST:-true}"  # Default to false if not set
 
 # Display logo and version
 show_logo() {

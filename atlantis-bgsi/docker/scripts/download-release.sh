@@ -14,17 +14,19 @@ esac
 for VERSION in ${AVAILABLE_VERSIONS}; do
   case "${COMMAND_NAME}" in
     "terraform")
+      # https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
       DOWNLOAD_URL_FORMAT=$(printf 'https://releases.hashicorp.com/terraform/%s/%s_%s' "$VERSION" "$COMMAND_NAME" "$VERSION")
       COMMAND_DIR=/usr/local/bin/terraform
       FILE_EXTENSION="zip"
       ;;
     "tofu")
+      # https://github.com/opentofu/opentofu/releases/download/v1.10.1/tofu_1.10.1_linux_amd64.zip
       DOWNLOAD_URL_FORMAT=$(printf 'https://github.com/opentofu/opentofu/releases/download/v%s/%s_%s' "$VERSION" "$COMMAND_NAME" "$VERSION")
       COMMAND_DIR=/usr/local/bin/tofu
       FILE_EXTENSION="zip"
       ;;
     "terragrunt")
-      # Terragrunt releases are single binaries, not zipped
+      # https://github.com/gruntwork-io/terragrunt/releases/download/v0.82.2/terragrunt_linux_amd64
       DOWNLOAD_URL_FORMAT=$(printf 'https://github.com/gruntwork-io/terragrunt/releases/download/v%s/%s_linux_%s' "$VERSION" "$COMMAND_NAME" "$ARCH")
       COMMAND_DIR=/usr/local/bin/terragrunt
       FILE_EXTENSION="binary"

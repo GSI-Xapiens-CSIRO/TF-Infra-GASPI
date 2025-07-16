@@ -9,6 +9,7 @@ ARG GOLANG_TAG=1.23.3-alpine@sha256:c694a4d291a13a9f9d94933395673494fc2cc9d4777b
 ARG DEFAULT_TERRAFORM_VERSION=1.9.8
 ARG DEFAULT_OPENTOFU_VERSION=1.8.6
 ARG DEFAULT_CONFTEST_VERSION=0.56.0
+ARG DEFAULT_TERRAGRUNT_VERSION=0.70.4
 
 # Stage 1: Get Artifact Atlantis
 FROM ghcr.io/runatlantis/atlantis:latest@sha256:f9e0b6ff14b1313b169e4ca128a578fc719745f61114e468afab0d4cbcda575e as builder
@@ -50,26 +51,38 @@ RUN case ${TARGETPLATFORM} in \
     mv git-lfs /usr/bin/git-lfs && \
     git-lfs --version
 
-# Install terraform binaries
+# Install terraform, tofu, and terragrunt binaries
 ARG DEFAULT_TERRAFORM_VERSION
 ENV DEFAULT_TERRAFORM_VERSION=${DEFAULT_TERRAFORM_VERSION:-1.9.8}
 ARG DEFAULT_OPENTOFU_VERSION
 ENV DEFAULT_OPENTOFU_VERSION=${DEFAULT_OPENTOFU_VERSION:-1.8.6}
+ARG DEFAULT_TERRAGRUNT_VERSION
+ENV DEFAULT_TERRAGRUNT_VERSION=${DEFAULT_TERRAGRUNT_VERSION:-0.70.4}
 
 COPY scripts/download-release.sh download-release.sh
 
+# Install Terraform
 RUN ./download-release.sh \
     "terraform" \
     "${TARGETPLATFORM}" \
     "${DEFAULT_TERRAFORM_VERSION}" \
-    "1.6.6 1.7.5 1.8.5 ${DEFAULT_TERRAFORM_VERSION} 1.10.5 1.11.4" \
-    && ./download-release.sh \
+    "1.6.6 1.7.5 1.8.5 ${DEFAULT_TERRAFORM_VERSION} 1.10.5 1.11.4"
+
+# Install OpenTofu
+RUN ./download-release.sh \
     "tofu" \
     "${TARGETPLATFORM}" \
     "${DEFAULT_OPENTOFU_VERSION}" \
     "${DEFAULT_OPENTOFU_VERSION}"
 
-# Final Stage: Build sBeacon-Atlantis
+# Install Terragrunt (compatible with Terraform 1.9.8+)
+RUN ./download-release.sh \
+    "terragrunt" \
+    "${TARGETPLATFORM}" \
+    "${DEFAULT_TERRAGRUNT_VERSION}" \
+    "${DEFAULT_TERRAGRUNT_VERSION}"
+
+# Final Stage: Build Atlantis
 FROM public.ecr.aws/sam/build-python3.12:latest-x86_64
 
 # Switch to root for installations
@@ -107,6 +120,12 @@ RUN dnf update -y --allowerasing && \
     dnf clean all && \
     rm -rf /var/cache/dnf/*
 
+# Install AWS CLI v2
+# RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+#     unzip awscliv2.zip && \
+#     ./aws/install && \
+#     rm -rf aws awscliv2.zip
+
 # Setup Docker environment
 RUN mkdir -p /etc/docker && \
     echo '{"storage-driver": "overlay2", "features": {"buildkit": true}}' > /etc/docker/daemon.json && \
@@ -136,7 +155,9 @@ RUN echo "docker:x:999:" >> /etc/group && \
     sed -i 's/docker:x:999:/docker:x:999:100/' /etc/group
 
 # Ensure proper permissions for atlantis user home directory
-RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.config/git,.pyenv,.npm,.pnpm,.atlantis} && \
+RUN mkdir -p /home/atlantis/.ssh /home/atlantis/.aws /home/atlantis/.local /home/atlantis/.nvm \
+             /home/atlantis/.docker /home/atlantis/.config /home/atlantis/.config/git \
+             /home/atlantis/.pyenv /home/atlantis/.npm /home/atlantis/.pnpm /home/atlantis/.atlantis && \
     mkdir -p /atlantis-data && \
     mkdir -p /atlantis && \
     # Set ownership for all atlantis home directory
@@ -145,11 +166,11 @@ RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.config/git,.
     chown -R 100:100 /atlantis && \
     # Set proper permissions
     chmod 755 /home/atlantis && \
-    chmod 700 /home/atlantis/{.ssh,.aws} && \
-    chmod 755 /home/atlantis/{.local,.config,.config/git} && \
+    chmod 700 /home/atlantis/.ssh /home/atlantis/.aws && \
+    chmod 755 /home/atlantis/.local /home/atlantis/.config /home/atlantis/.config/git && \
     # Create .gitconfig with proper permissions
     touch /home/atlantis/.gitconfig && \
-    chown -R 100:100 /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis,.gitconfig} && \
+    chown 100:100 /home/atlantis/.gitconfig && \
     chmod 644 /home/atlantis/.gitconfig && \
     # Create .bash_profile and .bashrc with proper ownership
     touch /home/atlantis/.bash_profile /home/atlantis/.bashrc && \
@@ -161,16 +182,11 @@ RUN pip install --no-cache-dir dumb-init && \
     chmod +x /var/lang/bin/dumb-init && \
     ln -s /var/lang/bin/dumb-init /usr/local/bin/dumb-init
 
-# Install Terraform
-RUN wget https://releases.hashicorp.com/terraform/1.9.4/terraform_1.9.4_linux_amd64.zip && \
-    unzip terraform_1.9.4_linux_amd64.zip -d /usr/bin/ && \
-    rm terraform_1.9.4_linux_amd64.zip && \
-    chmod +x /usr/bin/terraform
-
 # Copy binaries and setup environment
 COPY --from=builder /usr/local/bin/atlantis /usr/local/bin/atlantis
 COPY --from=deps /usr/local/bin/terraform/terraform* /usr/local/bin/
 COPY --from=deps /usr/local/bin/tofu/tofu* /usr/local/bin/
+COPY --from=deps /usr/local/bin/terragrunt/terragrunt* /usr/local/bin/
 COPY --from=deps /usr/bin/git-lfs /usr/bin/git-lfs
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
@@ -178,12 +194,10 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
     chmod +x /usr/local/bin/atlantis && \
     chown -R 100:100 /usr/local/bin/atlantis && \
+    chmod +x /usr/local/bin/terragrunt* && \
     # Ensure atlantis user can access required directories
     mkdir -p /atlantis/config && \
     chown -R 100:100 /atlantis/config
-
-RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis} && \
-    chown -R 100:100 /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis}
 
 # Copy configuration files
 COPY config/docker/home /home
@@ -196,6 +210,11 @@ RUN chown -R 100:100 /home/atlantis && \
     chmod 644 /home/atlantis/.gitconfig && \
     chmod 644 /home/atlantis/.bash_profile && \
     chmod 644 /home/atlantis/.bashrc
+
+# Install Python requirements
+COPY requirements.txt ./
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
 # Switch to atlantis user
 USER 100
@@ -214,14 +233,10 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | b
     nvm alias default ${NODE_VERSION} && \
     npm install -g pnpm
 
-# Install Python requirements
-COPY requirements.txt ./
+# Copy atlantis-deploy script
 COPY docker-entrypoint.sh /home/atlantis
 COPY scripts/atlantis-deploy /usr/local/bin/atlantis-deploy
 COPY scripts/install-atlantis-deploy /usr/local/bin/install-atlantis-deploy
-
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
 
 # Set the exposed port
 EXPOSE ${ATLANTIS_PORT:-4141}
