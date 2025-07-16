@@ -32,7 +32,7 @@ locals {
 #  Reuse Module: Core
 # --------------------------------------------------------------------------
 module "core" {
-  source = "../../../modules//core-igw-ec2"
+  source = "../../../modules//core-nat-ec2"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source
@@ -54,16 +54,16 @@ module "core" {
   peer_owner_id    = var.peer_owner_id
   propagating_vgws = var.propagating_vgws
   ec2_prefix       = var.ec2_prefix
-  # nat_ec2_prefix   = var.nat_ec2_prefix
-  ec2_private_a = var.ec2_private_a
-  ec2_private_b = var.ec2_private_b
-  ec2_private_c = var.ec2_private_c
-  ec2_public_a  = var.ec2_public_a
-  ec2_public_b  = var.ec2_public_b
-  ec2_public_c  = var.ec2_public_c
-  ec2_rt_prefix = var.ec2_rt_prefix
-  igw_prefix    = var.igw_prefix
-  igw_rt_prefix = var.igw_rt_prefix
-  # nat_prefix       = var.nat_prefix
-  # nat_rt_prefix    = var.nat_rt_prefix
+  nat_ec2_prefix   = var.nat_ec2_prefix
+  ec2_private_a    = var.ec2_private_a
+  ec2_private_b    = var.ec2_private_b
+  ec2_private_c    = var.ec2_private_c
+  ec2_public_a     = var.ec2_public_a
+  ec2_public_b     = var.ec2_public_b
+  ec2_public_c     = var.ec2_public_c
+  ec2_rt_prefix    = var.ec2_rt_prefix
+  igw_prefix       = var.igw_prefix
+  igw_rt_prefix    = var.igw_rt_prefix
+  nat_prefix       = var.nat_prefix
+  nat_rt_prefix    = var.nat_rt_prefix
 }
