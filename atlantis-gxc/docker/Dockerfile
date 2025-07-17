@@ -213,8 +213,8 @@ RUN chown -R 100:100 /home/atlantis && \
 
 # Install Python requirements
 COPY requirements.txt ./
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+RUN python3.12 -m pip install --upgrade pip
+RUN pip install -r requirements.txt
 
 # Switch to atlantis user
 USER 100
