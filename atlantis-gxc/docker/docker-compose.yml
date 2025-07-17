@@ -126,12 +126,13 @@ services:
   # ATLANTIS TERRAFORM
   #================================================================================================
   atlantis:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        PYTHON_VERSION: 3.12
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    #   args:
+    #     PYTHON_VERSION: 3.12
     # image: ${ATLANTIS_IMAGE:-YOUR_AWS_ACCOUNT.dkr.ecr.ap-southeast-3.amazonaws.com/gxc/atlantis-sbeacon}:${ATLANTIS_VERSION:-latest}
+    image: devopsxti/atlantis-gxc:latest
     container_name: ${CONTAINER_ATLANTIS:-gxc_atlantis}
     restart: unless-stopped
     ports:
