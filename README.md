@@ -31,7 +31,10 @@ Terraform Infra for Genetic Analysis Support Platform Indonesia (GASPI)
     ├── GXC-Billing
     │   └── gxc-consortium-billing   (098765432123 | gxc-consortium-billing@domain.com)
     ├── gxc-consortium-hub01         (438465168484 | gxc-consortium-hub01@domain.com)
-    └── gxc-consortium-hub02         (127214202110 | gxc-consortium-hub02@domain.com)
+    ├── gxc-consortium-hub03         (111122223333 | gxc-consortium-hub03@domain.com)
+    ├── gxc-consortium-uat03         (444455556666 | gxc-consortium-uat03@domain.com)
+    ├── gxc-consortium-uat04         (777788889999 | gxc-consortium-uat04@domain.com)
+    └── gxc-consortium-uat05         (123412341234 | gxc-consortium-uat05@domain.com)
 ```
 
 ## Terraform Structure
