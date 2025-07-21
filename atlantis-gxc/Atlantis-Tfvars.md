@@ -1,6 +1,6 @@
 # Terraform Variables for Atlantis CI/CD
 
-## HUB01
+## HUB01: RSCM (Rare Desease)
 
 - **backend.tf**
 
@@ -76,7 +76,7 @@
 
 ---
 
-## HUB03
+## HUB03: RSPON (PGX / PhamCAT)
 
 - **backend.tf**
 
@@ -163,7 +163,7 @@
 
 ---
 
-## UAT03
+## UAT03: SARDJITO (Rare Desease)
 
 - **backend.tf**
 
@@ -436,7 +436,7 @@
 
 ---
 
-## UAT04
+## UAT04: IGNG (PGX / Lookup)
 
 - **backend.tf**
 
@@ -503,7 +503,7 @@
 
 ---
 
-## UAT05
+## UAT05: RSJPD (PGX / PhamCAT & Lookup)
 
 - **backend.tf**
 
