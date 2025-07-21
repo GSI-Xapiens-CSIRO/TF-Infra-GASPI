@@ -58,7 +58,7 @@ This system provides a unified approach to managing Terraform deployments across
 GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxx"
 GITHUB_USERNAME="DevOps-XTI"
 GIT_USER_NAME="DevOps XTI"
-GIT_USER_EMAIL="devops@xapiens.id"
+GIT_USER_EMAIL="support.undp@xapiens.id"
 
 # Atlantis Configuration
 ATLANTIS_GH_TOKEN="$GITHUB_TOKEN"
@@ -118,44 +118,32 @@ atlantis-deploy hub01 --help
 ```
 repository/
 ├── scripts/
-│   ├── atlantis-deploy              # Source script
-│   └── install-atlantis-deploy      # Installation script
+│   ├── atlantis-deploy                 # Source script
+│   └── install-atlantis-deploy         # Installation script
 ├── atlantis.yaml                       # Project configuration
 ├── repo.yaml                           # Repository workflows
 ├── README.md                           # This documentation
 └── /atlantis/config/                   # Configuration files
-    ├── hub01/
+    ├── hub01/                          # HUB01: RSCM (Rare Desease)
     │   ├── backend.tf
     │   ├── backend.tfvars
     │   └── hub01.tfvars
-    ├── hub02/
+    ├── hub03/                          # HUB03: RSPON (PGX / PhamCAT)
     │   ├── backend.tf
     │   ├── backend.tfvars
-    │   └── hub02.tfvars
-    ├── hub03/
-    │   ├── backend.tf
-    │   ├── backend.tfvars
-    │   └── hub03.tfvars
-    ├── hub04/
-    │   ├── backend.tf
-    │   ├── backend.tfvars
-    │   └── hub04.tfvars
-    ├── uat01/
-    │   ├── backend.tf
-    │   ├── backend.tfvars
-    │   └── uat01.tfvars
-    ├── uat02/
-    │   ├── backend.tf
-    │   ├── backend.tfvars
-    │   └── uat02.tfvars
-    ├── uat03/
+    │   └── hub01.tfvars
+    ├── uat03/                          # UAT03: SARDJITO (Rare Desease)
     │   ├── backend.tf
     │   ├── backend.tfvars
     │   └── uat03.tfvars
-    └── uat04/
+    ├── uat04/                          # UAT04: IGNG (PGX / Lookup)
+    │   ├── backend.tf
+    │   ├── backend.tfvars
+    │   └── uat04.tfvars
+    └── uat05/                          # UAT05: RSJPD (PGX / PhamCAT & Lookup)
         ├── backend.tf
         ├── backend.tfvars
-        └── uat04.tfvars
+        └── uat05.tfvars
 ```
 
 ### Environment Configuration
@@ -581,7 +569,7 @@ sudo ./install-atlantis-deploy.sh
 ### Contact Information
 
 - **Team**: DevOps XTI
-- **Email**: devops@xapiens.id
+- **Email**: support.undp@xapiens.id
 - **Repository**: [BGSI-GASPI](https://github.com/GSI-Xapiens-CSIRO/BGSI-GeneticAnalysisSupportPlatformIndonesia-GASPI)
 
 ### Documentation

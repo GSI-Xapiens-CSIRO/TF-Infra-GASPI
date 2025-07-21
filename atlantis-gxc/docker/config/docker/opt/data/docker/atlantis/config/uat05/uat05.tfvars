@@ -24,10 +24,43 @@ svep-method-max-request-rate    = 10
 svep-method-queue-size          = 100
 
 ses-source-email = "devops@example.com"
-enable-inspector = false
-hub_name         = "RSIGNG"
+enable-inspector = true
+hub_name         = "RSJPD"
+pharmcat_configuration = {
+  ORGANISATIONS = [
+    {
+      "gene" = "CPIC"
+      "drug" = "CPIC Guideline Annotation"
+    },
+    {
+      "gene" = "DPWG"
+      "drug" = "DPWG Guideline Annotation"
+    },
+    {
+      "gene" = "CPIC"
+      "drug" = "FDA Label Annotation"
+    },
+    {
+      "gene" = "CPIC"
+      "drug" = "FDA PGx Association"
+    }
+  ]
+  GENES = [
+    "SLCO1B1",
+  ]
+  DRUGS = [
+    "simvastatin",
+    "rosuvastatin",
+    "pravastatin",
+    "pitavastatin",
+    "lovastatin",
+    "fluvastatin",
+    "atorvastatin"
+  ]
+}
+
 lookup_configuration = {
-  assoc_matrix_filename = "RSIGNG_association_matrix.csv"
+  assoc_matrix_filename = "RSJPD_association_matrix.csv"
   chr_header            = "chr"
   start_header          = "start"
   end_header            = "end"

@@ -24,11 +24,31 @@ svep-method-max-request-rate    = 10
 svep-method-queue-size          = 100
 
 ses-source-email = "devops@example.com"
-enable-inspector = false
-hub_name         = "RSIGNG"
-lookup_configuration = {
-  assoc_matrix_filename = "RSIGNG_association_matrix.csv"
-  chr_header            = "chr"
-  start_header          = "start"
-  end_header            = "end"
+enable-inspector = true
+hub_name         = "RSPON"
+pharmcat_configuration = {
+  ORGANISATIONS = [
+    {
+      "gene" = "CPIC"
+      "drug" = "CPIC Guideline Annotation"
+    },
+    {
+      "gene" = "DPWG"
+      "drug" = "DPWG Guideline Annotation"
+    },
+    {
+      "gene" = "CPIC"
+      "drug" = "FDA Label Annotation"
+    },
+    {
+      "gene" = "CPIC"
+      "drug" = "FDA PGx Association"
+    }
+  ]
+  GENES = [
+    "CYP2C19",
+  ]
+  DRUGS = [
+    "clopidogrel",
+  ]
 }

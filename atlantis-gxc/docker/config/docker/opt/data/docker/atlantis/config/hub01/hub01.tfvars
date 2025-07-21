@@ -25,10 +25,19 @@ svep-method-queue-size          = 100
 
 ses-source-email = "devops@example.com"
 enable-inspector = false
-hub_name         = "RSIGNG"
-lookup_configuration = {
-  assoc_matrix_filename = "RSIGNG_association_matrix.csv"
-  chr_header            = "chr"
-  start_header          = "start"
-  end_header            = "end"
+hub_name         = "RSCM"
+svep-filters = {
+  clinvar_exclude = [
+    "Benign",
+    "Benign/Likely benign",
+    "Likely benign",
+    "not provided",
+  ]
+  consequence_rank = 14
+  max_maf          = 0.05
+  genes = [
+    "APOB",
+    "LDLR",
+    "PCSK9",
+  ]
 }

@@ -25,7 +25,7 @@ svep-method-queue-size          = 100
 
 ses-source-email = "devops@example.com"
 enable-inspector = false
-hub_name         = "RSSARJITO"
+hub_name         = "RSSARDJITO"
 svep-filters = {
   clinvar_exclude = [
     "Benign",
