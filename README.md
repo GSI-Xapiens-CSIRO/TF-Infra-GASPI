@@ -30,11 +30,11 @@ Terraform Infra for Genetic Analysis Support Platform Indonesia (GASPI)
 └── GXC-OrganizationUnit
     ├── GXC-Billing
     │   └── gxc-consortium-billing   (098765432123 | gxc-consortium-billing@domain.com)
-    ├── gxc-consortium-hub01         (438465168484 | gxc-consortium-hub01@domain.com)
-    ├── gxc-consortium-hub03         (111122223333 | gxc-consortium-hub03@domain.com)
-    ├── gxc-consortium-uat03         (444455556666 | gxc-consortium-uat03@domain.com)
-    ├── gxc-consortium-uat04         (777788889999 | gxc-consortium-uat04@domain.com)
-    └── gxc-consortium-uat05         (123412341234 | gxc-consortium-uat05@domain.com)
+    ├── hub01-438465168484           (438465168484 | gxc-consortium-hub01@domain.com)
+    ├── hub03-111122223333           (111122223333 | gxc-consortium-hub03@domain.com)
+    ├── uat03-444455556666           (444455556666 | gxc-consortium-uat03@domain.com)
+    ├── uat04-777788889999           (777788889999 | gxc-consortium-uat04@domain.com)
+    └── uat05-123412341234           (123412341234 | gxc-consortium-uat05@domain.com)
 ```
 
 ## Terraform Structure
@@ -46,73 +46,85 @@ tree -L 3    # three-levels show
 ├── LICENSE
 ├── README.md
 ├── atlantis-bgsi
-│   ├── HOW-TO.md
-│   ├── assets
-│   ├── atlantis-nginx-basic-auth.conf
-│   ├── atlantis-nginx.conf
-│   └── docker
-│       ├── DockerHub.md
-│       ├── Dockerfile
-│       ├── config
-│       ├── docker-compose-db-memory.yml
-│       ├── docker-compose-db-psql.yml
-│       ├── docker-compose-nonginx.yml
-│       ├── docker-compose.yml
-│       ├── docker-entrypoint.sh
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── requirements.txt
-│       └── scripts
+│   ├── HOW-TO.md
+│   ├── assets
+│   │   ├── atlantis-pr-github-webhook.png
+│   │   ├── atlantis-pr-state-diagram.png
+│   │   ├── atlantis-sequence-gaspi-process.png
+│   │   ├── atlantis-sequence-process.png
+│   │   └── atlantis-state-diagram-process.png
+│   ├── atlantis-nginx-basic-auth.conf
+│   ├── atlantis-nginx.conf
+│   └── docker
+│       ├── DockerHub.md
+│       ├── Dockerfile
+│       ├── config
+│       ├── docker-compose-db-memory.yml
+│       ├── docker-compose-db-psql.yml
+│       ├── docker-compose-nonginx.yml
+│       ├── docker-compose.yml
+│       ├── docker-entrypoint.sh
+│       ├── package-lock.json
+│       ├── package.json
+│       ├── requirements.txt
+│       └── scripts
 ├── atlantis-gxc
-│   ├── HOW-TO.md
-│   ├── assets
-│   ├── atlantis-nginx-basic-auth.conf
-│   ├── atlantis-nginx.conf
-│   └── docker
-│       ├── DockerHub.md
-│       ├── Dockerfile
-│       ├── config
-│       ├── docker-compose-db-memory.yml
-│       ├── docker-compose-db-psql.yml
-│       ├── docker-compose.yml
-│       ├── docker-entrypoint.sh
-│       ├── package-lock.json
-│       ├── package.json
-│       ├── requirements.txt
-│       └── scripts
+│   ├── Atlantis-Tfvars.md
+│   ├── HOW-TO.md
+│   ├── assets
+│   │   ├── atlantis-pr-github-webhook.png
+│   │   ├── atlantis-pr-state-diagram.png
+│   │   ├── atlantis-sequence-gaspi-process.png
+│   │   ├── atlantis-sequence-process.png
+│   │   └── atlantis-state-diagram-process.png
+│   ├── atlantis-nginx-basic-auth.conf
+│   ├── atlantis-nginx.conf
+│   └── docker
+│       ├── DockerHub.md
+│       ├── Dockerfile
+│       ├── config
+│       ├── docker-compose-db-memory.yml
+│       ├── docker-compose-db-psql.yml
+│       ├── docker-compose.yml
+│       ├── docker-entrypoint.sh
+│       ├── package-lock.json
+│       ├── package.json
+│       ├── requirements.txt
+│       └── scripts
 ├── docs
-│   └── assets
-│       └── ct.png
+│   └── assets
+│       └── ct.png
 ├── environments
-│   ├── ct
-│   │   └── gxc-management
-│   ├── dev
-│   │   ├── gxc-consortium-hub01
-│   │   └── gxc-consortium-hub02
-│   └── uat
-│       ├── gxc-consortium-uat03
-│       └── gxc-consortium-uat04
+│   ├── ct
+│   │   └── gxc-management
+│   ├── dev
+│   │   ├── hub01-438465168484
+│   │   └── hub03-111122223333
+│   └── uat
+│       ├── uat03-444455556666
+│       ├── uat04-777788889999
+│       └── uat05-123412341234
 ├── gen-docs.sh
 ├── modules
-│   ├── audit
-│   │   └── cloudtrails-opensearch
-│   ├── budget
-│   ├── cloudfront-ssl
-│   ├── core-igw-ec2
-│   ├── core-nat-ec2
-│   ├── iam-tfuser-executor
-│   ├── iam-user
-│   ├── s3-logs
-│   ├── storage-efs
-│   ├── storage-s3
-│   └── tfstate
+│   ├── audit
+│   │   └── cloudtrails-opensearch
+│   ├── budget
+│   ├── cloudfront-ssl
+│   ├── core-igw-ec2
+│   ├── core-nat-ec2
+│   ├── iam-tfuser-executor
+│   ├── iam-user
+│   ├── s3-logs
+│   ├── storage-efs
+│   ├── storage-s3
+│   └── tfstate
 └── scripts
     ├── cleanup-resources
-    │   ├── cleanup.py
-    │   └── requirements.txt
+    │   ├── cleanup.py
+    │   └── requirements.txt
     └── cloudfront-ssl
 
-43 directories, 171 files
+44 directories, 172 files
 ```
 
 ## Copyright
