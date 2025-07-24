@@ -35,7 +35,7 @@ log_error() {
 SCRIPT_VERSION="2.2.0"
 SCRIPT_NAME="atlantis-deploy"
 SCRIPT_AUTHOR="GXC DevOps-Team"
-SCRIPT_EMAIL="devops@xapiens.id"
+SCRIPT_EMAIL="support.gxc@xapiens.id"
 SCRIPT_COMPANY="GXC Consortium"
 SCRIPT_LICENSE="Apache v2"
 SCRIPT_DATE="June, 2025"
@@ -190,7 +190,7 @@ setup_environment_variables() {
 
     # Git configuration
     GIT_USER_NAME="${GIT_USER_NAME:-DevOps XTI}"           # Display name for commits
-    GIT_USER_EMAIL="${GIT_USER_EMAIL:-devops@xapiens.id}"  # Email for commits
+    GIT_USER_EMAIL="${GIT_USER_EMAIL:-support.gxc@xapiens.id}"  # Email for commits
     GITHUB_USERNAME="${GITHUB_USERNAME:-devopsxti}"        # Actual GitHub username for auth
 
     log_info "Environment Type: $ENV_TYPE, Number: $ENV_NUMBER"

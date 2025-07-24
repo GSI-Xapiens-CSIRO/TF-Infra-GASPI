@@ -129,6 +129,6 @@ terraform destroy
 
 ## Copyright
 
-- Author: **DevOps Engineer (devops@xapiens.id)**
+- Author: **DevOps Engineer (support.gxc@xapiens.id)**
 - Vendor: **Xapiens Teknologi Indonesia (xapiens.id)**
 - License: **Apache v2**

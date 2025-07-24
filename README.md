@@ -129,6 +129,6 @@ tree -L 3    # three-levels show
 
 ## Copyright
 
-- Author: **DevOps Engineer (devops@xapiens.id)**
+- Author: **DevOps Engineer (support.gxc@xapiens.id)**
 - Vendor: **Xapiens Teknologi Indonesia (xapiens.id)**
 - License: **Apache v2**

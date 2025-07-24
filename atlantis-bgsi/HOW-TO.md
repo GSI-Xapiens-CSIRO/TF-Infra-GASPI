@@ -58,7 +58,7 @@ This system provides a unified approach to managing Terraform deployments across
 GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxx"
 GITHUB_USERNAME="DevOps-XTI"
 GIT_USER_NAME="DevOps XTI"
-GIT_USER_EMAIL="devops@xapiens.id"
+GIT_USER_EMAIL="support.gxc@xapiens.id"
 
 # Atlantis Configuration
 ATLANTIS_GH_TOKEN="$GITHUB_TOKEN"
@@ -581,7 +581,7 @@ sudo ./install-atlantis-deploy
 ### Contact Information
 
 - **Team**: DevOps XTI
-- **Email**: devops@xapiens.id
+- **Email**: support.gxc@xapiens.id
 - **Repository**: [BGSI-GASPI](https://github.com/GSI-Xapiens-CSIRO/BGSI-GeneticAnalysisSupportPlatformIndonesia-GASPI)
 
 ### Documentation
