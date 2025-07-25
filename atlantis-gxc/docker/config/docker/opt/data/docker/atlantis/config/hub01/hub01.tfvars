@@ -25,7 +25,16 @@ svep-method-queue-size          = 100
 
 ses-source-email = "devops@example.com"
 enable-inspector = false
-hub_name         = "RSCM"
+
+hub_name = "RSCM"
+svep-warning-thresholds = {
+  dp     = 10
+  filter = "PASS"
+  gq     = 15
+  mq     = 30
+  qd     = 20
+  qual   = 20
+}
 svep-filters = {
   clinvar_exclude = [
     "Benign",
