@@ -245,7 +245,7 @@
     qual = 20
   }
   svep-filters = {
-    clinvar_exclude  = [
+    clinvar_exclude = [
       "Benign",
       "Benign/Likely benign",
       "Likely benign",
