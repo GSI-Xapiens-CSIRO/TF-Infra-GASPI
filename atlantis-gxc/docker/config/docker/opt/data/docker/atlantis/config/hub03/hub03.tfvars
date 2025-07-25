@@ -25,6 +25,7 @@ svep-method-queue-size          = 100
 
 ses-source-email = "devops@example.com"
 enable-inspector = true
+
 hub_name         = "RSPON"
 pharmcat_configuration = {
   ORGANISATIONS = [

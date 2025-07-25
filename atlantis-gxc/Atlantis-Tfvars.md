@@ -55,10 +55,19 @@
   svep-method-queue-size          = 100
 
   ses-source-email = "devops@example.com"
-  enable-inspector = false
-  hub_name         = "RSCM"
+  enable-inspector=false
+
+  hub_name = "RSCM"
+  svep-warning-thresholds = {
+    dp = 10
+    filter = "PASS"
+    gq = 15
+    mq = 30
+    qd = 20
+    qual = 20
+  }
   svep-filters = {
-    clinvar_exclude = [
+    clinvar_exclude  = [
       "Benign",
       "Benign/Likely benign",
       "Likely benign",
@@ -66,7 +75,7 @@
     ]
     consequence_rank = 14
     max_maf          = 0.05
-    genes = [
+    genes            = [
       "APOB",
       "LDLR",
       "PCSK9",
@@ -132,6 +141,7 @@
 
   ses-source-email = "devops@example.com"
   enable-inspector = true
+
   hub_name         = "RSPON"
   pharmcat_configuration = {
     ORGANISATIONS = [
@@ -219,9 +229,23 @@
 
   ses-source-email = "devops@example.com"
   enable-inspector = false
-  hub_name         = "RSSARDJITO"
+
+  hub_name = "RSSARDJITO"
+  max-request-rate-per-5mins = 1000
+  sbeacon-method-queue-size = 100
+  sbeacon-method-max-request-rate = 10
+  svep-method-max-request-rate = 10
+  svep-method-queue-size = 100
+  svep-warning-thresholds = {
+    dp = 10
+    filter = "PASS"
+    gq = 15
+    mq = 30
+    qd = 20
+    qual = 20
+  }
   svep-filters = {
-    clinvar_exclude = [
+    clinvar_exclude  = [
       "Benign",
       "Benign/Likely benign",
       "Likely benign",
@@ -229,7 +253,7 @@
     ]
     consequence_rank = 14
     max_maf          = 0.05
-    genes = [
+    genes            = [
       "ABCC8",
       "ABCC9",
       "ACAD9",
@@ -492,6 +516,7 @@
 
   ses-source-email = "devops@example.com"
   enable-inspector = false
+
   hub_name         = "RSIGNG"
   lookup_configuration = {
     assoc_matrix_filename = "RSIGNG_association_matrix.csv"
@@ -559,6 +584,7 @@
 
   ses-source-email = "devops@example.com"
   enable-inspector = true
+
   hub_name         = "RSJPD"
   pharmcat_configuration = {
     ORGANISATIONS = [
