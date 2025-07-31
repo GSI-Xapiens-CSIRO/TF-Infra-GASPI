@@ -86,6 +86,8 @@ locals {
         "backend-admin",
         "backend-dataPortal",
         "backend-deidentifyFiles",
+        "backend-generateCohortVCfs",
+        "backend-generateReports",
         "backend-getAnalyses",
         "backend-getBiosamples",
         "backend-getConfiguration",
@@ -109,22 +111,28 @@ locals {
     }
     svep = {
       functions = [
+        "backend-batchStarter",
+        "backend-batchSubmit",
+        "backend-clearTempAndRegions",
+        "backend-concat",
+        "backend-concatPages",
         "backend-concatStarter",
+        "backend-createPages",
+        "backend-deleteClinicalWorkflow",
+        "backend-formatOutput",
         "backend-getResultsURL",
         "backend-initQuery",
+        "backend-pluginClinvar",
         "backend-pluginConsequence",
+        "backend-pluginGnomad",
+        "backend-pluginGnomadConstraint",
+        "backend-pluginGnomadOneKG",
+        "backend-qcFigures",
+        "backend-qcNotes",
         "backend-queryGTF",
         "backend-queryVCF",
-        "concat",
-        "concatPages",
-        "concatStarter",
-        "createPages",
-        "getResultsURL",
-        "initQuery",
-        "pluginConsequence",
-        "pluginUpdownstream",
-        "queryGTF",
-        "queryVCF"
+        "backend-sendJobEmail",
+        "backend-updateReferenceFiles"
       ]
       log_group_prefix = "/aws/lambda/svep-"
     }
