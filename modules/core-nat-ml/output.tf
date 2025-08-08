@@ -28,10 +28,10 @@ output "vpc_name" {
   value       = local.vps_tags.Name
 }
 
-output "security_group_id" {
-  description = "Default Security Group of VPC Id's"
-  value       = aws_security_group.default.id
-}
+# output "security_group_id" {
+#   description = "Default Security Group of VPC Id's"
+#   value       = aws_security_group.default.id
+# }
 
 # --------------------------------------------------------------------------
 #  Original EC2 Output
@@ -252,7 +252,6 @@ locals {
 VPC Summary:
   VPC Id:                    ${aws_vpc.infra_vpc.id}
   VPC CIDR:                  ${aws_vpc.infra_vpc.cidr_block}
-  Default Security Group Id: ${aws_security_group.default.id}
   ML Default Security Group: ${aws_security_group.ml_default.id}
 
 Traditional EC2 Infrastructure:
