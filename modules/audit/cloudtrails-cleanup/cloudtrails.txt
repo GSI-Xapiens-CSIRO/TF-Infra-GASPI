@@ -1,0 +1,79 @@
+cloudtrail_arn = "arn:aws:cloudtrail:ap-southeast-3:209479276142:trail/genomic-services-trail-209479276142"
+cloudtrail_bucket = "genomic-cloudtrail-209479276142"
+cloudtrail_kms_key_arn = "arn:aws:kms:ap-southeast-3:209479276142:key/4c66f033-fd41-472c-811f-c73122d2b9b2"
+cloudtrail_log_group = "/aws/cloudtrail/genomic-services-209479276142"
+cloudtrail_sns_topic_arn = "arn:aws:sns:ap-southeast-3:209479276142:genomic-cloudtrail-alerts-209479276142"
+cloudwatch_log_groups_sbeacon = [
+  "/aws/lambda/sbeacon-backend-admin",
+  "/aws/lambda/sbeacon-backend-backend-admin",
+  "/aws/lambda/sbeacon-backend-backend-dataPortal",
+  "/aws/lambda/sbeacon-backend-backend-deidentifyFiles",
+  "/aws/lambda/sbeacon-backend-backend-getAnalyses",
+  "/aws/lambda/sbeacon-backend-backend-getBiosamples",
+  "/aws/lambda/sbeacon-backend-backend-getConfiguration",
+  "/aws/lambda/sbeacon-backend-backend-getDatasets",
+  "/aws/lambda/sbeacon-backend-backend-getEntryTypes",
+  "/aws/lambda/sbeacon-backend-backend-getFilteringTerms",
+  "/aws/lambda/sbeacon-backend-backend-getGenomicVariants",
+  "/aws/lambda/sbeacon-backend-backend-getIndividuals",
+  "/aws/lambda/sbeacon-backend-backend-getInfo",
+  "/aws/lambda/sbeacon-backend-backend-getMap",
+  "/aws/lambda/sbeacon-backend-backend-getProjects",
+  "/aws/lambda/sbeacon-backend-backend-getRuns",
+  "/aws/lambda/sbeacon-backend-backend-indexer",
+  "/aws/lambda/sbeacon-backend-backend-logEmailDelivery",
+  "/aws/lambda/sbeacon-backend-backend-performQuery",
+  "/aws/lambda/sbeacon-backend-backend-splitQuery",
+  "/aws/lambda/sbeacon-backend-backend-submitDataset",
+  "/aws/lambda/sbeacon-backend-backend-updateFiles",
+]
+cloudwatch_log_groups_svep = [
+  "/aws/lambda/svep-backend-backend-concatStarter",
+  "/aws/lambda/svep-backend-backend-getResultsURL",
+  "/aws/lambda/svep-backend-backend-initQuery",
+  "/aws/lambda/svep-backend-backend-pluginConsequence",
+  "/aws/lambda/svep-backend-backend-queryGTF",
+  "/aws/lambda/svep-backend-backend-queryVCF",
+  "/aws/lambda/svep-backend-concat",
+  "/aws/lambda/svep-backend-concatPages",
+  "/aws/lambda/svep-backend-concatStarter",
+  "/aws/lambda/svep-backend-createPages",
+  "/aws/lambda/svep-backend-getResultsURL",
+  "/aws/lambda/svep-backend-initQuery",
+  "/aws/lambda/svep-backend-pluginConsequence",
+  "/aws/lambda/svep-backend-pluginUpdownstream",
+  "/aws/lambda/svep-backend-queryGTF",
+  "/aws/lambda/svep-backend-queryVCF",
+]
+cloudwatch_monitoring_url = "https://ap-southeast-3.console.aws.amazon.com/cloudwatch/home?region=ap-southeast-3#dashboards:name=genomic-cloudtrail-209479276142"
+configuration_summary = {
+  "encryption_enabled" = true
+  "environment" = "STG"
+  "instance_count" = 2
+  "instance_type" = "t3.medium.search"
+  "opensearch_version" = "OpenSearch_2.9"
+  "region" = "ap-southeast-3"
+  "retention_period" = 365
+  "volume_size" = 150
+  "vpc_enabled" = true
+}
+kinesis_firehose_name = "genomic-cloudtrail-kinesis-opensearch-209479276142"
+kinesis_firehose_opensearch_role_arn = "arn:aws:iam::209479276142:role/genomic-cloudtrail-kinesis-firehose-opensearch-role"
+kinesis_firehose_stream_arn = "arn:aws:kinesis:ap-southeast-3:209479276142:stream/genomic-cloudtrail-kinesis-stream-209479276142"
+kinesis_firehose_stream_name = "genomic-cloudtrail-kinesis-stream-209479276142"
+lambda_function_arn = "arn:aws:lambda:ap-southeast-3:209479276142:function:genomic-cloudtrail-processor-209479276142"
+lambda_function_name = "genomic-cloudtrail-processor-209479276142"
+log_group_url = "https://ap-southeast-3.console.aws.amazon.com/cloudwatch/home?region=ap-southeast-3#logsV2:log-groups/log-group/%2Faws%2Fcloudtrail%2Fgenomic-services-209479276142"
+metrics_url = "https://ap-southeast-3.console.aws.amazon.com/cloudwatch/home?region=ap-southeast-3#metricsV2:graph=~()`"
+opensearch_credentials = <sensitive>
+opensearch_dashboard_endpoint = "search-opensearch-209479276142-paw3g3mil3vfw5l2rt7ehkzzea.ap-southeast-3.es.amazonaws.com/_dashboards"
+opensearch_dashboard_url = "https://search-opensearch-209479276142-paw3g3mil3vfw5l2rt7ehkzzea.ap-southeast-3.es.amazonaws.com/_dashboards/_dashboards"
+opensearch_domain_arn = "arn:aws:es:ap-southeast-3:209479276142:domain/opensearch-209479276142"
+opensearch_domain_endpoint = "search-opensearch-209479276142-paw3g3mil3vfw5l2rt7ehkzzea.ap-southeast-3.es.amazonaws.com"
+opensearch_domain_name = "opensearch-209479276142"
+opensearch_endpoint = "search-opensearch-209479276142-paw3g3mil3vfw5l2rt7ehkzzea.ap-southeast-3.es.amazonaws.com"
+opensearch_master_user = "gxc-admin"
+opensearch_monitoring_url = "https://search-opensearch-209479276142-paw3g3mil3vfw5l2rt7ehkzzea.ap-southeast-3.es.amazonaws.com/_dashboards/app/opensearch_dashboards#/dashboard/cloudtrail-monitoring"
+opensearch_password_parameter = "/genomic/cloudtrail/opensearch/master-password"
+password_retrieval_command = "aws ssm get-parameter --name /genomic/cloudtrail/opensearch/master-password --with-decryption --query Parameter.Value --output text"
+vpc_security_group_id = "sg-0017e175d406ad5af"
