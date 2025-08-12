@@ -224,9 +224,14 @@ output "firewall_policy_arn" {
   value       = var.enable_network_firewall ? aws_networkfirewall_firewall_policy.network_firewall_policy[0].arn : null
 }
 
+output "icmp_block_rule_group_arn" {
+  description = "ICMP Block Rule Group ARN"
+  value       = var.enable_network_firewall ? aws_networkfirewall_rule_group.icmp_block_stateless[0].arn : null
+}
+
 output "firewall_endpoints" {
   description = "Network Firewall Endpoint IDs by AZ"
-  value       = var.enable_network_firewall ? {
+  value = var.enable_network_firewall ? {
     zone_a = element(split(":", tolist(tolist(aws_networkfirewall_firewall.network_firewall[0].firewall_status[0].sync_states)[0].attachment)[0].endpoint_id), 1)
   } : {}
 }
@@ -321,7 +326,7 @@ output "firewall_flow_log_group" {
 # --------------------------------------------------------------------------
 output "summary" {
   description = "Summary Core Infrastructure Configuration with ML Security"
-  value = <<SUMMARY
+  value       = <<SUMMARY
 VPC Summary:
   VPC Id:                    ${aws_vpc.infra_vpc.id}
   VPC CIDR:                  ${aws_vpc.infra_vpc.cidr_block}
@@ -361,6 +366,7 @@ Data Protection Features:
 
 Allowed Domains: ${join(", ", var.allowed_domains)}
 Blocked Domains: ${join(", ", var.blocked_domains)}
+Allowed CIDR Blocks: ${join(", ", var.allowed_cidr_blocks)}
 SUMMARY
 }
 
@@ -371,6 +377,7 @@ output "ml_security_config" {
     sagemaker_studio_enabled = var.enable_sagemaker_studio
     allowed_domains_count    = length(var.allowed_domains)
     blocked_domains_count    = length(var.blocked_domains)
+    allowed_cidr_blocks      = length(var.allowed_cidr_blocks)
     vpc_endpoints_count      = var.enable_sagemaker_studio ? 9 : 0
     security_level           = var.enable_network_firewall && var.enable_sagemaker_studio ? "HIGH" : "MEDIUM"
   }
