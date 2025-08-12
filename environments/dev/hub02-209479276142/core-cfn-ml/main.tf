@@ -32,7 +32,7 @@ locals {
 #  Reuse Module: Core
 # --------------------------------------------------------------------------
 module "core" {
-  source = "../../../../modules//core-nat-ml"
+  source = "../../../../modules//core-cfn-ml"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source
@@ -75,7 +75,9 @@ module "core" {
   # Custom Domain Lists
   allowed_domains = [
     ".amazonaws.com",
-    ".aws.amazon.com"
+    ".aws.amazon.com",
+    ".kaggle.com",
+    ".typicode.com"
   ]
 
   blocked_domains = [
@@ -115,6 +117,12 @@ module "core" {
     ".hastebin.com",
     ".ghostbin.co",
     ".termbin.com"
+  ]
+
+  allowed_cidr_blocks = [
+    "10.16.0.0/16",
+    "10.32.0.0/16",
+    "10.48.0.0/16"
   ]
 
   # Monitoring
