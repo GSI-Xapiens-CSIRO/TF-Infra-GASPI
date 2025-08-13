@@ -11,7 +11,7 @@
 # ==========================================================================
 
 # --------------------------------------------------------------------------
-#  EIP for NAT Gateway
+#  EIP for NAT Gateway (Single)
 # --------------------------------------------------------------------------
 resource "aws_eip" "nat_gateway_eip" {
   count    = var.enable_network_firewall ? 1 : 0
@@ -164,7 +164,7 @@ resource "aws_networkfirewall_firewall_policy" "network_firewall_policy" {
 }
 
 # --------------------------------------------------------------------------
-#  Network Firewall (CloudFormation style)
+#  Network Firewall (Multi-AZ CloudFormation style)
 # --------------------------------------------------------------------------
 resource "aws_networkfirewall_firewall" "network_firewall" {
   count                             = var.enable_network_firewall ? 1 : 0
@@ -177,7 +177,15 @@ resource "aws_networkfirewall_firewall" "network_firewall" {
   subnet_change_protection          = false
 
   subnet_mapping {
-    subnet_id = aws_subnet.firewall_subnet[0].id
+    subnet_id = aws_subnet.ml_firewall_subnet_a[0].id
+  }
+
+  subnet_mapping {
+    subnet_id = aws_subnet.ml_firewall_subnet_b[0].id
+  }
+
+  subnet_mapping {
+    subnet_id = aws_subnet.ml_firewall_subnet_c[0].id
   }
 
   tags = merge(local.tags, {
@@ -188,17 +196,18 @@ resource "aws_networkfirewall_firewall" "network_firewall" {
 
 
 # --------------------------------------------------------------------------
-#  NAT Gateway
+#  NAT Gateway (Single in Zone A)
 # --------------------------------------------------------------------------
 resource "aws_nat_gateway" "nat_gateway" {
   count         = var.enable_network_firewall ? 1 : 0
   provider      = aws.destination
   allocation_id = aws_eip.nat_gateway_eip[0].id
-  subnet_id     = aws_subnet.nat_gateway_subnet[0].id
+  subnet_id     = aws_subnet.ml_gateway_subnet_a[0].id
 
   tags = merge(local.tags, {
-    Name = "nat-gateway-${local.project_name}"
+    Name = "${local.project_name}-natgw"
   })
 
   depends_on = [aws_internet_gateway.igw]
 }
+
