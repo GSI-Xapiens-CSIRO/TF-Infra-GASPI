@@ -71,25 +71,26 @@ resource "aws_route_table_association" "igw_route_table_association" {
   gateway_id     = aws_internet_gateway.igw.id
 }
 
+# Import existing association first if it exists
 resource "aws_route_table_association" "firewall_subnet_route_table_association" {
   count          = var.enable_network_firewall ? 1 : 0
   provider       = aws.destination
   route_table_id = aws_route_table.firewall_route_table[0].id
-  subnet_id      = aws_subnet.firewall_subnet[0].id
+  subnet_id      = aws_subnet.ml_firewall_subnet_a[0].id
 }
 
 resource "aws_route_table_association" "nat_gateway_subnet_route_table_association" {
   count          = var.enable_network_firewall ? 1 : 0
   provider       = aws.destination
   route_table_id = aws_route_table.nat_gateway_route_table[0].id
-  subnet_id      = aws_subnet.nat_gateway_subnet[0].id
+  subnet_id      = aws_subnet.ml_gateway_subnet[0].id
 }
 
 resource "aws_route_table_association" "sagemaker_studio_route_table_association" {
   count          = var.enable_sagemaker_studio ? 1 : 0
   provider       = aws.destination
   route_table_id = aws_route_table.sagemaker_studio_route_table[0].id
-  subnet_id      = aws_subnet.sagemaker_studio_subnet[0].id
+  subnet_id      = aws_subnet.ml_sagemaker_studio_subnet[0].id
 }
 
 # --------------------------------------------------------------------------

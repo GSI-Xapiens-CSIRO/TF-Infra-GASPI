@@ -16,7 +16,7 @@
 resource "aws_security_group" "vpc_endpoints_security_group" {
   count       = var.enable_sagemaker_studio ? 1 : 0
   provider    = aws.destination
-  name        = "sg-vpce-${local.project_name}"
+  name        = "ml-sg-vpce-${local.project_name}"
   description = "Allow TLS for VPC Endpoint"
   vpc_id      = aws_vpc.infra_vpc.id
 
@@ -24,7 +24,7 @@ resource "aws_security_group" "vpc_endpoints_security_group" {
     from_port       = 443
     to_port         = 443
     protocol        = "tcp"
-    security_groups = [aws_security_group.sagemaker_security_group[0].id]
+    security_groups = [aws_security_group.ml_sagemaker_security_group[0].id]
   }
 
   ingress {
@@ -36,7 +36,7 @@ resource "aws_security_group" "vpc_endpoints_security_group" {
   }
 
   tags = merge(local.tags, {
-    Name = "sg-vpce-${local.project_name}"
+    Name = "ml-sg-vpce-${local.project_name}"
   })
 }
 
@@ -44,18 +44,18 @@ resource "aws_security_group" "vpc_endpoints_security_group" {
 #  S3 Gateway Endpoint
 # --------------------------------------------------------------------------
 resource "aws_vpc_endpoint" "s3" {
-  count           = var.enable_sagemaker_studio ? 1 : 0
-  provider        = aws.destination
-  vpc_id          = aws_vpc.infra_vpc.id
-  service_name    = "com.amazonaws.${var.aws_region}.s3"
+  count             = var.enable_sagemaker_studio ? 1 : 0
+  provider          = aws.destination
+  vpc_id            = aws_vpc.infra_vpc.id
+  service_name      = "com.amazonaws.${var.aws_region}.s3"
   vpc_endpoint_type = "Gateway"
-  route_table_ids = [aws_route_table.sagemaker_studio_route_table[0].id]
+  route_table_ids   = [aws_route_table.sagemaker_studio_route_table[0].id]
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = "*"
         Action = [
           "s3:GetObject",
@@ -87,7 +87,7 @@ resource "aws_vpc_endpoint" "sagemaker_api" {
   vpc_id              = aws_vpc.infra_vpc.id
   service_name        = "com.amazonaws.${var.aws_region}.sagemaker.api"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.sagemaker_studio_subnet[0].id]
+  subnet_ids          = [aws_subnet.ml_sagemaker_studio_subnet[0].id]
   security_group_ids  = [aws_security_group.vpc_endpoints_security_group[0].id]
   private_dns_enabled = true
 
@@ -95,10 +95,10 @@ resource "aws_vpc_endpoint" "sagemaker_api" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = "*"
-        Action = "*"
-        Resource = "*"
+        Action    = "*"
+        Resource  = "*"
       }
     ]
   })
@@ -117,7 +117,7 @@ resource "aws_vpc_endpoint" "sagemaker_runtime" {
   vpc_id              = aws_vpc.infra_vpc.id
   service_name        = "com.amazonaws.${var.aws_region}.sagemaker.runtime"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.sagemaker_studio_subnet[0].id]
+  subnet_ids          = [aws_subnet.ml_sagemaker_studio_subnet[0].id]
   security_group_ids  = [aws_security_group.vpc_endpoints_security_group[0].id]
   private_dns_enabled = true
 
@@ -125,10 +125,10 @@ resource "aws_vpc_endpoint" "sagemaker_runtime" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = "*"
-        Action = "*"
-        Resource = "*"
+        Action    = "*"
+        Resource  = "*"
       }
     ]
   })
@@ -147,7 +147,7 @@ resource "aws_vpc_endpoint" "sagemaker_notebook" {
   vpc_id              = aws_vpc.infra_vpc.id
   service_name        = "aws.sagemaker.${var.aws_region}.notebook"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.sagemaker_studio_subnet[0].id]
+  subnet_ids          = [aws_subnet.ml_sagemaker_studio_subnet[0].id]
   security_group_ids  = [aws_security_group.vpc_endpoints_security_group[0].id]
   private_dns_enabled = true
 
@@ -155,10 +155,10 @@ resource "aws_vpc_endpoint" "sagemaker_notebook" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = "*"
-        Action = "*"
-        Resource = "*"
+        Action    = "*"
+        Resource  = "*"
       }
     ]
   })
@@ -177,7 +177,7 @@ resource "aws_vpc_endpoint" "sts" {
   vpc_id              = aws_vpc.infra_vpc.id
   service_name        = "com.amazonaws.${var.aws_region}.sts"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.sagemaker_studio_subnet[0].id]
+  subnet_ids          = [aws_subnet.ml_sagemaker_studio_subnet[0].id]
   security_group_ids  = [aws_security_group.vpc_endpoints_security_group[0].id]
   private_dns_enabled = true
 
@@ -185,10 +185,10 @@ resource "aws_vpc_endpoint" "sts" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = "*"
-        Action = "*"
-        Resource = "*"
+        Action    = "*"
+        Resource  = "*"
       }
     ]
   })
@@ -207,7 +207,7 @@ resource "aws_vpc_endpoint" "cloudwatch" {
   vpc_id              = aws_vpc.infra_vpc.id
   service_name        = "com.amazonaws.${var.aws_region}.monitoring"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.sagemaker_studio_subnet[0].id]
+  subnet_ids          = [aws_subnet.ml_sagemaker_studio_subnet[0].id]
   security_group_ids  = [aws_security_group.vpc_endpoints_security_group[0].id]
   private_dns_enabled = true
 
@@ -215,10 +215,10 @@ resource "aws_vpc_endpoint" "cloudwatch" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = "*"
-        Action = "*"
-        Resource = "*"
+        Action    = "*"
+        Resource  = "*"
       }
     ]
   })
@@ -237,7 +237,7 @@ resource "aws_vpc_endpoint" "cloudwatch_logs" {
   vpc_id              = aws_vpc.infra_vpc.id
   service_name        = "com.amazonaws.${var.aws_region}.logs"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.sagemaker_studio_subnet[0].id]
+  subnet_ids          = [aws_subnet.ml_sagemaker_studio_subnet[0].id]
   security_group_ids  = [aws_security_group.vpc_endpoints_security_group[0].id]
   private_dns_enabled = true
 
@@ -245,10 +245,10 @@ resource "aws_vpc_endpoint" "cloudwatch_logs" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = "*"
-        Action = "*"
-        Resource = "*"
+        Action    = "*"
+        Resource  = "*"
       }
     ]
   })
@@ -267,7 +267,7 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
   vpc_id              = aws_vpc.infra_vpc.id
   service_name        = "com.amazonaws.${var.aws_region}.ecr.dkr"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.sagemaker_studio_subnet[0].id]
+  subnet_ids          = [aws_subnet.ml_sagemaker_studio_subnet[0].id]
   security_group_ids  = [aws_security_group.vpc_endpoints_security_group[0].id]
   private_dns_enabled = true
 
@@ -275,10 +275,10 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = "*"
-        Action = "*"
-        Resource = "*"
+        Action    = "*"
+        Resource  = "*"
       }
     ]
   })
@@ -297,7 +297,7 @@ resource "aws_vpc_endpoint" "ecr_api" {
   vpc_id              = aws_vpc.infra_vpc.id
   service_name        = "com.amazonaws.${var.aws_region}.ecr.api"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.sagemaker_studio_subnet[0].id]
+  subnet_ids          = [aws_subnet.ml_sagemaker_studio_subnet[0].id]
   security_group_ids  = [aws_security_group.vpc_endpoints_security_group[0].id]
   private_dns_enabled = true
 
@@ -305,10 +305,10 @@ resource "aws_vpc_endpoint" "ecr_api" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = "*"
-        Action = "*"
-        Resource = "*"
+        Action    = "*"
+        Resource  = "*"
       }
     ]
   })

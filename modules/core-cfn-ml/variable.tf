@@ -225,24 +225,24 @@ variable "firewall_deletion_protection" {
 variable "allowed_domains" {
   description = "List of allowed domains for ML workloads (domain allowlist)"
   type        = list(string)
-  default = [
-    ".amazonaws.com",         # AWS services
-    ".anaconda.com",          # Anaconda packages
-    ".anaconda.org",          # Anaconda community
-    ".pypi.org",              # Python Package Index
-    ".pythonhosted.org",      # Python packages hosting
-    ".conda.io",              # Conda packages
-    ".continuum.io",          # Continuum Analytics
-    ".github.com",            # GitHub repositories
-    ".githubusercontent.com", # GitHub raw content
-    ".huggingface.co",        # Hugging Face models
-    ".kaggle.com",            # Kaggle datasets
-    ".pytorch.org",           # PyTorch framework
-    ".tensorflow.org",        # TensorFlow framework
-    ".jupyter.org",           # Jupyter documentation
-    ".scipy.org",             # SciPy ecosystem
-    ".numpy.org"              # NumPy library
-  ]
+  # default = [
+  #   ".amazonaws.com",         # AWS services
+  #   ".anaconda.com",          # Anaconda packages
+  #   ".anaconda.org",          # Anaconda community
+  #   ".pypi.org",              # Python Package Index
+  #   ".pythonhosted.org",      # Python packages hosting
+  #   ".conda.io",              # Conda packages
+  #   ".continuum.io",          # Continuum Analytics
+  #   ".github.com",            # GitHub repositories
+  #   ".githubusercontent.com", # GitHub raw content
+  #   ".huggingface.co",        # Hugging Face models
+  #   ".kaggle.com",            # Kaggle datasets
+  #   ".pytorch.org",           # PyTorch framework
+  #   ".tensorflow.org",        # TensorFlow framework
+  #   ".jupyter.org",           # Jupyter documentation
+  #   ".scipy.org",             # SciPy ecosystem
+  #   ".numpy.org"              # NumPy library
+  # ]
 
   validation {
     condition = alltrue([
@@ -255,45 +255,62 @@ variable "allowed_domains" {
 variable "blocked_domains" {
   description = "List of explicitly blocked domains for data exfiltration prevention"
   type        = list(string)
-  default = [
-    # File sharing and storage services
-    ".dropbox.com",
-    ".box.com",
-    ".onedrive.com",
-    ".googledrive.com",
-    ".icloud.com",
-    ".mega.nz",
-    ".mediafire.com",
-    ".rapidshare.com",
-    ".sendspace.com",
-    ".wetransfer.com",
-    ".fileserve.com",
-    ".4shared.com",
+  # default = [
+  #   # File sharing and storage services
+  #   ".dropbox.com",
+  #   ".box.com",
+  #   ".onedrive.com",
+  #   ".googledrive.com",
+  #   ".icloud.com",
+  #   ".mega.nz",
+  #   ".mediafire.com",
+  #   ".rapidshare.com",
+  #   ".sendspace.com",
+  #   ".wetransfer.com",
+  #   ".fileserve.com",
+  #   ".4shared.com",
 
-    # Communication and social platforms
-    ".telegram.org",
-    ".whatsapp.com",
-    ".slack.com",
-    ".discord.com",
-    ".teams.microsoft.com",
+  #   # Communication and social platforms
+  #   ".telegram.org",
+  #   ".whatsapp.com",
+  #   ".slack.com",
+  #   ".discord.com",
+  #   ".teams.microsoft.com",
 
-    # Code repositories (non-approved)
-    ".gitlab.com",
-    ".bitbucket.org",
-    ".sourceforge.net",
+  #   # Code repositories (non-approved)
+  #   ".gitlab.com",
+  #   ".bitbucket.org",
+  #   ".sourceforge.net",
 
-    # Potential data exfiltration vectors
-    ".pastebin.com",
-    ".hastebin.com",
-    ".ghostbin.co",
-    ".termbin.com"
-  ]
+  #   # Potential data exfiltration vectors
+  #   ".pastebin.com",
+  #   ".hastebin.com",
+  #   ".ghostbin.co",
+  #   ".termbin.com"
+  # ]
 
   validation {
     condition = alltrue([
       for domain in var.blocked_domains : can(regex("^\\.", domain))
     ])
     error_message = "All domains in blocked_domains must start with a dot (.) for wildcard matching."
+  }
+}
+
+variable "allowed_cidr_blocks" {
+  description = "List of CIDR blocks allowed through stateless firewall rules"
+  type        = list(string)
+  default = [
+    "10.16.0.0/16",
+    "10.32.0.0/16",
+    "10.48.0.0/16"
+  ]
+
+  validation {
+    condition = alltrue([
+      for cidr in var.allowed_cidr_blocks : can(cidrhost(cidr, 0))
+    ])
+    error_message = "All values must be valid CIDR blocks."
   }
 }
 

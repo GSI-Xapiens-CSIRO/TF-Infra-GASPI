@@ -36,7 +36,9 @@ No modules.
 | [aws_nat_gateway.nat_gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway) | resource |
 | [aws_networkfirewall_firewall.network_firewall](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_firewall) | resource |
 | [aws_networkfirewall_firewall_policy.network_firewall_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_firewall_policy) | resource |
+| [aws_networkfirewall_rule_group.cidr_allow_stateless](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_rule_group) | resource |
 | [aws_networkfirewall_rule_group.domain_allow_stateful](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_rule_group) | resource |
+| [aws_networkfirewall_rule_group.icmp_block_stateless](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_rule_group) | resource |
 | [aws_route.firewall_egress_route](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.igw_ingress_route](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.nat_gateway_egress_route](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
@@ -68,18 +70,24 @@ No modules.
 | [aws_sagemaker_app.jupyter_app](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sagemaker_app) | resource |
 | [aws_sagemaker_domain.sagemaker_studio_domain](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sagemaker_domain) | resource |
 | [aws_sagemaker_user_profile.sagemaker_user_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sagemaker_user_profile) | resource |
-| [aws_security_group.sagemaker_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.ml_sagemaker_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.ml_vpc_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.vpc_endpoints_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_security_group_rule.sagemaker_self_reference](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.ml_sagemaker_self_reference](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_subnet.ec2_private_a](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.ec2_private_b](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.ec2_private_c](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.ec2_public_a](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.ec2_public_b](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.ec2_public_c](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
-| [aws_subnet.firewall_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
-| [aws_subnet.nat_gateway_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
-| [aws_subnet.sagemaker_studio_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_firewall_subnet_a](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_firewall_subnet_b](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_firewall_subnet_c](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_gateway_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_gateway_subnet_a](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_gateway_subnet_b](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_gateway_subnet_c](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_sagemaker_studio_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.infra_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
 | [aws_vpc_endpoint.cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
 | [aws_vpc_endpoint.cloudwatch_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
@@ -99,7 +107,8 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_alert_email_addresses"></a> [alert\_email\_addresses](#input\_alert\_email\_addresses) | List of email addresses for security alerts | `list(string)` | `[]` | no |
 | <a name="input_allow_ssh_from_anywhere"></a> [allow\_ssh\_from\_anywhere](#input\_allow\_ssh\_from\_anywhere) | Allow SSH access from anywhere (DANGEROUS - only for testing) | `bool` | `false` | no |
-| <a name="input_allowed_domains"></a> [allowed\_domains](#input\_allowed\_domains) | List of allowed domains for ML workloads (domain allowlist) | `list(string)` | <pre>[<br/>  ".amazonaws.com",<br/>  ".anaconda.com",<br/>  ".anaconda.org",<br/>  ".pypi.org",<br/>  ".pythonhosted.org",<br/>  ".conda.io",<br/>  ".continuum.io",<br/>  ".github.com",<br/>  ".githubusercontent.com",<br/>  ".huggingface.co",<br/>  ".kaggle.com",<br/>  ".pytorch.org",<br/>  ".tensorflow.org",<br/>  ".jupyter.org",<br/>  ".scipy.org",<br/>  ".numpy.org"<br/>]</pre> | no |
+| <a name="input_allowed_cidr_blocks"></a> [allowed\_cidr\_blocks](#input\_allowed\_cidr\_blocks) | List of CIDR blocks allowed through stateless firewall rules | `list(string)` | <pre>[<br/>  "10.16.0.0/16",<br/>  "10.32.0.0/16",<br/>  "10.48.0.0/16"<br/>]</pre> | no |
+| <a name="input_allowed_domains"></a> [allowed\_domains](#input\_allowed\_domains) | List of allowed domains for ML workloads (domain allowlist) | `list(string)` | n/a | yes |
 | <a name="input_aws_access_key"></a> [aws\_access\_key](#input\_aws\_access\_key) | The AWS Access Key (use with caution, prefer IAM roles) | `string` | `""` | no |
 | <a name="input_aws_account_id_destination"></a> [aws\_account\_id\_destination](#input\_aws\_account\_id\_destination) | The AWS Account ID to deploy the infrastructure in | `string` | n/a | yes |
 | <a name="input_aws_account_id_source"></a> [aws\_account\_id\_source](#input\_aws\_account\_id\_source) | The AWS Account ID for management/source account | `string` | n/a | yes |
@@ -108,7 +117,7 @@ No modules.
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | The AWS region to deploy the VPC and resources in | `string` | n/a | yes |
 | <a name="input_aws_secret_key"></a> [aws\_secret\_key](#input\_aws\_secret\_key) | The AWS Secret Key (use with caution, prefer IAM roles) | `string` | `""` | no |
 | <a name="input_backup_retention_days"></a> [backup\_retention\_days](#input\_backup\_retention\_days) | Retention period for automated backups | `number` | `7` | no |
-| <a name="input_blocked_domains"></a> [blocked\_domains](#input\_blocked\_domains) | List of explicitly blocked domains for data exfiltration prevention | `list(string)` | <pre>[<br/>  ".dropbox.com",<br/>  ".box.com",<br/>  ".onedrive.com",<br/>  ".googledrive.com",<br/>  ".icloud.com",<br/>  ".mega.nz",<br/>  ".mediafire.com",<br/>  ".rapidshare.com",<br/>  ".sendspace.com",<br/>  ".wetransfer.com",<br/>  ".fileserve.com",<br/>  ".4shared.com",<br/>  ".telegram.org",<br/>  ".whatsapp.com",<br/>  ".slack.com",<br/>  ".discord.com",<br/>  ".teams.microsoft.com",<br/>  ".gitlab.com",<br/>  ".bitbucket.org",<br/>  ".sourceforge.net",<br/>  ".pastebin.com",<br/>  ".hastebin.com",<br/>  ".ghostbin.co",<br/>  ".termbin.com"<br/>]</pre> | no |
+| <a name="input_blocked_domains"></a> [blocked\_domains](#input\_blocked\_domains) | List of explicitly blocked domains for data exfiltration prevention | `list(string)` | n/a | yes |
 | <a name="input_compliance_framework"></a> [compliance\_framework](#input\_compliance\_framework) | Compliance framework requirements (affects security settings) | `list(string)` | <pre>[<br/>  "general"<br/>]</pre> | no |
 | <a name="input_coreinfra"></a> [coreinfra](#input\_coreinfra) | Core Infrastructure Name Prefix | `string` | `"gxc-tf-mgmt"` | no |
 | <a name="input_custom_firewall_rules"></a> [custom\_firewall\_rules](#input\_custom\_firewall\_rules) | Custom firewall rules for specific organizational requirements | <pre>list(object({<br/>    name        = string<br/>    priority    = number<br/>    action      = string<br/>    protocol    = string<br/>    source_port = string<br/>    dest_port   = string<br/>    content     = optional(string)<br/>    description = string<br/>  }))</pre> | `[]` | no |
@@ -195,12 +204,13 @@ No modules.
 | <a name="output_ec2_public_1c"></a> [ec2\_public\_1c](#output\_ec2\_public\_1c) | Public Subnet EC2 Zone C |
 | <a name="output_ec2_public_1c_cidr"></a> [ec2\_public\_1c\_cidr](#output\_ec2\_public\_1c\_cidr) | Public Subnet EC2 CIDR Block of Zone C |
 | <a name="output_firewall_alert_log_group"></a> [firewall\_alert\_log\_group](#output\_firewall\_alert\_log\_group) | Network Firewall Alert Log Group Name |
-| <a name="output_firewall_endpoints"></a> [firewall\_endpoints](#output\_firewall\_endpoints) | Network Firewall Endpoint IDs by AZ |
+| <a name="output_firewall_endpoints"></a> [firewall\_endpoints](#output\_firewall\_endpoints) | Network Firewall Endpoints Details by AZ |
 | <a name="output_firewall_flow_log_group"></a> [firewall\_flow\_log\_group](#output\_firewall\_flow\_log\_group) | Network Firewall Flow Log Group Name |
 | <a name="output_firewall_policy_arn"></a> [firewall\_policy\_arn](#output\_firewall\_policy\_arn) | Network Firewall Policy ARN |
 | <a name="output_firewall_subnet_1a"></a> [firewall\_subnet\_1a](#output\_firewall\_subnet\_1a) | Network Firewall Subnet Zone A |
 | <a name="output_firewall_subnet_1b"></a> [firewall\_subnet\_1b](#output\_firewall\_subnet\_1b) | Network Firewall Subnet Zone B |
 | <a name="output_firewall_subnet_1c"></a> [firewall\_subnet\_1c](#output\_firewall\_subnet\_1c) | Network Firewall Subnet Zone C |
+| <a name="output_icmp_block_rule_group_arn"></a> [icmp\_block\_rule\_group\_arn](#output\_icmp\_block\_rule\_group\_arn) | ICMP Block Rule Group ARN |
 | <a name="output_igw_route_table_id"></a> [igw\_route\_table\_id](#output\_igw\_route\_table\_id) | IGW route table ID |
 | <a name="output_kms_key_ebs_arn"></a> [kms\_key\_ebs\_arn](#output\_kms\_key\_ebs\_arn) | KMS key arn for SageMaker notebooks EBS encryption |
 | <a name="output_kms_key_s3_buckets_arn"></a> [kms\_key\_s3\_buckets\_arn](#output\_kms\_key\_s3\_buckets\_arn) | KMS key arn for data encryption in S3 buckets |
@@ -208,9 +218,16 @@ No modules.
 | <a name="output_ml_nat_gateway_1a"></a> [ml\_nat\_gateway\_1a](#output\_ml\_nat\_gateway\_1a) | ML NAT Gateway Zone A |
 | <a name="output_ml_nat_gateway_1b"></a> [ml\_nat\_gateway\_1b](#output\_ml\_nat\_gateway\_1b) | ML NAT Gateway Zone B |
 | <a name="output_ml_nat_gateway_1c"></a> [ml\_nat\_gateway\_1c](#output\_ml\_nat\_gateway\_1c) | ML NAT Gateway Zone C |
+| <a name="output_ml_sagemaker_security_group_name"></a> [ml\_sagemaker\_security\_group\_name](#output\_ml\_sagemaker\_security\_group\_name) | ML SageMaker Security Group Name |
 | <a name="output_ml_security_config"></a> [ml\_security\_config](#output\_ml\_security\_config) | ML Security Configuration Status |
+| <a name="output_ml_vpc_endpoints_security_group_name"></a> [ml\_vpc\_endpoints\_security\_group\_name](#output\_ml\_vpc\_endpoints\_security\_group\_name) | ML VPC Endpoints Security Group Name |
+| <a name="output_ml_vpc_security_group_id"></a> [ml\_vpc\_security\_group\_id](#output\_ml\_vpc\_security\_group\_id) | ML VPC Security Group ID |
+| <a name="output_ml_vpc_security_group_name"></a> [ml\_vpc\_security\_group\_name](#output\_ml\_vpc\_security\_group\_name) | ML VPC Security Group Name |
 | <a name="output_model_bucket_name"></a> [model\_bucket\_name](#output\_model\_bucket\_name) | Name of S3 bucket for models |
 | <a name="output_nat_gateway_route_table_id"></a> [nat\_gateway\_route\_table\_id](#output\_nat\_gateway\_route\_table\_id) | NAT Gateway route table ID |
+| <a name="output_nat_gateway_subnet_1a"></a> [nat\_gateway\_subnet\_1a](#output\_nat\_gateway\_subnet\_1a) | NAT Gateway Subnet Zone A |
+| <a name="output_nat_gateway_subnet_1b"></a> [nat\_gateway\_subnet\_1b](#output\_nat\_gateway\_subnet\_1b) | NAT Gateway Subnet Zone B |
+| <a name="output_nat_gateway_subnet_1c"></a> [nat\_gateway\_subnet\_1c](#output\_nat\_gateway\_subnet\_1c) | NAT Gateway Subnet Zone C |
 | <a name="output_nat_gateway_subnet_cidr"></a> [nat\_gateway\_subnet\_cidr](#output\_nat\_gateway\_subnet\_cidr) | NAT Gateway subnet CIDR |
 | <a name="output_network_firewall_arn"></a> [network\_firewall\_arn](#output\_network\_firewall\_arn) | Network Firewall ARN |
 | <a name="output_network_firewall_endpoint_id"></a> [network\_firewall\_endpoint\_id](#output\_network\_firewall\_endpoint\_id) | Network Firewall VPC Endpoint ID |

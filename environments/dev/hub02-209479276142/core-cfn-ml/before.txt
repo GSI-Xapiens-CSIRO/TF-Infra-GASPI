@@ -1,0 +1,50 @@
+ec2_private_1a = [
+  "subnet-051ff54dc21112a32",
+]
+ec2_private_1a_cidr = "10.32.16.0/21"
+ec2_private_1b = [
+  "subnet-0d558510787c4b25f",
+]
+ec2_private_1b_cidr = "10.32.24.0/21"
+ec2_private_1c = [
+  "subnet-026567749eb97c48b",
+]
+ec2_private_1c_cidr = "10.32.32.0/21"
+ec2_public_1a = [
+  "subnet-0ed79c11bf7be4e8a",
+]
+ec2_public_1a_cidr = "10.32.40.0/21"
+ec2_public_1b = [
+  "subnet-0c09781c6a1f91d84",
+]
+ec2_public_1b_cidr = "10.32.48.0/21"
+ec2_public_1c = [
+  "subnet-033cd9f938fb9bf8e",
+]
+ec2_public_1c_cidr = "10.32.56.0/21"
+security_group_id = "sg-09504d4243118cd0f"
+summary = <<EOT
+VPC Summary:
+  VPC Id:            vpc-0e850458fa9dfac54
+  Security Group Id: sg-09504d4243118cd0f
+Subnet Private:
+  EC2 Private 1a:    subnet-051ff54dc21112a32
+  EC2 Private 1b:    subnet-0d558510787c4b25f
+  EC2 Private 1c:    subnet-026567749eb97c48b
+Subnet Public:
+  EC2 Public 1a:     subnet-0ed79c11bf7be4e8a
+  EC2 Public 1b:     subnet-0c09781c6a1f91d84
+  EC2 Public 1c:     subnet-033cd9f938fb9bf8e
+CIDR Block Private:
+  EC2 CIDR 1a:       10.32.16.0/21
+  EC2 CIDR 1b:       10.32.24.0/21
+  EC2 CIDR 1c:       10.32.32.0/21
+CIDR Block Public:
+  EC2 CIDR 1a:       10.32.40.0/21
+  EC2 CIDR 1b:       10.32.48.0/21
+  EC2 CIDR 1c:       10.32.56.0/21
+
+EOT
+vpc_cidr = "10.32.0.0/16"
+vpc_id = "vpc-0e850458fa9dfac54"
+vpc_name = "gxc-tf-hub02-staging-vpc"
