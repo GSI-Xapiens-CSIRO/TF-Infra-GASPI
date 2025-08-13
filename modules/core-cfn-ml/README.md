@@ -70,18 +70,24 @@ No modules.
 | [aws_sagemaker_app.jupyter_app](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sagemaker_app) | resource |
 | [aws_sagemaker_domain.sagemaker_studio_domain](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sagemaker_domain) | resource |
 | [aws_sagemaker_user_profile.sagemaker_user_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sagemaker_user_profile) | resource |
-| [aws_security_group.sagemaker_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.ml_sagemaker_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.ml_vpc_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.vpc_endpoints_security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_security_group_rule.sagemaker_self_reference](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.ml_sagemaker_self_reference](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_subnet.ec2_private_a](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.ec2_private_b](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.ec2_private_c](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.ec2_public_a](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.ec2_public_b](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.ec2_public_c](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
-| [aws_subnet.firewall_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
-| [aws_subnet.nat_gateway_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
-| [aws_subnet.sagemaker_studio_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_firewall_subnet_a](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_firewall_subnet_b](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_firewall_subnet_c](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_gateway_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_gateway_subnet_a](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_gateway_subnet_b](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_gateway_subnet_c](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.ml_sagemaker_studio_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.infra_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
 | [aws_vpc_endpoint.cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
 | [aws_vpc_endpoint.cloudwatch_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
@@ -198,7 +204,7 @@ No modules.
 | <a name="output_ec2_public_1c"></a> [ec2\_public\_1c](#output\_ec2\_public\_1c) | Public Subnet EC2 Zone C |
 | <a name="output_ec2_public_1c_cidr"></a> [ec2\_public\_1c\_cidr](#output\_ec2\_public\_1c\_cidr) | Public Subnet EC2 CIDR Block of Zone C |
 | <a name="output_firewall_alert_log_group"></a> [firewall\_alert\_log\_group](#output\_firewall\_alert\_log\_group) | Network Firewall Alert Log Group Name |
-| <a name="output_firewall_endpoints"></a> [firewall\_endpoints](#output\_firewall\_endpoints) | Network Firewall Endpoint IDs by AZ |
+| <a name="output_firewall_endpoints"></a> [firewall\_endpoints](#output\_firewall\_endpoints) | Network Firewall Endpoints Details by AZ |
 | <a name="output_firewall_flow_log_group"></a> [firewall\_flow\_log\_group](#output\_firewall\_flow\_log\_group) | Network Firewall Flow Log Group Name |
 | <a name="output_firewall_policy_arn"></a> [firewall\_policy\_arn](#output\_firewall\_policy\_arn) | Network Firewall Policy ARN |
 | <a name="output_firewall_subnet_1a"></a> [firewall\_subnet\_1a](#output\_firewall\_subnet\_1a) | Network Firewall Subnet Zone A |
@@ -212,9 +218,16 @@ No modules.
 | <a name="output_ml_nat_gateway_1a"></a> [ml\_nat\_gateway\_1a](#output\_ml\_nat\_gateway\_1a) | ML NAT Gateway Zone A |
 | <a name="output_ml_nat_gateway_1b"></a> [ml\_nat\_gateway\_1b](#output\_ml\_nat\_gateway\_1b) | ML NAT Gateway Zone B |
 | <a name="output_ml_nat_gateway_1c"></a> [ml\_nat\_gateway\_1c](#output\_ml\_nat\_gateway\_1c) | ML NAT Gateway Zone C |
+| <a name="output_ml_sagemaker_security_group_name"></a> [ml\_sagemaker\_security\_group\_name](#output\_ml\_sagemaker\_security\_group\_name) | ML SageMaker Security Group Name |
 | <a name="output_ml_security_config"></a> [ml\_security\_config](#output\_ml\_security\_config) | ML Security Configuration Status |
+| <a name="output_ml_vpc_endpoints_security_group_name"></a> [ml\_vpc\_endpoints\_security\_group\_name](#output\_ml\_vpc\_endpoints\_security\_group\_name) | ML VPC Endpoints Security Group Name |
+| <a name="output_ml_vpc_security_group_id"></a> [ml\_vpc\_security\_group\_id](#output\_ml\_vpc\_security\_group\_id) | ML VPC Security Group ID |
+| <a name="output_ml_vpc_security_group_name"></a> [ml\_vpc\_security\_group\_name](#output\_ml\_vpc\_security\_group\_name) | ML VPC Security Group Name |
 | <a name="output_model_bucket_name"></a> [model\_bucket\_name](#output\_model\_bucket\_name) | Name of S3 bucket for models |
 | <a name="output_nat_gateway_route_table_id"></a> [nat\_gateway\_route\_table\_id](#output\_nat\_gateway\_route\_table\_id) | NAT Gateway route table ID |
+| <a name="output_nat_gateway_subnet_1a"></a> [nat\_gateway\_subnet\_1a](#output\_nat\_gateway\_subnet\_1a) | NAT Gateway Subnet Zone A |
+| <a name="output_nat_gateway_subnet_1b"></a> [nat\_gateway\_subnet\_1b](#output\_nat\_gateway\_subnet\_1b) | NAT Gateway Subnet Zone B |
+| <a name="output_nat_gateway_subnet_1c"></a> [nat\_gateway\_subnet\_1c](#output\_nat\_gateway\_subnet\_1c) | NAT Gateway Subnet Zone C |
 | <a name="output_nat_gateway_subnet_cidr"></a> [nat\_gateway\_subnet\_cidr](#output\_nat\_gateway\_subnet\_cidr) | NAT Gateway subnet CIDR |
 | <a name="output_network_firewall_arn"></a> [network\_firewall\_arn](#output\_network\_firewall\_arn) | Network Firewall ARN |
 | <a name="output_network_firewall_endpoint_id"></a> [network\_firewall\_endpoint\_id](#output\_network\_firewall\_endpoint\_id) | Network Firewall VPC Endpoint ID |

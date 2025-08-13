@@ -20,12 +20,12 @@ output "vpc_id" {
 
 output "sagemaker_studio_subnet_id" {
   description = "The ID of the SageMaker subnet"
-  value       = var.enable_sagemaker_studio ? aws_subnet.sagemaker_studio_subnet[0].id : null
+  value       = var.enable_sagemaker_studio ? aws_subnet.ml_sagemaker_studio_subnet[0].id : null
 }
 
 output "sagemaker_security_group_id" {
   description = "The ID the SageMaker security group"
-  value       = var.enable_sagemaker_studio ? aws_security_group.sagemaker_security_group[0].id : null
+  value       = var.enable_sagemaker_studio ? aws_security_group.ml_sagemaker_security_group[0].id : null
 }
 
 output "nat_gateway_subnet_cidr" {
@@ -183,12 +183,12 @@ output "ec2_public_1c_cidr" {
 # --------------------------------------------------------------------------
 output "sagemaker_private_1a" {
   description = "Private Subnet SageMaker Zone A"
-  value       = var.enable_sagemaker_studio ? aws_subnet.sagemaker_studio_subnet[0].id : null
+  value       = var.enable_sagemaker_studio ? aws_subnet.ml_sagemaker_studio_subnet[0].id : null
 }
 
 output "sagemaker_private_1a_cidr" {
   description = "Private Subnet SageMaker CIDR Block of Zone A"
-  value       = var.enable_sagemaker_studio ? aws_subnet.sagemaker_studio_subnet[0].cidr_block : null
+  value       = var.enable_sagemaker_studio ? aws_subnet.ml_sagemaker_studio_subnet[0].cidr_block : null
 }
 
 output "sagemaker_private_1b" {
@@ -230,32 +230,38 @@ output "icmp_block_rule_group_arn" {
 }
 
 output "firewall_endpoints" {
-  description = "Network Firewall Endpoint IDs by AZ"
+  description = "Network Firewall Endpoints Details by AZ"
   value = var.enable_network_firewall ? {
-    zone_a = element(split(":", tolist(tolist(aws_networkfirewall_firewall.network_firewall[0].firewall_status[0].sync_states)[0].attachment)[0].endpoint_id), 1)
+    for sync_state in aws_networkfirewall_firewall.network_firewall[0].firewall_status[0].sync_states :
+    sync_state.availability_zone => {
+      availability_zone = sync_state.availability_zone
+      subnet_id         = sync_state.attachment[0].subnet_id
+      endpoint_id       = element(split(":", sync_state.attachment[0].endpoint_id), 1)
+      status            = "Ready"
+    }
   } : {}
 }
 
 # --------------------------------------------------------------------------
-#  Firewall Subnet Outputs (Single AZ)
+#  Firewall Subnet Outputs (Multi-AZ)
 # --------------------------------------------------------------------------
 output "firewall_subnet_1a" {
   description = "Network Firewall Subnet Zone A"
-  value       = var.enable_network_firewall ? aws_subnet.firewall_subnet[0].id : null
+  value       = var.enable_network_firewall ? aws_subnet.ml_firewall_subnet_a[0].id : null
 }
 
 output "firewall_subnet_1b" {
   description = "Network Firewall Subnet Zone B"
-  value       = null
+  value       = var.enable_network_firewall ? aws_subnet.ml_firewall_subnet_b[0].id : null
 }
 
 output "firewall_subnet_1c" {
   description = "Network Firewall Subnet Zone C"
-  value       = null
+  value       = var.enable_network_firewall ? aws_subnet.ml_firewall_subnet_c[0].id : null
 }
 
 # --------------------------------------------------------------------------
-#  NAT Gateway Outputs (Single AZ)
+#  NAT Gateway Outputs (Single Zone A)
 # --------------------------------------------------------------------------
 output "ml_nat_gateway_1a" {
   description = "ML NAT Gateway Zone A"
@@ -270,6 +276,41 @@ output "ml_nat_gateway_1b" {
 output "ml_nat_gateway_1c" {
   description = "ML NAT Gateway Zone C"
   value       = null
+}
+
+output "nat_gateway_subnet_1a" {
+  description = "NAT Gateway Subnet Zone A"
+  value       = var.enable_network_firewall ? aws_subnet.ml_gateway_subnet_a[0].id : null
+}
+
+output "nat_gateway_subnet_1b" {
+  description = "NAT Gateway Subnet Zone B"
+  value       = var.enable_network_firewall ? aws_subnet.ml_gateway_subnet_b[0].id : null
+}
+
+output "nat_gateway_subnet_1c" {
+  description = "NAT Gateway Subnet Zone C"
+  value       = var.enable_network_firewall ? aws_subnet.ml_gateway_subnet_c[0].id : null
+}
+
+output "ml_sagemaker_security_group_name" {
+  description = "ML SageMaker Security Group Name"
+  value       = var.enable_sagemaker_studio ? aws_security_group.ml_sagemaker_security_group[0].name : null
+}
+
+output "ml_vpc_endpoints_security_group_name" {
+  description = "ML VPC Endpoints Security Group Name"
+  value       = var.enable_sagemaker_studio ? aws_security_group.vpc_endpoints_security_group[0].name : null
+}
+
+output "ml_vpc_security_group_name" {
+  description = "ML VPC Security Group Name"
+  value       = aws_security_group.ml_vpc_security_group.name
+}
+
+output "ml_vpc_security_group_id" {
+  description = "ML VPC Security Group ID"
+  value       = aws_security_group.ml_vpc_security_group.id
 }
 
 # --------------------------------------------------------------------------
@@ -347,17 +388,36 @@ ML Security Infrastructure:
   SageMaker Studio Status:   ${var.enable_sagemaker_studio ? "ENABLED" : "DISABLED"}
 
 ${var.enable_sagemaker_studio ? "  SageMaker Studio Subnet:" : "SageMaker Studio Subnet:"}
-${var.enable_sagemaker_studio ? "    Zone A: ${aws_subnet.sagemaker_studio_subnet[0].id} (${aws_subnet.sagemaker_studio_subnet[0].cidr_block})" : "    Zone A: N/A"}
+${var.enable_sagemaker_studio ? "    Zone A: ${aws_subnet.ml_sagemaker_studio_subnet[0].id} (${aws_subnet.ml_sagemaker_studio_subnet[0].cidr_block})" : "    Zone A: N/A"}
 
 ${var.enable_network_firewall ? "  Network Firewall:" : ""}
 ${var.enable_network_firewall ? "    Firewall ID: ${aws_networkfirewall_firewall.network_firewall[0].id}" : ""}
 ${var.enable_network_firewall ? "    Policy ARN:  ${aws_networkfirewall_firewall_policy.network_firewall_policy[0].arn}" : ""}
 
-${var.enable_network_firewall ? "  Firewall Subnet:" : ""}
-${var.enable_network_firewall ? "    Zone A: ${aws_subnet.firewall_subnet[0].id} (${aws_subnet.firewall_subnet[0].cidr_block})" : ""}
+  ${var.enable_network_firewall ? "  Firewall Subnets:" : ""}
+  ${var.enable_network_firewall ? "    Zone A: ${aws_subnet.ml_firewall_subnet_a[0].id} (${aws_subnet.ml_firewall_subnet_a[0].cidr_block})" : ""}
+  ${var.enable_network_firewall ? "    Zone B: ${aws_subnet.ml_firewall_subnet_b[0].id} (${aws_subnet.ml_firewall_subnet_b[0].cidr_block})" : ""}
+  ${var.enable_network_firewall ? "    Zone C: ${aws_subnet.ml_firewall_subnet_c[0].id} (${aws_subnet.ml_firewall_subnet_c[0].cidr_block})" : ""}
 
 ${var.enable_network_firewall ? "  NAT Gateway:" : ""}
 ${var.enable_network_firewall ? "    Zone A: ${aws_nat_gateway.nat_gateway[0].id}" : ""}
+${var.enable_network_firewall ? "    Subnet: ${aws_subnet.ml_gateway_subnet_a[0].id} (${aws_subnet.ml_gateway_subnet_a[0].cidr_block})" : ""}
+${var.enable_network_firewall ? "  NAT Gateway Subnets (Available):" : ""}
+${var.enable_network_firewall ? "    Zone A: ${aws_subnet.ml_gateway_subnet_a[0].id} (${aws_subnet.ml_gateway_subnet_a[0].cidr_block})" : ""}
+${var.enable_network_firewall ? "    Zone B: ${aws_subnet.ml_gateway_subnet_b[0].id} (${aws_subnet.ml_gateway_subnet_b[0].cidr_block})" : ""}
+${var.enable_network_firewall ? "    Zone C: ${aws_subnet.ml_gateway_subnet_c[0].id} (${aws_subnet.ml_gateway_subnet_c[0].cidr_block})" : ""}
+
+  Security Groups:
+    Default SG: ${aws_vpc.infra_vpc.default_security_group_id}
+    ML VPC SG: ${aws_security_group.ml_vpc_security_group.name} (${aws_security_group.ml_vpc_security_group.id})
+${var.enable_sagemaker_studio ? "    SageMaker SG: ${aws_security_group.ml_sagemaker_security_group[0].name} (${aws_security_group.ml_sagemaker_security_group[0].id})" : "    SageMaker SG: N/A (SageMaker Studio disabled)"}
+${var.enable_sagemaker_studio ? "    VPC Endpoints SG: ${aws_security_group.vpc_endpoints_security_group[0].name} (${aws_security_group.vpc_endpoints_security_group[0].id})" : "    VPC Endpoints SG: N/A (SageMaker Studio disabled)"}
+
+Sagemaker Studio Security Groups Details:
+  Default Security Group: ${aws_vpc.infra_vpc.default_security_group_id}
+  ML VPC Security Group: ${aws_security_group.ml_vpc_security_group.name} (${aws_security_group.ml_vpc_security_group.id})
+  SageMaker Security Group: ${var.enable_sagemaker_studio ? "${aws_security_group.ml_sagemaker_security_group[0].name} (${aws_security_group.ml_sagemaker_security_group[0].id})" : "N/A (SageMaker Studio disabled)"}
+  VPC Endpoints Security Group: ${var.enable_sagemaker_studio ? "${aws_security_group.vpc_endpoints_security_group[0].name} (${aws_security_group.vpc_endpoints_security_group[0].id})" : "N/A (SageMaker Studio disabled)"}
 
 Data Protection Features:
   - Domain Allow/Block Lists: ${var.enable_network_firewall ? "ACTIVE" : "INACTIVE"}

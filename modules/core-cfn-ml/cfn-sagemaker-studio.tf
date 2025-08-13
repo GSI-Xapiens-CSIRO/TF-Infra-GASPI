@@ -18,13 +18,13 @@ resource "aws_sagemaker_domain" "sagemaker_studio_domain" {
   domain_name             = "${var.sagemaker_domain_name}-${var.aws_region}"
   auth_mode               = "IAM"
   vpc_id                  = aws_vpc.infra_vpc.id
-  subnet_ids              = [aws_subnet.sagemaker_studio_subnet[0].id]
+  subnet_ids              = [aws_subnet.ml_sagemaker_studio_subnet[0].id]
   app_network_access_type = "VpcOnly"
   kms_key_id              = aws_kms_key.sagemaker_kms_key[0].arn
 
   default_user_settings {
     execution_role  = aws_iam_role.sagemaker_execution_role[0].arn
-    security_groups = [aws_security_group.sagemaker_security_group[0].id]
+    security_groups = [aws_security_group.ml_sagemaker_security_group[0].id]
   }
 
   tags = merge(local.tags, {
@@ -34,8 +34,8 @@ resource "aws_sagemaker_domain" "sagemaker_studio_domain" {
 
   depends_on = [
     aws_iam_role.sagemaker_execution_role,
-    aws_security_group.sagemaker_security_group,
-    aws_subnet.sagemaker_studio_subnet
+    aws_security_group.ml_sagemaker_security_group,
+    aws_subnet.ml_sagemaker_studio_subnet
   ]
 }
 
@@ -43,14 +43,14 @@ resource "aws_sagemaker_domain" "sagemaker_studio_domain" {
 #  SageMaker User Profile
 # --------------------------------------------------------------------------
 resource "aws_sagemaker_user_profile" "sagemaker_user_profile" {
-  count           = var.enable_sagemaker_studio ? 1 : 0
-  provider        = aws.destination
-  domain_id       = aws_sagemaker_domain.sagemaker_studio_domain[0].id
+  count             = var.enable_sagemaker_studio ? 1 : 0
+  provider          = aws.destination
+  domain_id         = aws_sagemaker_domain.sagemaker_studio_domain[0].id
   user_profile_name = "${var.sagemaker_user_profile_name}-${var.aws_region}"
 
   user_settings {
     execution_role  = aws_iam_role.sagemaker_execution_role[0].arn
-    security_groups = [aws_security_group.sagemaker_security_group[0].id]
+    security_groups = [aws_security_group.ml_sagemaker_security_group[0].id]
   }
 
   tags = merge(local.tags, {
@@ -65,12 +65,12 @@ resource "aws_sagemaker_user_profile" "sagemaker_user_profile" {
 #  Jupyter Server App (always created)
 # --------------------------------------------------------------------------
 resource "aws_sagemaker_app" "jupyter_app" {
-  count            = var.enable_sagemaker_studio ? 1 : 0
-  provider         = aws.destination
-  domain_id        = aws_sagemaker_domain.sagemaker_studio_domain[0].id
+  count             = var.enable_sagemaker_studio ? 1 : 0
+  provider          = aws.destination
+  domain_id         = aws_sagemaker_domain.sagemaker_studio_domain[0].id
   user_profile_name = aws_sagemaker_user_profile.sagemaker_user_profile[0].user_profile_name
-  app_name         = "default"
-  app_type         = "JupyterServer"
+  app_name          = "default"
+  app_type          = "JupyterServer"
 
   tags = merge(local.tags, {
     Name        = "jupyter-app-${local.project_name}"
@@ -84,16 +84,16 @@ resource "aws_sagemaker_app" "jupyter_app" {
 #  Data Science Kernel Gateway App (optional)
 # --------------------------------------------------------------------------
 resource "aws_sagemaker_app" "data_science_app" {
-  count            = var.enable_sagemaker_studio && var.start_kernel_gateway_apps ? 1 : 0
-  provider         = aws.destination
-  domain_id        = aws_sagemaker_domain.sagemaker_studio_domain[0].id
+  count             = var.enable_sagemaker_studio && var.start_kernel_gateway_apps ? 1 : 0
+  provider          = aws.destination
+  domain_id         = aws_sagemaker_domain.sagemaker_studio_domain[0].id
   user_profile_name = aws_sagemaker_user_profile.sagemaker_user_profile[0].user_profile_name
-  app_name         = "instance-event-engine-datascience-ml-t3-medium"
-  app_type         = "KernelGateway"
+  app_name          = "instance-event-engine-datascience-ml-t3-medium"
+  app_type          = "KernelGateway"
 
   resource_spec {
-    instance_type               = "ml.t3.medium"
-    sagemaker_image_arn        = local.sagemaker_images[var.aws_region]["datascience"]
+    instance_type       = "ml.t3.medium"
+    sagemaker_image_arn = local.sagemaker_images[var.aws_region]["datascience"]
   }
 
   tags = merge(local.tags, {
@@ -108,16 +108,16 @@ resource "aws_sagemaker_app" "data_science_app" {
 #  Data Wrangler Kernel Gateway App (optional)
 # --------------------------------------------------------------------------
 resource "aws_sagemaker_app" "data_wrangler_app" {
-  count            = var.enable_sagemaker_studio && var.start_kernel_gateway_apps ? 1 : 0
-  provider         = aws.destination
-  domain_id        = aws_sagemaker_domain.sagemaker_studio_domain[0].id
+  count             = var.enable_sagemaker_studio && var.start_kernel_gateway_apps ? 1 : 0
+  provider          = aws.destination
+  domain_id         = aws_sagemaker_domain.sagemaker_studio_domain[0].id
   user_profile_name = aws_sagemaker_user_profile.sagemaker_user_profile[0].user_profile_name
-  app_name         = "instance-event-engine-datawrangler-ml-m5-4xlarge"
-  app_type         = "KernelGateway"
+  app_name          = "instance-event-engine-datawrangler-ml-m5-4xlarge"
+  app_type          = "KernelGateway"
 
   resource_spec {
-    instance_type               = "ml.m5.4xlarge"
-    sagemaker_image_arn        = local.sagemaker_images[var.aws_region]["datawrangler"]
+    instance_type       = "ml.m5.4xlarge"
+    sagemaker_image_arn = local.sagemaker_images[var.aws_region]["datawrangler"]
   }
 
   tags = merge(local.tags, {
