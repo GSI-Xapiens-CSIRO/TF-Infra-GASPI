@@ -71,18 +71,11 @@ resource "aws_route_table_association" "igw_route_table_association" {
   gateway_id     = aws_internet_gateway.igw.id
 }
 
-# Import existing association first if it exists
-resource "aws_route_table_association" "firewall_subnet_route_table_association" {
-  count          = var.enable_network_firewall ? 1 : 0
-  provider       = aws.destination
-  route_table_id = aws_route_table.firewall_route_table[0].id
-  subnet_id      = aws_subnet.ml_firewall_subnet_a[0].id
-}
-
+# Legacy single NAT Gateway subnet (PUBLIC) - Connect to IGW
 resource "aws_route_table_association" "nat_gateway_subnet_route_table_association" {
   count          = var.enable_network_firewall ? 1 : 0
   provider       = aws.destination
-  route_table_id = aws_route_table.nat_gateway_route_table[0].id
+  route_table_id = aws_route_table.igw_ec2_rt_public_a.id
   subnet_id      = aws_subnet.ml_gateway_subnet[0].id
 }
 
@@ -131,4 +124,88 @@ resource "aws_route" "sagemaker_egress_route" {
   route_table_id         = aws_route_table.sagemaker_studio_route_table[0].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gateway[0].id
+}
+
+# --------------------------------------------------------------------------
+#  EC2 Private Subnet Route Tables (NAT Gateway)
+# --------------------------------------------------------------------------
+resource "aws_route_table" "ec2_private_route_table" {
+  count    = var.enable_network_firewall ? 1 : 0
+  provider = aws.destination
+  vpc_id   = aws_vpc.infra_vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gateway[0].id
+  }
+
+  tags = merge(local.tags, {
+    Name = "rtb-${local.project_name}-ec2-private"
+  })
+}
+
+# EC2 Private Subnet Associations
+resource "aws_route_table_association" "ec2_private_a_association" {
+  count          = var.enable_network_firewall ? 1 : 0
+  provider       = aws.destination
+  route_table_id = aws_route_table.ec2_private_route_table[0].id
+  subnet_id      = aws_subnet.ec2_private_a.id
+}
+
+resource "aws_route_table_association" "ec2_private_b_association" {
+  count          = var.enable_network_firewall ? 1 : 0
+  provider       = aws.destination
+  route_table_id = aws_route_table.ec2_private_route_table[0].id
+  subnet_id      = aws_subnet.ec2_private_b.id
+}
+
+resource "aws_route_table_association" "ec2_private_c_association" {
+  count          = var.enable_network_firewall ? 1 : 0
+  provider       = aws.destination
+  route_table_id = aws_route_table.ec2_private_route_table[0].id
+  subnet_id      = aws_subnet.ec2_private_c.id
+}
+
+# Firewall Subnets (PRIVATE) - Connect to NAT Gateway
+resource "aws_route_table_association" "firewall_subnet_b_association" {
+  count          = var.enable_network_firewall ? 1 : 0
+  provider       = aws.destination
+  route_table_id = aws_route_table.ec2_private_route_table[0].id
+  subnet_id      = aws_subnet.ml_firewall_subnet_b[0].id
+}
+
+resource "aws_route_table_association" "firewall_subnet_c_association" {
+  count          = var.enable_network_firewall ? 1 : 0
+  provider       = aws.destination
+  route_table_id = aws_route_table.ec2_private_route_table[0].id
+  subnet_id      = aws_subnet.ml_firewall_subnet_c[0].id
+}
+
+resource "aws_route_table_association" "firewall_subnet_a_association" {
+  count          = var.enable_network_firewall ? 1 : 0
+  provider       = aws.destination
+  route_table_id = aws_route_table.ec2_private_route_table[0].id
+  subnet_id      = aws_subnet.ml_firewall_subnet_a[0].id
+}
+
+# NAT Gateway Subnets (PUBLIC) - Connect to IGW
+resource "aws_route_table_association" "nat_gateway_subnet_a_association" {
+  count          = var.enable_network_firewall ? 1 : 0
+  provider       = aws.destination
+  route_table_id = aws_route_table.igw_ec2_rt_public_a.id
+  subnet_id      = aws_subnet.ml_gateway_subnet_a[0].id
+}
+
+resource "aws_route_table_association" "nat_gateway_subnet_b_association" {
+  count          = var.enable_network_firewall ? 1 : 0
+  provider       = aws.destination
+  route_table_id = aws_route_table.igw_ec2_rt_public_b.id
+  subnet_id      = aws_subnet.ml_gateway_subnet_b[0].id
+}
+
+resource "aws_route_table_association" "nat_gateway_subnet_c_association" {
+  count          = var.enable_network_firewall ? 1 : 0
+  provider       = aws.destination
+  route_table_id = aws_route_table.igw_ec2_rt_public_c.id
+  subnet_id      = aws_subnet.ml_gateway_subnet_c[0].id
 }
