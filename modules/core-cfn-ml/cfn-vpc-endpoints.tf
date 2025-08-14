@@ -21,18 +21,24 @@ resource "aws_security_group" "vpc_endpoints_security_group" {
   vpc_id      = aws_vpc.infra_vpc.id
 
   ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ml_sagemaker_security_group[0].id]
-  }
-
-  ingress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = [var.vpc_cidr[local.env]]
-    description = "Allow all traffic from the VPC"
+  }
+
+  # ingress {
+  #   from_port = 443
+  #   to_port   = 443
+  #   protocol  = "tcp"
+  #   self      = true
+  # }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = merge(local.tags, {

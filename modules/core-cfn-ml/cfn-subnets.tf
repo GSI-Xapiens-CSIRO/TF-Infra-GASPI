@@ -140,12 +140,12 @@ resource "aws_security_group" "ml_vpc_security_group" {
     cidr_blocks = [var.vpc_cidr[local.env]]
   }
 
-  ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-    self      = true
-  }
+  # ingress {
+  #   from_port = 443
+  #   to_port   = 443
+  #   protocol  = "tcp"
+  #   self      = true
+  # }
 
   egress {
     from_port   = 0
@@ -173,12 +173,12 @@ resource "aws_security_group" "ml_sagemaker_security_group" {
     cidr_blocks = [var.vpc_cidr[local.env]]
   }
 
-  ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-    self      = true
-  }
+  # ingress {
+  #   from_port = 443
+  #   to_port   = 443
+  #   protocol  = "tcp"
+  #   self      = true
+  # }
 
   egress {
     from_port   = 0
