@@ -112,7 +112,7 @@ The SonarQube integration is positioned in the deployment workflow as follows:
    - Initialize submodules
    - Setup Terraform configuration
 
-3. **🆕 SonarQube Analysis** (NEW)
+3. **SonarQube Analysis**
    - Run code quality analysis
    - Generate quality reports
    - Check quality gates
