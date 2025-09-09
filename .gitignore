@@ -81,3 +81,4 @@ hub*.tfvars
 python3.9
 python3.12
 venv
+*.env*

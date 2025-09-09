@@ -1,0 +1,373 @@
+#!/bin/bash
+# /usr/local/bin/sonar-scan
+
+set -euo pipefail
+
+# ============================================================================
+# SONARQUBE SCANNING SCRIPT FOR ATLANTIS
+# Location: /usr/local/bin/sonar-scan
+# Usage: sonar-scan [environment] [options]
+# ============================================================================
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+PURPLE='\033[0;35m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+# Logging functions
+log_info() { echo -e "${BLUE}ℹ️  $1${NC}"; }
+log_success() { echo -e "${GREEN}✅ $1${NC}"; }
+log_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
+log_error() { echo -e "${RED}❌ $1${NC}" >&2; }
+
+# Script metadata
+SCRIPT_VERSION="1.0.0"
+SCRIPT_NAME="sonar-scan"
+SCRIPT_AUTHOR="GXC DevOps-Team"
+SCRIPT_EMAIL="support.gxc@xapiens.id"
+SCRIPT_COMPANY="GXC Consortium"
+
+# Show help
+show_help() {
+    cat << EOF
+USAGE:
+    $SCRIPT_NAME [environment] [options]
+
+ARGUMENTS:
+    environment    Target environment (hub01-05, uat01-05) [optional]
+
+OPTIONS:
+    -h, --help              Show this help message
+    -v, --version           Show version information
+    --project-key KEY       Override SonarQube project key
+    --project-name NAME     Override SonarQube project name
+    --project-version VER   Override project version
+    --sources PATH          Override source paths (default: .)
+    --exclusions PATTERN    Override exclusion patterns
+    --host-url URL          Override SonarQube host URL
+    --token TOKEN           Override SonarQube token
+    --timeout SECONDS       Override scan timeout (default: 600)
+    --fail-on-error         Fail script on scan error (default: true)
+    --no-fail-on-error      Continue on scan error
+    --dry-run               Show configuration without running scan
+
+EXAMPLES:
+    $SCRIPT_NAME                    # Scan current directory with default settings
+    $SCRIPT_NAME hub01              # Scan for hub01 environment
+    $SCRIPT_NAME --project-key my-project --sources ./src
+    $SCRIPT_NAME --dry-run          # Show what would be scanned
+
+ENVIRONMENT VARIABLES:
+    SONAR_HOST_URL          SonarQube server URL
+    SONAR_TOKEN             SonarQube authentication token
+    SONAR_PROJECT_KEY       Project key
+    SONAR_PROJECT_NAME      Project display name
+    SONAR_PROJECT_VERSION   Project version
+    SONAR_SOURCES           Source directories to scan
+    SONAR_EXCLUSIONS        Files/patterns to exclude
+    SONAR_TIMEOUT           Scan timeout in seconds
+    SONAR_FAIL_ON_ERROR     Fail on scan error (true/false)
+
+EOF
+    exit 0
+}
+
+# Show version
+show_version() {
+    echo -e "${GREEN}$SCRIPT_NAME version $SCRIPT_VERSION${NC}"
+    echo -e "${BLUE}SonarQube Integration for Atlantis Deployments${NC}"
+    echo -e "${BLUE}Author: $SCRIPT_AUTHOR${NC}"
+    exit 0
+}
+
+# Parse command line arguments
+parse_arguments() {
+    ENVIRONMENT=""
+    DRY_RUN=false
+
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -h|--help)
+                show_help
+                ;;
+            -v|--version)
+                show_version
+                ;;
+            --project-key)
+                SONAR_PROJECT_KEY="$2"
+                shift 2
+                ;;
+            --project-name)
+                SONAR_PROJECT_NAME="$2"
+                shift 2
+                ;;
+            --project-version)
+                SONAR_PROJECT_VERSION="$2"
+                shift 2
+                ;;
+            --sources)
+                SONAR_SOURCES="$2"
+                shift 2
+                ;;
+            --exclusions)
+                SONAR_EXCLUSIONS="$2"
+                shift 2
+                ;;
+            --host-url)
+                SONAR_HOST_URL="$2"
+                shift 2
+                ;;
+            --token)
+                SONAR_TOKEN="$2"
+                shift 2
+                ;;
+            --timeout)
+                SONAR_TIMEOUT="$2"
+                shift 2
+                ;;
+            --fail-on-error)
+                SONAR_FAIL_ON_ERROR="true"
+                shift
+                ;;
+            --no-fail-on-error)
+                SONAR_FAIL_ON_ERROR="false"
+                shift
+                ;;
+            --dry-run)
+                DRY_RUN=true
+                shift
+                ;;
+            hub01|hub02|hub03|hub04|hub05|uat01|uat02|uat03|uat04|uat05)
+                ENVIRONMENT="$1"
+                shift
+                ;;
+            *)
+                log_error "Unknown option: $1"
+                echo "Try '$SCRIPT_NAME --help' for more information."
+                exit 1
+                ;;
+        esac
+    done
+}
+
+# Setup configuration
+setup_configuration() {
+    # Set defaults based on environment if provided
+    if [[ -n "$ENVIRONMENT" ]]; then
+        SONAR_PROJECT_KEY="${SONAR_PROJECT_KEY:-gxc-gaspi-${ENVIRONMENT}}"
+        SONAR_PROJECT_NAME="${SONAR_PROJECT_NAME:-GXC-GASPI-${ENVIRONMENT^^}}"
+    else
+        SONAR_PROJECT_KEY="${SONAR_PROJECT_KEY:-gxc-gaspi-default}"
+        SONAR_PROJECT_NAME="${SONAR_PROJECT_NAME:-GXC-GASPI-Default}"
+    fi
+
+   # Set other defaults - Update these with your actual SonarQube server details
+    SONAR_HOST_URL="${SONAR_HOST_URL:-http://your-sonarqube-server:9000}"
+    SONAR_TOKEN="${SONAR_TOKEN:-your_sonarqube_token}"
+    SONAR_PROJECT_VERSION="${SONAR_PROJECT_VERSION:-1.0.0}"
+    SONAR_SOURCES="${SONAR_SOURCES:-.}"
+    SONAR_EXCLUSIONS="${SONAR_EXCLUSIONS:-**/*.tfvars,**/*.tf.example,**/node_modules/**,**/.terraform/**,**/.git/**,**/.DS_Store,**/coverage/**,**/build/**,**/dist/**}"
+    SONAR_TIMEOUT="${SONAR_TIMEOUT:-600}"
+    SONAR_FAIL_ON_ERROR="${SONAR_FAIL_ON_ERROR:-true}"
+
+    # Validate required parameters
+    if [[ -z "$SONAR_TOKEN" ]] || [[ "$SONAR_TOKEN" == "your_sonarqube_token" ]]; then
+        log_error "SONAR_TOKEN is required and must be set to a valid token"
+        log_info "Set SONAR_TOKEN environment variable or use --token option"
+        exit 1
+    fi
+
+    if [[ -z "$SONAR_HOST_URL" ]] || [[ "$SONAR_HOST_URL" == "http://your-sonarqube-server:9000" ]]; then
+        log_error "SONAR_HOST_URL is required and must be set to your SonarQube server URL"
+        log_info "Set SONAR_HOST_URL environment variable or use --host-url option"
+        exit 1
+    fi
+}
+
+# Display configuration
+display_configuration() {
+    log_info "SonarQube Scan Configuration:"
+    log_info "- Host URL: $SONAR_HOST_URL"
+    log_info "- Project Key: $SONAR_PROJECT_KEY"
+    log_info "- Project Name: $SONAR_PROJECT_NAME"
+    log_info "- Project Version: $SONAR_PROJECT_VERSION"
+    log_info "- Sources: $SONAR_SOURCES"
+    log_info "- Exclusions: $SONAR_EXCLUSIONS"
+    log_info "- Timeout: ${SONAR_TIMEOUT}s"
+    log_info "- Fail on Error: $SONAR_FAIL_ON_ERROR"
+    log_info "- Working Directory: $(pwd)"
+    echo ""
+}
+
+# Validate prerequisites
+validate_prerequisites() {
+    log_info "Validating prerequisites..."
+
+    # Check if Docker is available
+    if ! command -v docker &> /dev/null; then
+        log_error "Docker is not available - SonarQube scan requires Docker"
+        exit 1
+    fi
+
+    # Check if Docker daemon is running
+    if ! docker info &> /dev/null; then
+        log_error "Docker daemon is not running - cannot execute SonarQube scan"
+        exit 1
+    fi
+
+    # Test SonarQube server connectivity (optional)
+    if command -v curl &> /dev/null; then
+        log_info "Testing SonarQube server connectivity..."
+        if curl -s --connect-timeout 10 "$SONAR_HOST_URL/api/system/status" > /dev/null; then
+            log_success "SonarQube server is accessible"
+        else
+            log_warning "Cannot reach SonarQube server at $SONAR_HOST_URL"
+            log_warning "Proceeding anyway - server might be accessible from Docker container"
+        fi
+    fi
+
+    log_success "Prerequisites validated"
+}
+
+# Create SonarQube project properties
+create_sonar_properties() {
+    local sonar_props_file="sonar-project.properties"
+
+    log_info "Creating SonarQube project configuration: $sonar_props_file"
+
+    cat > "$sonar_props_file" << EOF
+# SonarQube Project Configuration
+# Generated by $SCRIPT_NAME script for GXC GASPI
+
+sonar.projectKey=$SONAR_PROJECT_KEY
+sonar.projectName=$SONAR_PROJECT_NAME
+sonar.projectVersion=$SONAR_PROJECT_VERSION
+
+# Source configuration
+sonar.sources=$SONAR_SOURCES
+sonar.exclusions=$SONAR_EXCLUSIONS
+
+# Language-specific settings
+sonar.python.coverage.reportPaths=coverage.xml,**/coverage.xml
+sonar.javascript.lcov.reportPaths=coverage/lcov.info,**/coverage/lcov.info
+sonar.go.coverage.reportPaths=coverage.out,**/coverage.out
+sonar.java.coveragePlugin=jacoco
+sonar.jacoco.reportPaths=target/jacoco.exec,**/target/jacoco.exec
+
+# Additional settings
+sonar.sourceEncoding=UTF-8
+sonar.scm.provider=git
+sonar.qualitygate.wait=true
+
+# Analysis settings
+sonar.analysis.mode=publish
+sonar.buildString=$(date +%Y%m%d-%H%M%S)
+
+# Terraform specific exclusions
+sonar.exclusions=$SONAR_EXCLUSIONS
+
+EOF
+
+    log_success "SonarQube configuration file created"
+    return 0
+}
+
+# Run SonarQube scan
+run_sonar_scan() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_info "DRY RUN MODE - Would execute SonarQube scan with above configuration"
+        log_info "Docker command that would be executed:"
+        echo "docker run --rm \\"
+        echo "  -e SONAR_HOST_URL=\"$SONAR_HOST_URL\" \\"
+        echo "  -e SONAR_TOKEN=\"[REDACTED]\" \\"
+        echo "  -v \"$(pwd):/usr/src\" \\"
+        echo "  -w /usr/src \\"
+        echo "  sonarsource/sonar-scanner-cli"
+        return 0
+    fi
+
+    local scan_start_time=$(date +%s)
+    log_info "Starting SonarQube analysis..."
+
+    # Create properties file
+    create_sonar_properties
+
+    # Prepare Docker command
+    local docker_cmd=(
+        docker run --rm
+        -e SONAR_HOST_URL="$SONAR_HOST_URL"
+        -e SONAR_TOKEN="$SONAR_TOKEN"
+        -v "$(pwd):/usr/src"
+        -w /usr/src
+        sonarsource/sonar-scanner-cli
+    )
+
+    # Execute scan with timeout
+    if timeout "$SONAR_TIMEOUT" "${docker_cmd[@]}"; then
+        local scan_end_time=$(date +%s)
+        local scan_duration=$((scan_end_time - scan_start_time))
+        log_success "SonarQube analysis completed successfully (${scan_duration}s)"
+
+        # Display results
+        log_info "Quality Gate Status: Check SonarQube dashboard"
+        log_info "Project URL: $SONAR_HOST_URL/dashboard?id=$SONAR_PROJECT_KEY"
+
+        # Clean up
+        [ -f "sonar-project.properties" ] && rm -f "sonar-project.properties"
+
+        return 0
+    else
+        local exit_code=$?
+        local scan_end_time=$(date +%s)
+        local scan_duration=$((scan_end_time - scan_start_time))
+
+        # Clean up
+        [ -f "sonar-project.properties" ] && rm -f "sonar-project.properties"
+
+        if [ $exit_code -eq 124 ]; then
+            log_error "SonarQube analysis timed out after ${SONAR_TIMEOUT}s"
+        else
+            log_error "SonarQube analysis failed with exit code: $exit_code (${scan_duration}s)"
+        fi
+
+        if [[ "$SONAR_FAIL_ON_ERROR" == "true" ]]; then
+            log_error "Failing due to SonarQube scan error (SONAR_FAIL_ON_ERROR=true)"
+            exit 1
+        else
+            log_warning "Continuing despite SonarQube scan error (SONAR_FAIL_ON_ERROR=false)"
+            return 0
+        fi
+    fi
+}
+
+# Main execution
+main() {
+    echo -e "${CYAN}${BOLD}"
+    echo "================================================================"
+    echo "    SonarQube Scanner for GXC Atlantis Deployments"
+    echo "================================================================"
+    echo -e "${NC}"
+    echo "Version: $SCRIPT_VERSION"
+    echo "Author: $SCRIPT_AUTHOR"
+    echo "Company: $SCRIPT_COMPANY"
+    echo ""
+
+    parse_arguments "$@"
+    setup_configuration
+    display_configuration
+    validate_prerequisites
+    run_sonar_scan
+
+    log_success "SonarQube scan completed successfully!"
+    echo ""
+    echo -e "${CYAN}${BOLD}Thank you for using SonarQube Scanner${NC}"
+    echo -e "${BLUE}© 2025 $SCRIPT_COMPANY${NC}"
+}
+
+# Execute main function
+main "$@"

@@ -233,10 +233,12 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | b
     nvm alias default ${NODE_VERSION} && \
     npm install -g pnpm
 
-# Copy atlantis-deploy script
+# Copy atlantis-deploy & sonar-scan script
 COPY docker-entrypoint.sh /home/atlantis
 COPY scripts/atlantis-deploy /usr/local/bin/atlantis-deploy
 COPY scripts/install-atlantis-deploy /usr/local/bin/install-atlantis-deploy
+COPY scripts/sonar-scan /usr/local/bin/sonar-scan
+COPY scripts/sonarqube.env.example /usr/local/bin/sonarqube.env
 
 # Set the exposed port
 EXPOSE ${ATLANTIS_PORT:-4141}

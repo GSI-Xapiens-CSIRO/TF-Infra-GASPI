@@ -32,7 +32,7 @@ log_error() {
 }
 
 # Script metadata
-SCRIPT_VERSION="2.2.0"
+SCRIPT_VERSION="2.3.1-BGSI"
 SCRIPT_NAME="atlantis-deploy"
 SCRIPT_AUTHOR="BGSI DevOps-Team"
 SCRIPT_EMAIL="devops@bgsi.com"
@@ -42,7 +42,8 @@ SCRIPT_DATE="June, 2025"
 SCRIPT_PATTERN="BGSI"
 SCRIPT_GH_USER="bgsi-devops"
 SCRIPT_GH_REPO="bgsi-id"
-SCRIPT_RUN_TEST="${SCRIPT_RUN_TEST:-true}"  # Default to false if not set
+SCRIPT_RUN_TEST="${SCRIPT_RUN_TEST:-true}"    # Default to false if not set
+SCRIPT_RUN_SONAR="${SCRIPT_RUN_SONAR:-true}"  # Default to false if not set
 
 # Display logo and version
 show_logo() {
@@ -97,19 +98,31 @@ ARGUMENTS:
     operation      Operation to perform (plan, apply) [default: plan]
 
 EXAMPLES:
-    $SCRIPT_NAME hub01 plan          # Plan deployment for hub01
-    $SCRIPT_NAME uat02 apply         # Apply deployment for uat02
-    $SCRIPT_NAME hub01               # Plan deployment for hub01 (default)
+    $SCRIPT_NAME hub01 plan            # Plan deployment for hub01
+    $SCRIPT_NAME uat02 apply           # Apply deployment for uat02
+    $SCRIPT_NAME hub01                 # Plan deployment for hub01 (default)
 
 ENVIRONMENT VARIABLES:
-    GITHUB_TOKEN                     Required: GitHub Personal Access Token
-    GIT_USER_NAME                    Git commit author name (default: $SCRIPT_AUTHOR)
-    GIT_USER_EMAIL                   Git commit author email (default: $SCRIPT_EMAIL)
-    GITHUB_USERNAME                  GitHub username for authentication (default: $SCRIPT_GH_USER)
-    ATLANTIS_CONFIG_PATH             Config path (default: /atlantis/config)
-    ATLANTIS_WORKSPACE               Current workspace directory
-    ATLANTIS_PROJECT_NAME            Current project name
-    ATLANTIS_PULL_REQUEST_HEAD_BRANCH Current branch name
+    GITHUB_TOKEN                       Required: GitHub Personal Access Token
+    GIT_USER_NAME                      Git commit author name (default: $SCRIPT_AUTHOR)
+    GIT_USER_EMAIL                     Git commit author email (default: $SCRIPT_EMAIL)
+    GITHUB_USERNAME                    GitHub username for authentication (default: $SCRIPT_GH_USER)
+    ATLANTIS_CONFIG_PATH               Config path (default: /atlantis/config)
+    ATLANTIS_WORKSPACE                 Current workspace directory
+    ATLANTIS_PROJECT_NAME              Current project name
+    ATLANTIS_PULL_REQUEST_HEAD_BRANCH  Current branch name
+
+SONARQUBE INTEGRATION:
+    SCRIPT_RUN_SONAR                   Enable/disable SonarQube scan (default: true)
+    SONAR_HOST_URL                     SonarQube server URL (default: http://16.79.20.54:9000)
+    SONAR_TOKEN                        SonarQube authentication token
+    SONAR_PROJECT_KEY                  Project key (default: gaspi-{environment})
+    SONAR_PROJECT_NAME                 Project display name (default: GASPI-{ENVIRONMENT})
+    SONAR_PROJECT_VERSION              Project version (default: 1.0.0)
+    SONAR_SOURCES                      Source directories to scan (default: .)
+    SONAR_EXCLUSIONS                   Files/patterns to exclude from scan
+    SONAR_TIMEOUT                      Scan timeout in seconds (default: 600)
+    SONAR_FAIL_ON_ERROR                Fail deployment on scan error (default: true)
 
 SUPPORTED ENVIRONMENTS:
     HUB environments: hub01, hub02, hub03, hub04, hub05
@@ -190,7 +203,7 @@ setup_environment_variables() {
 
     # Git configuration
     GIT_USER_NAME="${GIT_USER_NAME:-DevOps XTI}"           # Display name for commits
-    GIT_USER_EMAIL="${GIT_USER_EMAIL:-support.gxc@xapiens.id}"  # Email for commits
+    GIT_USER_EMAIL="${GIT_USER_EMAIL:-support.bgsi@xapiens.id}"  # Email for commits
     GITHUB_USERNAME="${GITHUB_USERNAME:-devopsxti}"        # Actual GitHub username for auth
 
     log_info "Environment Type: $ENV_TYPE, Number: $ENV_NUMBER"
@@ -492,6 +505,83 @@ initialize_terraform() {
     fi
 }
 
+# Run SonarQube code quality scan
+run_sonarqube_scan() {
+    log_info "Running SonarQube code quality analysis"
+
+    local sonar_script="sonar-scan"
+    local script_dir="/usr/local/bin"
+    local sonar_script_alt="${script_dir}/sonar-scan"
+
+    # Look for sonar-scan script in current directory or script directory
+    if [ -f "$sonar_script" ]; then
+        local sonar_path="$sonar_script"
+    elif [ -f "$sonar_script_alt" ]; then
+        local sonar_path="$sonar_script_alt"
+    else
+        log_warning "SonarQube scan script not found"
+        log_info "Checked locations:"
+        log_info "- $sonar_script"
+        log_info "- $sonar_script_alt"
+        log_warning "Skipping SonarQube analysis"
+        return 0
+    fi
+
+    log_info "Using SonarQube scan script: $sonar_path"
+
+    # Check if script is executable
+    if [ ! -x "$sonar_path" ]; then
+        log_info "Making SonarQube scan script executable"
+        if ! chmod +x "$sonar_path"; then
+            log_error "Failed to make SonarQube scan script executable"
+            log_warning "Skipping SonarQube analysis"
+            return 0
+        fi
+    fi
+
+    # Execute SonarQube scan with environment parameter
+    local scan_start_time=$(date +%s)
+    log_info "Executing SonarQube scan for environment: $ENVIRONMENT"
+
+    if timeout "$sonar_timeout" "$sonar_path" "$ENVIRONMENT"; then
+        local scan_end_time=$(date +%s)
+        local scan_duration=$((scan_end_time - scan_start_time))
+        log_success "SonarQube analysis completed successfully (${scan_duration}s)"
+
+        # Clean up temporary files
+        [ -f "$sonar_props_file" ] && rm -f "$sonar_props_file"
+
+        # Display quality gate results
+        log_info "Quality Gate Status: Check SonarQube dashboard at $sonar_host_url"
+        log_info "Project URL: $sonar_host_url/dashboard?id=$sonar_project_key"
+
+        return 0
+    else
+        local exit_code=$?
+        local scan_end_time=$(date +%s)
+        local scan_duration=$((scan_end_time - scan_start_time))
+
+        # Clean up temporary files
+        [ -f "$sonar_props_file" ] && rm -f "$sonar_props_file"
+
+        if [ $exit_code -eq 124 ]; then
+            log_error "SonarQube analysis timed out after ${sonar_timeout}s"
+        else
+            log_error "SonarQube analysis failed with exit code: $exit_code (${scan_duration}s)"
+        fi
+
+        # Check if we should fail hard or continue with warnings
+        if [[ "${SONAR_FAIL_ON_ERROR:-true}" == "true" ]]; then
+            log_error "Deployment failed due to SonarQube analysis failure"
+            return 1
+        else
+            log_warning "Continuing deployment despite SonarQube analysis failure"
+            log_warning "Set SONAR_FAIL_ON_ERROR=true to fail deployment on SonarQube errors"
+            return 0
+        fi
+    fi
+}
+
 # Run application tests
 run_application_tests() {
     log_info "Running application test suites"
@@ -687,6 +777,21 @@ main() {
 
     # Terraform operations
     safe_execute initialize_terraform "Failed to initialize Terraform" || return 1
+
+    # Conditionally run SonarQube scan based on SCRIPT_RUN_SONAR variable
+    if [[ "$SCRIPT_RUN_SONAR" == "true" ]]; then
+        log_info "============================================================"
+        log_info "EXECUTING SONARQUBE CODE QUALITY ANALYSIS"
+        log_info "============================================================"
+        safe_execute run_sonarqube_scan "SonarQube analysis failed" || return 1
+    else
+        log_info "============================================================"
+        log_info "SKIPPING SONARQUBE ANALYSIS"
+        log_info "============================================================"
+        log_warning "SonarQube analysis is disabled"
+        log_info "To enable SonarQube scan, set: SCRIPT_RUN_SONAR=true"
+        echo ""
+    fi
 
     # Conditionally run tests based on SCRIPT_RUN_TEST variable
     if [[ "$SCRIPT_RUN_TEST" == "true" ]]; then
