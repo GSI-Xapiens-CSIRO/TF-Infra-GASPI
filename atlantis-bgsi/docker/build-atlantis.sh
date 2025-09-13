@@ -20,7 +20,7 @@ export IMAGE_ECR="$CI_PROJECT_REGISTRY_ECR/$CI_PROJECT_NAME"
 
 PATH_FOLDER=`pwd`
 
-TAG_VERSION="2.3.1"
+TAG_VERSION="2.4.0"
 TAG_ID=`echo $(date '+%Y%m%d')`
 
 LINE_PRINT="======================================================="
@@ -39,8 +39,8 @@ docker_atlantis() {
   echo $LINE_PRINT
   echo " DOCKER BUILD ATLANTIS TAG $TAG_VERSION-$TAG_ID "
   echo $LINE_PRINT
-  echo "docker build --no-cache -f Dockerfile -t $IMAGE:$CI_PROJECT_NAME ."
-  docker build --no-cache -f Dockerfile -t $IMAGE:$CI_PROJECT_NAME .
+  echo "docker build --no-cache -f Dockerfile -t $IMAGE:$TAG_VERSION ."
+  docker build --no-cache -f Dockerfile -t $IMAGE:$TAG_VERSION .
   echo ' - DONE -'
   echo ''
 }
@@ -49,17 +49,36 @@ tag_atlantis() {
    echo $LINE_PRINT
    echo " DOCKER TAG ATLANTIS $TAG_VERSION-$TAG_ID "
    echo $LINE_PRINT
-   echo "docker tag $IMAGE:$CI_PROJECT_NAME $IMAGE:$TAG_ID
-docker tag $IMAGE:$CI_PROJECT_NAME $IMAGE:$TAG_ID"
+   echo "docker tag $IMAGE:$TAG_VERSION $IMAGE:$TAG_VERSION-$TAG_ID
+docker tag $IMAGE:$TAG_VERSION $IMAGE:latest
+docker tag $IMAGE:$TAG_VERSION $IMAGE:$TAG_ID"
+
+docker tag $IMAGE:$TAG_VERSION $IMAGE:$TAG_VERSION-$TAG_ID
+docker tag $IMAGE:$TAG_VERSION $IMAGE:latest
+docker tag $IMAGE:$TAG_VERSION $IMAGE:$TAG_ID
    echo ' - DONE -'
    echo ''
 }
 
 push_atlantis() {
   echo $LINE_PRINT
-  echo " DOCKER PUSH XIGNALS $TAG_VERSION-$TAG_ID "
+  echo " DOCKER PUSH ATLANTIS $TAG_VERSION-$TAG_ID "
   echo $LINE_PRINT
-  PUSH_IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep $CI_PROJECT_PATH)
+  PUSH_IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep $CI_PROJECT_NAME)
+  for IMG in $PUSH_IMAGES; do
+    echo "Docker Push => $IMG"
+    echo ">> docker push $IMG"
+    docker push $IMG
+    echo '- DONE -'
+    echo ''
+  done
+}
+
+push_atlantis_latest() {
+  echo $LINE_PRINT
+  echo " DOCKER PUSH ATLANTIS $TAG_VERSION-$TAG_ID "
+  echo $LINE_PRINT
+  PUSH_IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep latest)
   for IMG in $PUSH_IMAGES; do
     echo "Docker Push => $IMG"
     echo ">> docker push $IMG"
@@ -93,6 +112,7 @@ docker_tag() {
 
 docker_push(){
   push_atlantis
+  push_atlantis_latest
 }
 
 ecr_push() {
@@ -103,7 +123,7 @@ ecr_push() {
 
 docker_clean() {
     echo "Cleanup Unknown Tags"
-    echo "docker images -a | grep none | awk '{ print $3; }' | xargs docker rmi"
+    echo "docker images -a | grep none | awk '{ print \$3; }' | xargs docker rmi"
     docker images -a | grep none | awk '{ print $3; }' | xargs docker rmi
     echo '- DONE -'
     echo ''
