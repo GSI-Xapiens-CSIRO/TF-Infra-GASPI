@@ -57,6 +57,18 @@ volumes:
       o: bind
       type: none
       device: ${DATA_ATLANTIS_DB:-/opt/data/docker/atlantis/db}
+  vol_sonar_data:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_SONAR:-/opt/data/docker/sonarqube}
+  vol_sonar_reports:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_SONAR_REPORTS:-/opt/data/docker/sonarqube/reports}
 
 #================================================================================================
 # SERVICES
@@ -70,9 +82,9 @@ services:
     container_name: ${CONTAINER_ATLANTIS_DB:-gxc_atlantis_db}
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=${ATLANTIS_DB_USER:-atlantis}
-      - POSTGRES_PASSWORD=${ATLANTIS_DB_PASSWORD:-atlantis_secure_password}
-      - POSTGRES_DB=${ATLANTIS_DB_NAME:-atlantis}
+      - POSTGRES_USER=${ATLANTIS_DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${ATLANTIS_DB_PASSWORD}
+      - POSTGRES_DB=${ATLANTIS_DB_NAME:-gxc_atlantis_db}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - /etc/localtime:/etc/localtime:ro          ## Do not use it in mac
@@ -99,7 +111,6 @@ services:
   # PORTAINER
   #================================================================================================
   portainer:
-    # image: dockerframework/portainer:${PORTAINER_VERSION:-2.9}
     image: portainer/portainer-ce:${PORTAINER_VERSION:-2.30.1-alpine}
     container_name: ${CONTAINER_PORTAINER:-gxc_portainer}
     restart: unless-stopped
@@ -131,8 +142,9 @@ services:
     #   dockerfile: Dockerfile
     #   args:
     #     PYTHON_VERSION: 3.12
-    # image: ${ATLANTIS_IMAGE:-YOUR_AWS_ACCOUNT.dkr.ecr.ap-southeast-3.amazonaws.com/gxc/atlantis-sbeacon}:${ATLANTIS_VERSION:-latest}
-    image: devopsxti/atlantis-gxc:latest
+    # image: ${ATLANTIS_IMAGE:-YOUR_AWS_ACCOUNT.dkr.ecr.ap-southeast-3.amazonaws.com/gxc/atlantis-gxc}:${ATLANTIS_VERSION:-latest}
+    # image: devopsxti/atlantis-gxc:latest
+    image: devopsxti/atlantis-gxc:2.4.0
     container_name: ${CONTAINER_ATLANTIS:-gxc_atlantis}
     restart: unless-stopped
     ports:
@@ -155,6 +167,8 @@ services:
       - vol_atlantis_repos:/home/atlantis/.atlantis/repos
       # Atlantis Template
       - ${DATA_ATLANTIS:-/opt/data/docker/atlantis}/template:/home/atlantis/.atlantis/repos/template
+      # SonarQube reports (shared volume)
+      - vol_sonar_reports:/opt/sonar-reports
     environment:
       # GitHub Configuration
       - ATLANTIS_GH_HOSTNAME=github.com
@@ -178,9 +192,9 @@ services:
       - ATLANTIS_DB_TYPE=postgres
       - ATLANTIS_DB_HOST=${CONTAINER_IP_ATLANTIS_DB:-172.149.149.4}
       - ATLANTIS_DB_PORT=5432
-      - ATLANTIS_DB_NAME=${ATLANTIS_DB_NAME:-atlantis}
-      - ATLANTIS_DB_USER=${ATLANTIS_DB_USER:-atlantis}
-      - ATLANTIS_DB_PASSWORD=${ATLANTIS_DB_PASSWORD:-atlantis_secure_password}
+      - ATLANTIS_DB_NAME=${ATLANTIS_DB_NAME:-gxc_atlantis_db}
+      - ATLANTIS_DB_USER=${ATLANTIS_DB_USER:-postgres}
+      - ATLANTIS_DB_PASSWORD=${ATLANTIS_DB_PASSWORD}
       - ATLANTIS_DB_SSL_MODE=disable
       # Data Directory
       - ATLANTIS_DATA_DIR=/atlantis/data
@@ -200,7 +214,51 @@ services:
       - ATLANTIS_PARALLEL_PLAN=true
       - ATLANTIS_PARALLEL_APPLY=true
       - ATLANTIS_ABORT_ON_EXECUTION_ORDER_FAIL=true
+      - ATLANTIS_CHECKOUT_STRATEGY=merge
       - ATLANTIS_CHECKOUT_DEPTH=10  # Number of commit hash
+      - ATLANTIS_HIDE_PREV_PLAN_COMMENTS=true
+      - ATLANTIS_TEST_TIMEOUT=${ATLANTIS_TEST_TIMEOUT:-600}
+      - ATLANTIS_LOG_LEVEL=warn
+      #================================================================================================
+      # SONARQUBE INTEGRATION CONFIGURATION
+      #================================================================================================
+      # Main SonarQube Controls
+      - ENABLE_SONARQUBE=${ENABLE_SONARQUBE:-true}
+      - SONARQUBE_REQUIRED=${SONARQUBE_REQUIRED:-false}
+      - SONARQUBE_QUALITY_GATE_REQUIRED=${SONARQUBE_QUALITY_GATE_REQUIRED:-false}
+      # SonarQube Server Configuration
+      - SONAR_HOST_URL=${SONAR_HOST_URL:-http://sonarqube-web:9000}
+      - SONAR_SCANNER_IMAGE=${SONAR_SCANNER_IMAGE:-sonarsource/sonar-scanner-cli:latest}
+      - SONAR_ANALYSIS_TIMEOUT=${SONAR_ANALYSIS_TIMEOUT:-600}
+      # Internal SonarQube Service (when using local SonarQube)
+      - SONAR_INTERNAL_URL=${SONAR_INTERNAL_URL:-http://sonarqube-local:9000}
+      - SONAR_SCANNER_CONTAINER=${SONAR_SCANNER_CONTAINER:-gxc_sonar_scanner}
+      # Security and Testing Controls
+      - SCRIPT_RUN_TEST=${SCRIPT_RUN_TEST:-true}
+      - SCRIPT_RUN_SONAR=${SCRIPT_RUN_SONAR:-true}
+      - SONAR_TOKEN_HUB01=${SONAR_TOKEN_HUB01}
+      - SONAR_TOKEN_HUB02=${SONAR_TOKEN_HUB02}
+      - SONAR_TOKEN_HUB03=${SONAR_TOKEN_HUB03}
+      - SONAR_TOKEN_HUB04=${SONAR_TOKEN_HUB04}
+      - SONAR_TOKEN_HUB05=${SONAR_TOKEN_HUB05}
+      - SONAR_TOKEN_UAT01=${SONAR_TOKEN_UAT01}
+      - SONAR_TOKEN_UAT02=${SONAR_TOKEN_UAT02}
+      - SONAR_TOKEN_UAT03=${SONAR_TOKEN_UAT03}
+      - SONAR_TOKEN_UAT04=${SONAR_TOKEN_UAT04}
+      - SONAR_TOKEN_UAT05=${SONAR_TOKEN_UAT05}
+      - SONAR_PROJECT_KEY_HUB01=${SONAR_PROJECT_KEY_HUB01:-gxc-cicd-gaspi-hub01}
+      - SONAR_PROJECT_KEY_HUB02=${SONAR_PROJECT_KEY_HUB02:-gxc-cicd-gaspi-hub02}
+      - SONAR_PROJECT_KEY_HUB03=${SONAR_PROJECT_KEY_HUB03:-gxc-cicd-gaspi-hub03}
+      - SONAR_PROJECT_KEY_HUB04=${SONAR_PROJECT_KEY_HUB04:-gxc-cicd-gaspi-hub04}
+      - SONAR_PROJECT_KEY_HUB05=${SONAR_PROJECT_KEY_HUB05:-gxc-cicd-gaspi-hub05}
+      - SONAR_PROJECT_KEY_UAT01=${SONAR_PROJECT_KEY_UAT01:-gxc-cicd-gaspi-uat01}
+      - SONAR_PROJECT_KEY_UAT02=${SONAR_PROJECT_KEY_UAT02:-gxc-cicd-gaspi-uat02}
+      - SONAR_PROJECT_KEY_UAT03=${SONAR_PROJECT_KEY_UAT03:-gxc-cicd-gaspi-uat03}
+      - SONAR_PROJECT_KEY_UAT04=${SONAR_PROJECT_KEY_UAT04:-gxc-cicd-gaspi-uat04}
+      - SONAR_PROJECT_KEY_UAT05=${SONAR_PROJECT_KEY_UAT05:-gxc-cicd-gaspi-uat05}
+      #================================================================================================
+      # AWS ACCOUNT
+      #================================================================================================
       # Organization Structure
       - GXC_MANAGEMENT_ACCOUNT=${GXC_MANAGEMENT_ACCOUNT}
       - GXC_SECURITY_ACCOUNT=${GXC_SECURITY_ACCOUNT}
@@ -216,7 +274,12 @@ services:
       - GXC_UAT03_ACCOUNT=${GXC_UAT03_ACCOUNT}
       - GXC_UAT04_ACCOUNT=${GXC_UAT04_ACCOUNT}
       - GXC_UAT05_ACCOUNT=${GXC_UAT05_ACCOUNT}
+      #================================================================================================
+      # OTHERS
+      #================================================================================================
       # Other Configuration
+      - ENABLE_SECURITY_AUDIT=true
+      - LOG_LEVEL=INFO
       - DEFAULT_CONFTEST_VERSION=${CONFTEST_VERSION:-0.56.0}
       - TZ=Asia/Jakarta
       - PYTHONPATH=/usr/local/lib/python3.12/site-packages

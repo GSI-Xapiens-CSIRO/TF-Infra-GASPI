@@ -11,7 +11,7 @@ Deployment tested under Amazon EKS (Kubernetes) Atlantis sBeacon
 
 - [sBeacon](https://aehrc.csiro.au/research/cloud-native-genomics/sbeacon-making-genomic-data-sharing-future-ready/)
 
-## Dockerfile `atlantis-gxc:20250611`
+## Dockerfile `atlantis-gxc:20250913`
 
 ```
 # syntax=docker/dockerfile:1@sha256:865e5dd094beca432e8c0a1d5e1c465db5f998dca4e439981029b3b81fb39ed5
@@ -25,6 +25,7 @@ ARG GOLANG_TAG=1.23.3-alpine@sha256:c694a4d291a13a9f9d94933395673494fc2cc9d4777b
 ARG DEFAULT_TERRAFORM_VERSION=1.9.8
 ARG DEFAULT_OPENTOFU_VERSION=1.8.6
 ARG DEFAULT_CONFTEST_VERSION=0.56.0
+ARG DEFAULT_TERRAGRUNT_VERSION=0.70.4
 
 # Stage 1: Get Artifact Atlantis
 FROM ghcr.io/runatlantis/atlantis:latest@sha256:f9e0b6ff14b1313b169e4ca128a578fc719745f61114e468afab0d4cbcda575e as builder
@@ -66,26 +67,38 @@ RUN case ${TARGETPLATFORM} in \
     mv git-lfs /usr/bin/git-lfs && \
     git-lfs --version
 
-# Install terraform binaries
+# Install terraform, tofu, and terragrunt binaries
 ARG DEFAULT_TERRAFORM_VERSION
 ENV DEFAULT_TERRAFORM_VERSION=${DEFAULT_TERRAFORM_VERSION:-1.9.8}
 ARG DEFAULT_OPENTOFU_VERSION
 ENV DEFAULT_OPENTOFU_VERSION=${DEFAULT_OPENTOFU_VERSION:-1.8.6}
+ARG DEFAULT_TERRAGRUNT_VERSION
+ENV DEFAULT_TERRAGRUNT_VERSION=${DEFAULT_TERRAGRUNT_VERSION:-0.70.4}
 
 COPY scripts/download-release.sh download-release.sh
 
+# Install Terraform
 RUN ./download-release.sh \
     "terraform" \
     "${TARGETPLATFORM}" \
     "${DEFAULT_TERRAFORM_VERSION}" \
-    "1.6.6 1.7.5 1.8.5 ${DEFAULT_TERRAFORM_VERSION} 1.10.5 1.11.4" \
-    && ./download-release.sh \
+    "1.6.6 1.7.5 1.8.5 ${DEFAULT_TERRAFORM_VERSION} 1.10.5 1.11.4"
+
+# Install OpenTofu
+RUN ./download-release.sh \
     "tofu" \
     "${TARGETPLATFORM}" \
     "${DEFAULT_OPENTOFU_VERSION}" \
     "${DEFAULT_OPENTOFU_VERSION}"
 
-# Final Stage: Build sBeacon-Atlantis
+# Install Terragrunt (compatible with Terraform 1.9.8+)
+RUN ./download-release.sh \
+    "terragrunt" \
+    "${TARGETPLATFORM}" \
+    "${DEFAULT_TERRAGRUNT_VERSION}" \
+    "${DEFAULT_TERRAGRUNT_VERSION}"
+
+# Final Stage: Build Atlantis
 FROM public.ecr.aws/sam/build-python3.12:latest-x86_64
 
 # Switch to root for installations
@@ -123,6 +136,12 @@ RUN dnf update -y --allowerasing && \
     dnf clean all && \
     rm -rf /var/cache/dnf/*
 
+# Install AWS CLI v2
+# RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+#     unzip awscliv2.zip && \
+#     ./aws/install && \
+#     rm -rf aws awscliv2.zip
+
 # Setup Docker environment
 RUN mkdir -p /etc/docker && \
     echo '{"storage-driver": "overlay2", "features": {"buildkit": true}}' > /etc/docker/daemon.json && \
@@ -152,7 +171,9 @@ RUN echo "docker:x:999:" >> /etc/group && \
     sed -i 's/docker:x:999:/docker:x:999:100/' /etc/group
 
 # Ensure proper permissions for atlantis user home directory
-RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.config/git,.pyenv,.npm,.pnpm,.atlantis} && \
+RUN mkdir -p /home/atlantis/.ssh /home/atlantis/.aws /home/atlantis/.local /home/atlantis/.nvm \
+             /home/atlantis/.docker /home/atlantis/.config /home/atlantis/.config/git \
+             /home/atlantis/.pyenv /home/atlantis/.npm /home/atlantis/.pnpm /home/atlantis/.atlantis && \
     mkdir -p /atlantis-data && \
     mkdir -p /atlantis && \
     # Set ownership for all atlantis home directory
@@ -161,11 +182,11 @@ RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.config/git,.
     chown -R 100:100 /atlantis && \
     # Set proper permissions
     chmod 755 /home/atlantis && \
-    chmod 700 /home/atlantis/{.ssh,.aws} && \
-    chmod 755 /home/atlantis/{.local,.config,.config/git} && \
+    chmod 700 /home/atlantis/.ssh /home/atlantis/.aws && \
+    chmod 755 /home/atlantis/.local /home/atlantis/.config /home/atlantis/.config/git && \
     # Create .gitconfig with proper permissions
     touch /home/atlantis/.gitconfig && \
-    chown -R 100:100 /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis,.gitconfig} && \
+    chown 100:100 /home/atlantis/.gitconfig && \
     chmod 644 /home/atlantis/.gitconfig && \
     # Create .bash_profile and .bashrc with proper ownership
     touch /home/atlantis/.bash_profile /home/atlantis/.bashrc && \
@@ -177,16 +198,11 @@ RUN pip install --no-cache-dir dumb-init && \
     chmod +x /var/lang/bin/dumb-init && \
     ln -s /var/lang/bin/dumb-init /usr/local/bin/dumb-init
 
-# Install Terraform
-RUN wget https://releases.hashicorp.com/terraform/1.9.4/terraform_1.9.4_linux_amd64.zip && \
-    unzip terraform_1.9.4_linux_amd64.zip -d /usr/bin/ && \
-    rm terraform_1.9.4_linux_amd64.zip && \
-    chmod +x /usr/bin/terraform
-
 # Copy binaries and setup environment
 COPY --from=builder /usr/local/bin/atlantis /usr/local/bin/atlantis
 COPY --from=deps /usr/local/bin/terraform/terraform* /usr/local/bin/
 COPY --from=deps /usr/local/bin/tofu/tofu* /usr/local/bin/
+COPY --from=deps /usr/local/bin/terragrunt/terragrunt* /usr/local/bin/
 COPY --from=deps /usr/bin/git-lfs /usr/bin/git-lfs
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
@@ -194,12 +210,10 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
     chmod +x /usr/local/bin/atlantis && \
     chown -R 100:100 /usr/local/bin/atlantis && \
+    chmod +x /usr/local/bin/terragrunt* && \
     # Ensure atlantis user can access required directories
     mkdir -p /atlantis/config && \
     chown -R 100:100 /atlantis/config
-
-RUN mkdir -p /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis} && \
-    chown -R 100:100 /home/atlantis/{.ssh,.aws,.local,.nvm,.docker,.config,.pyenv,.npm,.pnpm,.atlantis}
 
 # Copy configuration files
 COPY config/docker/home /home
@@ -212,6 +226,11 @@ RUN chown -R 100:100 /home/atlantis && \
     chmod 644 /home/atlantis/.gitconfig && \
     chmod 644 /home/atlantis/.bash_profile && \
     chmod 644 /home/atlantis/.bashrc
+
+# Install Python requirements
+COPY requirements.txt ./
+RUN python3.12 -m pip install --upgrade pip
+RUN pip install -r requirements.txt
 
 # Switch to atlantis user
 USER 100
@@ -230,14 +249,12 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | b
     nvm alias default ${NODE_VERSION} && \
     npm install -g pnpm
 
-# Install Python requirements
-COPY requirements.txt ./
+# Copy atlantis-deploy & sonar-scan script
 COPY docker-entrypoint.sh /home/atlantis
 COPY scripts/atlantis-deploy /usr/local/bin/atlantis-deploy
 COPY scripts/install-atlantis-deploy /usr/local/bin/install-atlantis-deploy
-
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+# COPY scripts/sonar-scan /usr/local/bin/sonar-scan
+# COPY scripts/sonarqube.env.example /usr/local/bin/sonarqube.env
 
 # Set the exposed port
 EXPOSE ${ATLANTIS_PORT:-4141}
@@ -314,6 +331,18 @@ volumes:
       o: bind
       type: none
       device: ${DATA_ATLANTIS_DB:-/opt/data/docker/atlantis/db}
+  vol_sonar_data:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_SONAR:-/opt/data/docker/sonarqube}
+  vol_sonar_reports:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_SONAR_REPORTS:-/opt/data/docker/sonarqube/reports}
 
 #================================================================================================
 # SERVICES
@@ -327,9 +356,9 @@ services:
     container_name: ${CONTAINER_ATLANTIS_DB:-gxc_atlantis_db}
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=${ATLANTIS_DB_USER:-atlantis}
-      - POSTGRES_PASSWORD=${ATLANTIS_DB_PASSWORD:-atlantis_secure_password}
-      - POSTGRES_DB=${ATLANTIS_DB_NAME:-atlantis}
+      - POSTGRES_USER=${ATLANTIS_DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${ATLANTIS_DB_PASSWORD}
+      - POSTGRES_DB=${ATLANTIS_DB_NAME:-gxc_atlantis_db}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - /etc/localtime:/etc/localtime:ro          ## Do not use it in mac
@@ -356,7 +385,6 @@ services:
   # PORTAINER
   #================================================================================================
   portainer:
-    # image: dockerframework/portainer:${PORTAINER_VERSION:-2.9}
     image: portainer/portainer-ce:${PORTAINER_VERSION:-2.30.1-alpine}
     container_name: ${CONTAINER_PORTAINER:-gxc_portainer}
     restart: unless-stopped
@@ -383,12 +411,14 @@ services:
   # ATLANTIS TERRAFORM
   #================================================================================================
   atlantis:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        PYTHON_VERSION: 3.12
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    #   args:
+    #     PYTHON_VERSION: 3.12
     # image: ${ATLANTIS_IMAGE:-YOUR_AWS_ACCOUNT.dkr.ecr.ap-southeast-3.amazonaws.com/gxc/atlantis-gxc}:${ATLANTIS_VERSION:-latest}
+    # image: devopsxti/atlantis-gxc:latest
+    image: devopsxti/atlantis-gxc:2.4.0
     container_name: ${CONTAINER_ATLANTIS:-gxc_atlantis}
     restart: unless-stopped
     ports:
@@ -411,6 +441,8 @@ services:
       - vol_atlantis_repos:/home/atlantis/.atlantis/repos
       # Atlantis Template
       - ${DATA_ATLANTIS:-/opt/data/docker/atlantis}/template:/home/atlantis/.atlantis/repos/template
+      # SonarQube reports (shared volume)
+      - vol_sonar_reports:/opt/sonar-reports
     environment:
       # GitHub Configuration
       - ATLANTIS_GH_HOSTNAME=github.com
@@ -434,9 +466,9 @@ services:
       - ATLANTIS_DB_TYPE=postgres
       - ATLANTIS_DB_HOST=${CONTAINER_IP_ATLANTIS_DB:-172.149.149.4}
       - ATLANTIS_DB_PORT=5432
-      - ATLANTIS_DB_NAME=${ATLANTIS_DB_NAME:-atlantis}
-      - ATLANTIS_DB_USER=${ATLANTIS_DB_USER:-atlantis}
-      - ATLANTIS_DB_PASSWORD=${ATLANTIS_DB_PASSWORD:-atlantis_secure_password}
+      - ATLANTIS_DB_NAME=${ATLANTIS_DB_NAME:-gxc_atlantis_db}
+      - ATLANTIS_DB_USER=${ATLANTIS_DB_USER:-postgres}
+      - ATLANTIS_DB_PASSWORD=${ATLANTIS_DB_PASSWORD}
       - ATLANTIS_DB_SSL_MODE=disable
       # Data Directory
       - ATLANTIS_DATA_DIR=/atlantis/data
@@ -456,6 +488,51 @@ services:
       - ATLANTIS_PARALLEL_PLAN=true
       - ATLANTIS_PARALLEL_APPLY=true
       - ATLANTIS_ABORT_ON_EXECUTION_ORDER_FAIL=true
+      - ATLANTIS_CHECKOUT_STRATEGY=merge
+      - ATLANTIS_CHECKOUT_DEPTH=10  # Number of commit hash
+      - ATLANTIS_HIDE_PREV_PLAN_COMMENTS=true
+      - ATLANTIS_TEST_TIMEOUT=${ATLANTIS_TEST_TIMEOUT:-600}
+      - ATLANTIS_LOG_LEVEL=warn
+      #================================================================================================
+      # SONARQUBE INTEGRATION CONFIGURATION
+      #================================================================================================
+      # Main SonarQube Controls
+      - ENABLE_SONARQUBE=${ENABLE_SONARQUBE:-true}
+      - SONARQUBE_REQUIRED=${SONARQUBE_REQUIRED:-false}
+      - SONARQUBE_QUALITY_GATE_REQUIRED=${SONARQUBE_QUALITY_GATE_REQUIRED:-false}
+      # SonarQube Server Configuration
+      - SONAR_HOST_URL=${SONAR_HOST_URL:-http://sonarqube-web:9000}
+      - SONAR_SCANNER_IMAGE=${SONAR_SCANNER_IMAGE:-sonarsource/sonar-scanner-cli:latest}
+      - SONAR_ANALYSIS_TIMEOUT=${SONAR_ANALYSIS_TIMEOUT:-600}
+      # Internal SonarQube Service (when using local SonarQube)
+      - SONAR_INTERNAL_URL=${SONAR_INTERNAL_URL:-http://sonarqube-local:9000}
+      - SONAR_SCANNER_CONTAINER=${SONAR_SCANNER_CONTAINER:-gxc_sonar_scanner}
+      # Security and Testing Controls
+      - SCRIPT_RUN_TEST=${SCRIPT_RUN_TEST:-true}
+      - SCRIPT_RUN_SONAR=${SCRIPT_RUN_SONAR:-true}
+      - SONAR_TOKEN_HUB01=${SONAR_TOKEN_HUB01}
+      - SONAR_TOKEN_HUB02=${SONAR_TOKEN_HUB02}
+      - SONAR_TOKEN_HUB03=${SONAR_TOKEN_HUB03}
+      - SONAR_TOKEN_HUB04=${SONAR_TOKEN_HUB04}
+      - SONAR_TOKEN_HUB05=${SONAR_TOKEN_HUB05}
+      - SONAR_TOKEN_UAT01=${SONAR_TOKEN_UAT01}
+      - SONAR_TOKEN_UAT02=${SONAR_TOKEN_UAT02}
+      - SONAR_TOKEN_UAT03=${SONAR_TOKEN_UAT03}
+      - SONAR_TOKEN_UAT04=${SONAR_TOKEN_UAT04}
+      - SONAR_TOKEN_UAT05=${SONAR_TOKEN_UAT05}
+      - SONAR_PROJECT_KEY_HUB01=${SONAR_PROJECT_KEY_HUB01:-gxc-cicd-gaspi-hub01}
+      - SONAR_PROJECT_KEY_HUB02=${SONAR_PROJECT_KEY_HUB02:-gxc-cicd-gaspi-hub02}
+      - SONAR_PROJECT_KEY_HUB03=${SONAR_PROJECT_KEY_HUB03:-gxc-cicd-gaspi-hub03}
+      - SONAR_PROJECT_KEY_HUB04=${SONAR_PROJECT_KEY_HUB04:-gxc-cicd-gaspi-hub04}
+      - SONAR_PROJECT_KEY_HUB05=${SONAR_PROJECT_KEY_HUB05:-gxc-cicd-gaspi-hub05}
+      - SONAR_PROJECT_KEY_UAT01=${SONAR_PROJECT_KEY_UAT01:-gxc-cicd-gaspi-uat01}
+      - SONAR_PROJECT_KEY_UAT02=${SONAR_PROJECT_KEY_UAT02:-gxc-cicd-gaspi-uat02}
+      - SONAR_PROJECT_KEY_UAT03=${SONAR_PROJECT_KEY_UAT03:-gxc-cicd-gaspi-uat03}
+      - SONAR_PROJECT_KEY_UAT04=${SONAR_PROJECT_KEY_UAT04:-gxc-cicd-gaspi-uat04}
+      - SONAR_PROJECT_KEY_UAT05=${SONAR_PROJECT_KEY_UAT05:-gxc-cicd-gaspi-uat05}
+      #================================================================================================
+      # AWS ACCOUNT
+      #================================================================================================
       # Organization Structure
       - GXC_MANAGEMENT_ACCOUNT=${GXC_MANAGEMENT_ACCOUNT}
       - GXC_SECURITY_ACCOUNT=${GXC_SECURITY_ACCOUNT}
@@ -471,7 +548,12 @@ services:
       - GXC_UAT03_ACCOUNT=${GXC_UAT03_ACCOUNT}
       - GXC_UAT04_ACCOUNT=${GXC_UAT04_ACCOUNT}
       - GXC_UAT05_ACCOUNT=${GXC_UAT05_ACCOUNT}
+      #================================================================================================
+      # OTHERS
+      #================================================================================================
       # Other Configuration
+      - ENABLE_SECURITY_AUDIT=true
+      - LOG_LEVEL=INFO
       - DEFAULT_CONFTEST_VERSION=${CONFTEST_VERSION:-0.56.0}
       - TZ=Asia/Jakarta
       - PYTHONPATH=/usr/local/lib/python3.12/site-packages
@@ -699,6 +781,7 @@ DATA_ATLANTIS_SRC=/opt/data/docker/atlantis/src
 
 # Using container binding volume path
 DATA_ATLANTIS_CONFIG=/opt/data/docker/atlantis/config
+DATA_POSTGRESQL=/opt/data/docker/postgresql/data
 
 #================================================================================================
 # CONTAINER CONFIGURATION
@@ -719,16 +802,29 @@ CONTAINER_NGINX=gxc_nginx
 DATA_NGINX=/opt/data/docker/nginx
 CONTAINER_IP_NGINX=172.149.149.7
 
+# PostgreSQL Container
+CONTAINER_POSTGRESQL=gxc_postgresql
+CONTAINER_IP_POSTGRESQL=172.149.149.8
+# PostgreSQL Settings
+POSTGRES_USER=sonar
+POSTGRES_PASSWORD=sonar
+POSTGRES_DB=sonar
+
 #================================================================================================
 # IMAGE CONFIGURATION
 #================================================================================================
 # Atlantis
 ATLANTIS_VERSION=latest
+# ATLANTIS_IMAGE=463470956521.dkr.ecr.ap-southeast-3.amazonaws.com/gxc/atlantis-gxc
 ATLANTIS_IMAGE=devopsxti/atlantis-gxc:latest
 
 # Version tags
-PORTAINER_VERSION=2.20.3-alpine
+PORTAINER_VERSION=2.30.1-alpine
 PORTAINER_TEMPLATE=generic
+POSTGRES_VERSION=15.4-alpine
+SONARQUBE_VERSION=10.3-community
+NGINX_VERSION=1.25.3-alpine
+
 
 #================================================================================================
 # GITHUB CONFIGURATION
@@ -737,10 +833,18 @@ ATLANTIS_GH_HOSTNAME=github.com
 ATLANTIS_GH_USER=gxc-gh-user
 ATLANTIS_GH_EMAIL=devops@example.com
 ATLANTIS_WEB_HOSTNAME=atlantis.example.com
-ATLANTIS_REPO_ALLOWLIST=github.com/GSI-Xapiens-CSIRO/BGSI-GeneticAnalysisSupportPlatformIndonesia-GASPI/*
+ATLANTIS_REPO_ALLOWLIST=github.com/GSI-Xapiens-CSIRO/*
 ATLANTIS_REPO_CONFIG=/atlantis/repo.yaml
 ATLANTIS_CONFIG_PATH=/atlantis/config
+ATLANTIS_CHECKOUT_STRATEGY=merge
+ATLANTIS_CHECKOUT_DEPTH=10  # Number of commit hash
 GIT_USER_NAME="GXC DevOps"
+
+ATLANTIS_HIDE_PREV_PLAN_COMMENTS=true
+ATLANTIS_TEST_TIMEOUT=600
+ATLANTIS_LOG_LEVEL=warn
+ENABLE_SECURITY_AUDIT=true
+LOG_LEVEL=INFO
 
 # Security Secrets (DO NOT COMMIT - Set these in .env local)
 # ATLANTIS_GH_TOKEN=your-github-token
@@ -819,9 +923,9 @@ ATLANTIS_ALLOW_COMMANDS=version,plan,apply,unlock,approve_policies
 ATLANTIS_DB_TYPE=postgres
 ATLANTIS_DB_HOST=172.149.149.4
 ATLANTIS_DB_PORT=5432
-ATLANTIS_DB_NAME=atlantis
-ATLANTIS_DB_USER=atlantis
-ATLANTIS_DB_PASSWORD=atlantis_secure_password
+ATLANTIS_DB_NAME=gxc_atlantis_db
+ATLANTIS_DB_USER=postgres
+ATLANTIS_DB_PASSWORD=
 ATLANTIS_DB_SSL_MODE=disable
 
 #================================================================================================
@@ -829,6 +933,61 @@ ATLANTIS_DB_SSL_MODE=disable
 #================================================================================================
 BACKUP_RETENTION_DAYS=30
 BACKUP_PATH=/backup/atlantis
+
+# =============================================================================
+# SONARQUBE CONFIGURATION
+# =============================================================================
+# Main Controls
+ENABLE_SONARQUBE=true                          # true/false - Master toggle
+SONARQUBE_REQUIRED=false                       # true/false - Fail pipeline if SonarQube fails
+SONARQUBE_QUALITY_GATE_REQUIRED=false          # true/false - Fail on quality gate failure
+
+# SonarQube Server
+SONAR_HOST_URL=http://sonarqube_web:9000
+SONAR_TOKEN=__sonarqube_token__
+SONAR_TOKEN_HUB01=__sonarqube_token__
+SONAR_TOKEN_HUB02=__sonarqube_token__
+SONAR_TOKEN_HUB03=__sonarqube_token__
+SONAR_TOKEN_HUB04=__sonarqube_token__
+SONAR_TOKEN_HUB05=__sonarqube_token__
+SONAR_TOKEN_UAT01=__sonarqube_token__
+SONAR_TOKEN_UAT02=__sonarqube_token__
+SONAR_TOKEN_UAT03=__sonarqube_token__
+SONAR_TOKEN_UAT04=__sonarqube_token__
+SONAR_TOKEN_UAT05=__sonarqube_token__
+SONAR_PROJECT_KEY=gxc-cicd-gaspi
+SONAR_PROJECT_KEY_HUB01=gxc-cicd-gaspi-hub01
+SONAR_PROJECT_KEY_HUB02=gxc-cicd-gaspi-hub02
+SONAR_PROJECT_KEY_HUB03=gxc-cicd-gaspi-hub03
+SONAR_PROJECT_KEY_HUB04=gxc-cicd-gaspi-hub04
+SONAR_PROJECT_KEY_HUB05=gxc-cicd-gaspi-hub05
+SONAR_PROJECT_KEY_UAT01=gxc-cicd-gaspi-uat01
+SONAR_PROJECT_KEY_UAT02=gxc-cicd-gaspi-uat02
+SONAR_PROJECT_KEY_UAT03=gxc-cicd-gaspi-uat03
+SONAR_PROJECT_KEY_UAT04=gxc-cicd-gaspi-uat04
+SONAR_PROJECT_KEY_UAT05=gxc-cicd-gaspi-uat05
+
+# Scanner Configuration
+SONAR_SCANNER_IMAGE=sonarsource/sonar-scanner-cli:latest
+SONAR_ANALYSIS_TIMEOUT=3600
+SONAR_SCANNER_OPTS=-Xmx2048m
+
+# Container Configuration
+CONTAINER_SONAR_SCAN=gxc_sonar_scanner
+CONTAINER_SONARQUBE=gxc_sonarqube_local
+CONTAINER_IP_SONAR_SCAN=172.149.149.8
+CONTAINER_IP_SONARQUBE=172.149.149.9
+
+# Data Directories
+DATA_SONAR=/opt/data/docker/sonarqube
+DATA_SONAR_REPORTS=/opt/data/docker/sonarqube/reports
+
+# Optional: Local SonarQube Server
+PORT_SONARQUBE=9000
+SONAR_DB_USER=postgres
+SONAR_DB_PASSWORD=
+SONAR_WEB_JAVAOPTS=-Xmx2048m -Xms1024m
+SONAR_CE_JAVAOPTS=-Xmx2048m -Xms1024m
 ```
 
 ## Package Javascript `package.json`

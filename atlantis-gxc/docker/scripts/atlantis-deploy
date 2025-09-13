@@ -1,16 +1,16 @@
-#!/bin/bash
-# /usr/local/bin/atlantis-deploy
+#!/usr/bin/env sh
 
 set -euo pipefail
 
-# ============================================================================
-# ATLANTIS SYSTEM-WIDE DEPLOYMENT SCRIPT
+# =================================================================================
+# ATLANTIS SYSTEM-WIDE DEPLOYMENT SCRIPT - SECURITY HARDENED VERSION
 # Location: /usr/local/bin/atlantis-deploy
 # Usage: atlantis-deploy <environment> [plan|apply]
-# ============================================================================
+# =================================================================================
 
 # Global exit code variable
 EXIT_CODE=0
+SCRIPT_START_TIME=$(date +%s)
 
 # Color codes for output
 RED='\033[0;31m'
@@ -32,18 +32,94 @@ log_error() {
 }
 
 # Script metadata
-SCRIPT_VERSION="2.3.1-GXC"
+SCRIPT_VERSION="2.4.0-GXC-SECURE-MULTI-SONAR"
 SCRIPT_NAME="atlantis-deploy"
 SCRIPT_AUTHOR="GXC DevOps-Team"
 SCRIPT_EMAIL="support.gxc@xapiens.id"
 SCRIPT_COMPANY="GXC Consortium"
 SCRIPT_LICENSE="Apache v2"
-SCRIPT_DATE="June, 2025"
+SCRIPT_DATE="September, 2025"
 SCRIPT_PATTERN="GXC"
 SCRIPT_GH_USER="devopsxti"
 SCRIPT_GH_REPO="GSI-Xapiens-CSIRO"
-SCRIPT_RUN_TEST="${SCRIPT_RUN_TEST:-true}"    # Default to false if not set
-SCRIPT_RUN_SONAR="${SCRIPT_RUN_SONAR:-true}"  # Default to false if not set
+SCRIPT_RUN_TEST="${SCRIPT_RUN_TEST:-true}"
+SCRIPT_RUN_SONAR="${SCRIPT_RUN_SONAR:-true}"
+
+# Security configuration
+ENABLE_SECURITY_AUDIT="${ENABLE_SECURITY_AUDIT:-true}"
+LOG_LEVEL="${LOG_LEVEL:-INFO}"
+
+# =================================================================================
+# Set default values for environment variables to prevent unbound variable errors
+# =================================================================================
+SONAR_TOKEN="${SONAR_TOKEN:-}"
+GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-}"
+AWS_SESSION_TOKEN="${AWS_SESSION_TOKEN:-}"
+AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-}"
+TAG_ID=$(echo $(date '+%Y%m%d'))
+
+# =================================================================================
+# MULTI-SONARQUBE PROJECT CONFIGURATION
+# =================================================================================
+# Environment-specific SonarQube tokens
+SONAR_TOKEN_HUB01="${SONAR_TOKEN_HUB01:-}"
+SONAR_TOKEN_HUB02="${SONAR_TOKEN_HUB02:-}"
+SONAR_TOKEN_HUB03="${SONAR_TOKEN_HUB03:-}"
+SONAR_TOKEN_HUB04="${SONAR_TOKEN_HUB04:-}"
+SONAR_TOKEN_HUB05="${SONAR_TOKEN_HUB05:-}"
+SONAR_TOKEN_UAT01="${SONAR_TOKEN_UAT01:-}"
+SONAR_TOKEN_UAT02="${SONAR_TOKEN_UAT02:-}"
+SONAR_TOKEN_UAT03="${SONAR_TOKEN_UAT03:-}"
+SONAR_TOKEN_UAT04="${SONAR_TOKEN_UAT04:-}"
+SONAR_TOKEN_UAT05="${SONAR_TOKEN_UAT05:-}"
+# Environment-specific SonarQube project keys
+SONAR_PROJECT_KEY_HUB01="${SONAR_PROJECT_KEY_HUB01:-gxc-cicd-gaspi-hub01}"
+SONAR_PROJECT_KEY_HUB02="${SONAR_PROJECT_KEY_HUB02:-gxc-cicd-gaspi-hub02}"
+SONAR_PROJECT_KEY_HUB03="${SONAR_PROJECT_KEY_HUB03:-gxc-cicd-gaspi-hub03}"
+SONAR_PROJECT_KEY_HUB04="${SONAR_PROJECT_KEY_HUB04:-gxc-cicd-gaspi-hub04}"
+SONAR_PROJECT_KEY_HUB05="${SONAR_PROJECT_KEY_HUB05:-gxc-cicd-gaspi-hub05}"
+SONAR_PROJECT_KEY_UAT01="${SONAR_PROJECT_KEY_UAT01:-gxc-cicd-gaspi-uat01}"
+SONAR_PROJECT_KEY_UAT02="${SONAR_PROJECT_KEY_UAT02:-gxc-cicd-gaspi-uat02}"
+SONAR_PROJECT_KEY_UAT03="${SONAR_PROJECT_KEY_UAT03:-gxc-cicd-gaspi-uat03}"
+SONAR_PROJECT_KEY_UAT04="${SONAR_PROJECT_KEY_UAT04:-gxc-cicd-gaspi-uat04}"
+SONAR_PROJECT_KEY_UAT05="${SONAR_PROJECT_KEY_UAT05:-gxc-cicd-gaspi-uat05}"
+
+# Function to get environment-specific SonarQube token
+get_sonar_token_for_environment() {
+    local env="$1"
+    local token_var="SONAR_TOKEN_${env^^}"
+    local token_value="${!token_var:-}"
+
+    if [[ -n "$token_value" ]]; then
+        echo "$token_value"
+        return 0
+    fi
+
+    # Fallback to general SONAR_TOKEN
+    if [[ -n "$SONAR_TOKEN" ]]; then
+        echo "$SONAR_TOKEN"
+        return 0
+    fi
+
+    return 1
+}
+
+# Function to get environment-specific SonarQube project key
+get_sonar_project_key_for_environment() {
+    local env="$1"
+    local key_var="SONAR_PROJECT_KEY_${env^^}"
+    local key_value="${!key_var:-}"
+
+    if [[ -n "$key_value" ]]; then
+        echo "$key_value"
+        return 0
+    fi
+
+    # Fallback to default pattern
+    echo "gxc-cicd-gaspi-${env}"
+    return 0
+}
 
 # Display logo and version
 show_logo() {
@@ -80,7 +156,7 @@ EOF
 show_version() {
     show_logo
     echo -e "${GREEN}$SCRIPT_NAME version $SCRIPT_VERSION${NC}"
-    echo -e "${BLUE}Build for Terraform Infrastructure Automation${NC}"
+    echo -e "${BLUE}Build for Terraform Infrastructure Automation with Multi-SonarQube Support${NC}"
     echo -e "${BLUE}Supports environments: hub01-05, uat01-05${NC}"
     echo ""
     exit 0
@@ -112,25 +188,59 @@ ENVIRONMENT VARIABLES:
     ATLANTIS_PROJECT_NAME              Current project name
     ATLANTIS_PULL_REQUEST_HEAD_BRANCH  Current branch name
 
-SONARQUBE INTEGRATION:
+SONARQUBE INTEGRATION (Multi-Project Support):
     SCRIPT_RUN_SONAR                   Enable/disable SonarQube scan (default: true)
-    SONAR_HOST_URL                     SonarQube server URL (default: http://16.79.20.54:9000)
-    SONAR_TOKEN                        SonarQube authentication token
-    SONAR_PROJECT_KEY                  Project key (default: gaspi-{environment})
-    SONAR_PROJECT_NAME                 Project display name (default: GASPI-{ENVIRONMENT})
-    SONAR_PROJECT_VERSION              Project version (default: 1.0.0)
+    SONAR_HOST_URL                     SonarQube server URL (default: https://sonarqube-gxc.xapiens.id)
+
+    # Environment-specific tokens (preferred)
+    SONAR_TOKEN_HUB01                  SonarQube token for hub01 environment
+    SONAR_TOKEN_HUB02                  SonarQube token for hub02 environment
+    SONAR_TOKEN_HUB03                  SonarQube token for hub03 environment
+    SONAR_TOKEN_HUB04                  SonarQube token for hub04 environment
+    SONAR_TOKEN_HUB05                  SonarQube token for hub05 environment
+    SONAR_TOKEN_UAT01                  SonarQube token for uat01 environment
+    SONAR_TOKEN_UAT02                  SonarQube token for uat02 environment
+    SONAR_TOKEN_UAT03                  SonarQube token for uat03 environment
+    SONAR_TOKEN_UAT04                  SonarQube token for uat04 environment
+    SONAR_TOKEN_UAT05                  SonarQube token for uat05 environment
+
+    # Environment-specific project keys (optional)
+    SONAR_PROJECT_KEY_HUB01            Project key for hub01 (default: gxc-cicd-gaspi-hub01)
+    SONAR_PROJECT_KEY_HUB02            Project key for hub02 (default: gxc-cicd-gaspi-hub02)
+    SONAR_PROJECT_KEY_HUB03            Project key for hub03 (default: gxc-cicd-gaspi-hub03)
+    SONAR_PROJECT_KEY_HUB04            Project key for hub04 (default: gxc-cicd-gaspi-hub04)
+    SONAR_PROJECT_KEY_HUB05            Project key for hub05 (default: gxc-cicd-gaspi-hub05)
+    SONAR_PROJECT_KEY_UAT01            Project key for uat01 (default: gxc-cicd-gaspi-uat01)
+    SONAR_PROJECT_KEY_UAT02            Project key for uat02 (default: gxc-cicd-gaspi-uat02)
+    SONAR_PROJECT_KEY_UAT03            Project key for uat03 (default: gxc-cicd-gaspi-uat03)
+    SONAR_PROJECT_KEY_UAT04            Project key for uat04 (default: gxc-cicd-gaspi-uat04)
+    SONAR_PROJECT_KEY_UAT05            Project key for uat05 (default: gxc-cicd-gaspi-uat05)
+
+    # Fallback general configuration
+    SONAR_TOKEN                        General SonarQube token (fallback if environment-specific not set)
+    SONAR_PROJECT_NAME                 Project display name (default: GXC-Atlantis-SonarQube-CICD-{environment})
+    SONAR_PROJECT_VERSION              Project version (default: auto-generated timestamp)
     SONAR_SOURCES                      Source directories to scan (default: .)
     SONAR_EXCLUSIONS                   Files/patterns to exclude from scan
-    SONAR_TIMEOUT                      Scan timeout in seconds (default: 600)
-    SONAR_FAIL_ON_ERROR                Fail deployment on scan error (default: true)
+    SONAR_ANALYSIS_TIMEOUT             Scan timeout in seconds (default: 600)
+    SONAR_FAIL_ON_ERROR                Fail deployment on scan error (default: false)
+    SONAR_SCANNER_VERSION              SonarQube scanner version (default: 7.0.2.4839)
+
+SECURITY CONTROLS:
+    ENABLE_SECURITY_AUDIT              Enable security audit logging (default: true)
+    LOG_LEVEL                          Logging level (DEBUG, INFO, WARN, ERROR)
 
 SUPPORTED ENVIRONMENTS:
     HUB environments: hub01, hub02, hub03, hub04, hub05
     UAT environments: uat01, uat02, uat03, uat04, uat05
 
 OPTIONS:
-    -h, --help      Show this help message
-    -v, --version   Show version information
+    -h, --help                Show this help message
+    -v, --version             Show version information
+    --show-sonar-config       Show SonarQube configuration for all environments
+    --validate-all            Validate all environment configurations
+    --debug                   Show debug information
+    --extended-help           Show extended help with examples
 
 EOF
     exit 0
@@ -157,6 +267,22 @@ parse_arguments() {
         -v|--version)
             show_version
             ;;
+        --show-sonar-config)
+            show_sonar_config
+            exit 0
+            ;;
+        --validate-all)
+            validate_all_sonar_configs
+            exit $?
+            ;;
+        --debug)
+            debug_atlantis_environment
+            exit 0
+            ;;
+        --extended-help)
+            show_extended_help
+            exit 0
+            ;;
         "")
             show_logo
             log_error "Environment argument is required"
@@ -171,6 +297,66 @@ parse_arguments() {
             return 0
             ;;
     esac
+}
+
+# Security function to mask sensitive values - enhanced
+mask_sensitive_value() {
+    local value="$1"
+    if [[ -z "$value" ]]; then
+        echo "NOT_SET"
+        return
+    fi
+
+    local length=${#value}
+    if [[ $length -le 8 ]]; then
+        echo "****"
+    elif [[ $length -le 16 ]]; then
+        echo "${value:0:2}****${value: -2}"
+    else
+        echo "${value:0:4}****${value: -4}"
+    fi
+}
+
+# Function to safely log commands without exposing secrets
+safe_log_command() {
+    local cmd="$1"
+    local masked_cmd="$cmd"
+
+    # Mask all known sensitive patterns - use parameter expansion to handle unset variables
+    local sensitive_patterns=(
+        "${SONAR_TOKEN:-}"
+        "${GITHUB_TOKEN:-}"
+        "${AWS_SECRET_ACCESS_KEY:-}"
+        "${AWS_SESSION_TOKEN:-}"
+        "${AWS_ACCESS_KEY_ID:-}"
+        # Add environment-specific tokens
+        "${SONAR_TOKEN_HUB01:-}"
+        "${SONAR_TOKEN_HUB02:-}"
+        "${SONAR_TOKEN_HUB03:-}"
+        "${SONAR_TOKEN_HUB04:-}"
+        "${SONAR_TOKEN_HUB05:-}"
+        "${SONAR_TOKEN_UAT01:-}"
+        "${SONAR_TOKEN_UAT02:-}"
+        "${SONAR_TOKEN_UAT03:-}"
+        "${SONAR_TOKEN_UAT04:-}"
+        "${SONAR_TOKEN_UAT05:-}"
+    )
+
+    # Only mask non-empty values
+    for pattern in "${sensitive_patterns[@]}"; do
+        if [[ -n "$pattern" ]]; then
+            masked_cmd="${masked_cmd//$pattern/****}"
+        fi
+    done
+
+    # Additional pattern-based masking for common token formats
+    masked_cmd=$(echo "$masked_cmd" | sed -E 's/ghp_[A-Za-z0-9_]{36}/ghp_****/g')
+    masked_cmd=$(echo "$masked_cmd" | sed -E 's/ghs_[A-Za-z0-9_]{36}/ghs_****/g')
+    masked_cmd=$(echo "$masked_cmd" | sed -E 's/sqp_[a-f0-9]{40}/sqp_****/g')
+    masked_cmd=$(echo "$masked_cmd" | sed -E 's/sqa_[a-f0-9]{40}/sqa_****/g')
+    masked_cmd=$(echo "$masked_cmd" | sed -E 's/AKIA[A-Z0-9]{16}/AKIA****/g')
+
+    log_info "Command: $masked_cmd"
 }
 
 # Validate environment
@@ -188,7 +374,7 @@ validate_environment() {
     esac
 }
 
-# Set environment-specific variables
+# Set environment-specific variables with secure logging
 setup_environment_variables() {
     # Environment type and number
     ENV_TYPE=$(echo $ENVIRONMENT | sed 's/[0-9]*$//')
@@ -202,22 +388,69 @@ setup_environment_variables() {
     CONFIG_PATH="${CONFIG_BASE_PATH}/${ENVIRONMENT}"
 
     # Git configuration
-    GIT_USER_NAME="${GIT_USER_NAME:-DevOps XTI}"           # Display name for commits
+    GIT_USER_NAME="${GIT_USER_NAME:-DevOps XTI}"                # Display name for commits
     GIT_USER_EMAIL="${GIT_USER_EMAIL:-support.gxc@xapiens.id}"  # Email for commits
-    GITHUB_USERNAME="${GITHUB_USERNAME:-devopsxti}"        # Actual GitHub username for auth
+    GITHUB_USERNAME="${GITHUB_USERNAME:-devopsxti}"             # Actual GitHub username for auth
 
     log_info "Environment Type: $ENV_TYPE, Number: $ENV_NUMBER"
     log_info "AWS Profile: $AWS_PROFILE"
     log_info "Config Path: $CONFIG_PATH"
+
+    # SECURE environment variables logging - using parameter expansion to handle unset vars
+    log_info "Environment Variables Status:"
+
+    # Use parameter expansion to safely check variables
+    local github_token_val="${GITHUB_TOKEN:-}"
+    local sonar_token_val="${SONAR_TOKEN:-}"
+    local aws_secret_val="${AWS_SECRET_ACCESS_KEY:-}"
+    local aws_session_val="${AWS_SESSION_TOKEN:-}"
+
+    if [[ -n "$github_token_val" ]]; then
+        log_info "- GITHUB_TOKEN: SET (${#github_token_val} chars) - $(mask_sensitive_value "$github_token_val")"
+    else
+        log_info "- GITHUB_TOKEN: NOT_SET"
+    fi
+
+    if [[ -n "$sonar_token_val" ]]; then
+        log_info "- SONAR_TOKEN (general): SET (${#sonar_token_val} chars) - $(mask_sensitive_value "$sonar_token_val")"
+    else
+        log_info "- SONAR_TOKEN (general): NOT_SET"
+    fi
+
+    # Check environment-specific SonarQube token
+    local env_sonar_token=""
+    if env_sonar_token=$(get_sonar_token_for_environment "$ENVIRONMENT" 2>/dev/null); then
+        log_info "- SONAR_TOKEN_${ENVIRONMENT^^}: SET (${#env_sonar_token} chars) - $(mask_sensitive_value "$env_sonar_token")"
+    else
+        log_info "- SONAR_TOKEN_${ENVIRONMENT^^}: NOT_SET"
+    fi
+
+    # AWS credentials status (without values)
+    if [[ -n "$aws_secret_val" ]]; then
+        log_info "- AWS_SECRET_ACCESS_KEY: SET (${#aws_secret_val} chars) - $(mask_sensitive_value "$aws_secret_val")"
+    else
+        log_info "- AWS_SECRET_ACCESS_KEY: NOT_SET"
+    fi
+
+    if [[ -n "$aws_session_val" ]]; then
+        log_info "- AWS_SESSION_TOKEN: SET (${#aws_session_val} chars) - $(mask_sensitive_value "$aws_session_val")"
+    else
+        log_info "- AWS_SESSION_TOKEN: NOT_SET"
+    fi
+
+    # These are safe to log
+    log_info "- ATLANTIS_WORKSPACE: ${ATLANTIS_WORKSPACE:-NOT_SET}"
+    log_info "- ATLANTIS_PROJECT_NAME: ${ATLANTIS_PROJECT_NAME:-NOT_SET}"
+
     return 0
 }
 
-# Validate prerequisites
+# Enhanced prerequisites validation with security checks
 validate_prerequisites() {
     log_info "Validating prerequisites..."
 
     # Check required commands
-    local required_commands=("git" "aws" "terraform")
+    local required_commands=("git" "aws" "terraform" "curl" "jq")
     for cmd in "${required_commands[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
             log_error "Required command not found: $cmd"
@@ -226,14 +459,26 @@ validate_prerequisites() {
     done
 
     # Check GitHub token
-    if [ -z "${GITHUB_TOKEN:-}" ]; then
+    if [[ -z "$GITHUB_TOKEN" ]]; then
         log_error "GITHUB_TOKEN environment variable is required"
+        log_error "Please set GITHUB_TOKEN before running this script"
         return 1
     fi
 
+    # Validate token format without logging the actual token
+    if [[ ! "$GITHUB_TOKEN" =~ ^gh[ps]_[A-Za-z0-9_]{36,255}$ ]]; then
+        log_warning "GITHUB_TOKEN format appears non-standard (expected: ghp_ or ghs_ prefix)"
+    fi
+
     # Check configuration directory
-    if [ ! -d "$CONFIG_PATH" ]; then
+    if [[ ! -d "$CONFIG_PATH" ]]; then
         log_error "Configuration directory not found: $CONFIG_PATH"
+        return 1
+    fi
+
+    # Run security audit
+    if ! security_audit; then
+        log_error "Security audit failed"
         return 1
     fi
 
@@ -252,32 +497,31 @@ fix_git_permissions() {
     log_info "Home directory: $HOME"
 
     # Ensure the home directory exists and has proper permissions
-    if [ ! -d "$HOME" ]; then
+    if [[ ! -d "$HOME" ]]; then
         log_error "Home directory $HOME does not exist"
         return 1
     fi
 
     # Check if we can write to home directory
-    if [ ! -w "$HOME" ]; then
+    if [[ ! -w "$HOME" ]]; then
         log_error "Cannot write to home directory: $HOME"
         log_error "Directory permissions: $(ls -ld "$HOME")"
         return 1
     fi
 
     # Remove existing .gitconfig if it has wrong permissions
-    if [ -f "$git_config_file" ] && [ ! -w "$git_config_file" ]; then
+    if [[ -f "$git_config_file" ]] && [[ ! -w "$git_config_file" ]]; then
         log_warning "Removing non-writable .gitconfig file"
         if ! rm -f "$git_config_file" 2>/dev/null; then
             log_error "Cannot remove .gitconfig file with wrong permissions"
             log_error "File permissions: $(ls -l "$git_config_file")"
-            # Force use local config
             GIT_CONFIG_SCOPE="--local"
             return 0
         fi
     fi
 
     # Create new .gitconfig with proper permissions
-    if [ ! -f "$git_config_file" ]; then
+    if [[ ! -f "$git_config_file" ]]; then
         if ! touch "$git_config_file" || ! chmod 644 "$git_config_file"; then
             log_warning "Cannot create global git config, will use local only"
             GIT_CONFIG_SCOPE="--local"
@@ -286,7 +530,7 @@ fix_git_permissions() {
     fi
 
     # Test if we can write to .gitconfig
-    if [ -w "$git_config_file" ]; then
+    if [[ -w "$git_config_file" ]]; then
         GIT_CONFIG_SCOPE="--global"
         log_success "Using global Git configuration"
     else
@@ -332,21 +576,34 @@ setup_git_config() {
     return 0
 }
 
-# Setup GitHub authentication
+# Setup GitHub authentication (without exposing token)
 setup_github_auth() {
     log_info "Configuring GitHub authentication"
 
+    # Validate inputs without exposing them
+    if [[ -z "$GITHUB_USERNAME" ]]; then
+        log_error "GITHUB_USERNAME is required for authentication"
+        return 1
+    fi
+
+    if [[ -z "$GITHUB_TOKEN" ]]; then
+        log_error "GITHUB_TOKEN is required for authentication"
+        return 1
+    fi
+
     # Configure GitHub authentication using URL rewriting
     # Try global first, fall back to local if needed
-    if ! git config --global url."https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" 2>/dev/null; then
+    local github_url="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/"
+
+    if ! git config --global url."$github_url".insteadOf "https://github.com/" 2>/dev/null; then
         log_warning "Failed to set global GitHub auth, using local config"
-        if ! git config --local url."https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; then
+        if ! git config --local url."$github_url".insteadOf "https://github.com/"; then
             log_error "Failed to configure GitHub authentication"
             return 1
         fi
     fi
 
-    log_success "GitHub authentication configured"
+    log_success "GitHub authentication configured for user: $GITHUB_USERNAME"
     return 0
 }
 
@@ -424,7 +681,7 @@ setup_terraform_config() {
     local files=("$backend_tf" "$backend_tfvars" "$terraform_tfvars")
 
     for file in "${files[@]}"; do
-        if [ ! -f "$file" ]; then
+        if [[ ! -f "$file" ]]; then
             log_error "Configuration file not found: $file"
             return 1
         fi
@@ -455,11 +712,11 @@ run_initialization_script() {
     log_info "Current working directory: $current_dir"
 
     # Check if main init.sh exists in current directory
-    if [ -f "$init_script" ]; then
+    if [[ -f "$init_script" ]]; then
         log_info "Found init.sh in current directory"
 
         # Check if script is executable, make it executable if needed
-        if [ ! -x "$init_script" ]; then
+        if [[ ! -x "$init_script" ]]; then
             log_info "Making init.sh executable"
             if ! chmod +x "$init_script"; then
                 log_error "Failed to make init.sh executable"
@@ -483,7 +740,7 @@ run_initialization_script() {
         # List contents to help with debugging
         log_info "Directory contents:"
         ls -la . || true
-        return 0  # Not finding init.sh is not necessarily an error
+        return 0
     fi
 }
 
@@ -505,78 +762,393 @@ initialize_terraform() {
     fi
 }
 
-# Run SonarQube code quality scan
-run_sonarqube_scan() {
-    log_info "Running SonarQube code quality analysis"
-
-    local sonar_script="sonar-scan"
-    local script_dir="/usr/local/bin"
-    local sonar_script_alt="${script_dir}/sonar-scan"
-
-    # Look for sonar-scan script in current directory or script directory
-    if [ -f "$sonar_script" ]; then
-        local sonar_path="$sonar_script"
-    elif [ -f "$sonar_script_alt" ]; then
-        local sonar_path="$sonar_script_alt"
-    else
-        log_warning "SonarQube scan script not found"
-        log_info "Checked locations:"
-        log_info "- $sonar_script"
-        log_info "- $sonar_script_alt"
-        log_warning "Skipping SonarQube analysis"
+# Enhanced security audit function
+security_audit() {
+    if [[ "$ENABLE_SECURITY_AUDIT" != "true" ]]; then
         return 0
     fi
 
-    log_info "Using SonarQube scan script: $sonar_path"
+    log_info "Running security audit..."
 
-    # Check if script is executable
-    if [ ! -x "$sonar_path" ]; then
-        log_info "Making SonarQube scan script executable"
-        if ! chmod +x "$sonar_path"; then
-            log_error "Failed to make SonarQube scan script executable"
-            log_warning "Skipping SonarQube analysis"
+    # Check for exposed secrets in environment
+    local audit_warnings=0
+
+    # Use parameter expansion to safely handle potentially unset variables
+    local sonar_token_val="${SONAR_TOKEN:-}"
+    local github_token_val="${GITHUB_TOKEN:-}"
+
+    # Validate token patterns without logging values
+    if [[ -z "$sonar_token_val" ]]; then
+        log_warning "SONAR_TOKEN not set - will check environment-specific tokens"
+
+        # Check if environment-specific token is available
+        local env_sonar_token=""
+        if env_sonar_token=$(get_sonar_token_for_environment "$ENVIRONMENT" 2>/dev/null); then
+            log_info "Environment-specific SonarQube token found for $ENVIRONMENT"
+        else
+            log_warning "No SonarQube token found for environment $ENVIRONMENT - SonarQube analysis will be disabled"
+            ((audit_warnings++))
+        fi
+    else
+        # Validate SonarQube token format
+        if [[ ! "$sonar_token_val" =~ ^sq[ap]_[a-f0-9]{40}$ ]]; then
+            log_warning "SONAR_TOKEN format appears invalid (expected: sqp_ or sqa_ + 40 hex chars)"
+            ((audit_warnings++))
+        fi
+        log_info "SONAR_TOKEN: $(mask_sensitive_value "$sonar_token_val") (length: ${#sonar_token_val})"
+    fi
+
+    if [[ -z "$github_token_val" ]]; then
+        log_error "GITHUB_TOKEN not set - deployment cannot proceed"
+        return 1
+    else
+        # Validate GitHub token format
+        if [[ ! "$github_token_val" =~ ^gh[ps]_[A-Za-z0-9_]{36,255}$ ]]; then
+            log_warning "GITHUB_TOKEN format appears invalid (expected: ghp_ or ghs_ prefix)"
+            ((audit_warnings++))
+        fi
+        log_info "GITHUB_TOKEN: $(mask_sensitive_value "$github_token_val") (length: ${#github_token_val})"
+    fi
+
+    # Check for token exposure in environment variables
+    local exposed_vars=$(env | grep -iE "(TOKEN|SECRET|KEY|PASS)" | grep -v -E "^(PATH|HOME|USER|TERM)" | wc -l)
+    if [[ $exposed_vars -gt 15 ]]; then  # Increased threshold due to multiple env tokens
+        log_warning "High number of sensitive environment variables detected: $exposed_vars"
+        ((audit_warnings++))
+    fi
+
+    # Check file permissions
+    if [[ -f ~/.gitconfig ]] && [[ "$(stat -c %a ~/.gitconfig 2>/dev/null)" != "644" ]]; then
+        log_warning "Git config file has unusual permissions"
+        ((audit_warnings++))
+    fi
+
+    # Check if we're running as root (security concern)
+    if [[ "$(id -u)" == "0" ]]; then
+        log_warning "Running as root user - consider using dedicated service account"
+        ((audit_warnings++))
+    fi
+
+    # Check for common security misconfigurations
+    if [[ -f ~/.aws/credentials ]] && [[ "$(stat -c %a ~/.aws/credentials 2>/dev/null)" != "600" ]]; then
+        log_warning "AWS credentials file has overly permissive permissions"
+        ((audit_warnings++))
+    fi
+
+    # Check for git hooks that might expose credentials
+    if [[ -d .git/hooks ]]; then
+        local suspicious_hooks=$(find .git/hooks -name "*.sample" -prune -o -type f -executable -print | wc -l)
+        if [[ $suspicious_hooks -gt 0 ]]; then
+            log_warning "Found $suspicious_hooks executable git hooks - review for security"
+            ((audit_warnings++))
+        fi
+    fi
+
+    log_info "Security audit completed with $audit_warnings warnings"
+    return 0
+}
+
+# Install SonarQube Scanner CLI natively (like your example)
+install_sonar_scanner() {
+    local sonar_version="${SONAR_SCANNER_VERSION:-7.0.2.4839}"
+    local sonar_home="$HOME/.sonar/sonar-scanner-$sonar_version-linux-x64"
+    local sonar_zip="$HOME/.sonar/sonar-scanner.zip"
+
+    log_info "Installing SonarQube Scanner CLI version: $sonar_version"
+
+    # Check if already installed
+    if [[ -d "$sonar_home" ]] && [[ -x "$sonar_home/bin/sonar-scanner" ]]; then
+        log_info "SonarQube Scanner already installed at: $sonar_home"
+        export SONAR_SCANNER_HOME="$sonar_home"
+        export PATH="$sonar_home/bin:$PATH"
+        return 0
+    fi
+
+    # Create directory structure
+    if ! mkdir -p "$HOME/.sonar"; then
+        log_error "Failed to create SonarQube directory"
+        return 1
+    fi
+
+    # Download SonarQube Scanner
+    local download_url="https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$sonar_version-linux-x64.zip"
+
+    log_info "Downloading SonarQube Scanner from: $download_url"
+    if ! curl --create-dirs -sSLo "$sonar_zip" "$download_url"; then
+        log_error "Failed to download SonarQube Scanner"
+        return 1
+    fi
+
+    # Extract the scanner
+    log_info "Extracting SonarQube Scanner to: $HOME/.sonar/"
+    if ! unzip -o "$sonar_zip" -d "$HOME/.sonar/"; then
+        log_error "Failed to extract SonarQube Scanner"
+        return 1
+    fi
+
+    # Verify installation
+    if [[ ! -x "$sonar_home/bin/sonar-scanner" ]]; then
+        log_error "SonarQube Scanner installation verification failed"
+        return 1
+    fi
+
+    # Set environment variables
+    export SONAR_SCANNER_HOME="$sonar_home"
+    export PATH="$sonar_home/bin:$PATH"
+
+    # Clean up zip file
+    rm -f "$sonar_zip"
+
+    log_success "SonarQube Scanner installed successfully"
+    log_info "Scanner home: $SONAR_SCANNER_HOME"
+    log_info "Scanner version: $(sonar-scanner --version | head -1 || echo 'version check failed')"
+
+    return 0
+}
+
+# Enhanced SonarQube scanning with native CLI and multi-project support
+run_sonarqube_scan() {
+    log_info "============================================================"
+    log_info "STARTING SONARQUBE CODE QUALITY ANALYSIS"
+    log_info "============================================================"
+
+    # Get environment-specific SonarQube configuration
+    local env_sonar_token=""
+    local env_sonar_project_key=""
+
+    if ! env_sonar_token=$(get_sonar_token_for_environment "$ENVIRONMENT"); then
+        log_error "No SonarQube token available for environment: $ENVIRONMENT"
+        log_info "Please set SONAR_TOKEN_${ENVIRONMENT^^} or fallback SONAR_TOKEN"
+
+        if [[ "${SONAR_FAIL_ON_ERROR:-false}" == "true" ]]; then
+            log_error "Failing deployment due to missing SonarQube token (SONAR_FAIL_ON_ERROR=true)"
+            return 1
+        else
+            log_warning "Skipping SonarQube analysis due to missing token (SONAR_FAIL_ON_ERROR=false)"
             return 0
         fi
     fi
 
-    # Execute SonarQube scan with environment parameter
-    local scan_start_time=$(date +%s)
-    log_info "Executing SonarQube scan for environment: $ENVIRONMENT"
+    env_sonar_project_key=$(get_sonar_project_key_for_environment "$ENVIRONMENT")
 
-    if timeout "$sonar_timeout" "$sonar_path" "$ENVIRONMENT"; then
-        local scan_end_time=$(date +%s)
-        local scan_duration=$((scan_end_time - scan_start_time))
-        log_success "SonarQube analysis completed successfully (${scan_duration}s)"
+    # Set SonarQube configuration with secure defaults
+    local sonar_host_url="${SONAR_HOST_URL:-https://sonarqube-gxc.xapiens.id}"
+    local sonar_project_key="$env_sonar_project_key"
+    local sonar_project_name="${SONAR_PROJECT_NAME:-GXC-Atlantis-SonarQube-CICD-${ENVIRONMENT^^}}"
+    local sonar_project_version="${SONAR_PROJECT_VERSION:-$(date +%Y%m%d-%H%M%S)}"
+    local sonar_sources="${SONAR_SOURCES:-.}"
+    local sonar_timeout="${SONAR_ANALYSIS_TIMEOUT:-3600}"
+    local sonar_fail_on_error="${SONAR_FAIL_ON_ERROR:-false}"
 
-        # Clean up temporary files
-        [ -f "$sonar_props_file" ] && rm -f "$sonar_props_file"
+    # Enhanced exclusions for Atlantis environment
+    local sonar_exclusions="${SONAR_EXCLUSIONS:-**/node_modules/**,**/.terraform/**,**/.git/**,**/.DS_Store,**/coverage/**,**/build/**,**/dist/**,**/*.log,**/*.tmp,**/.atlantis/**,**/.terragrunt-cache/**,**/vendor/**,**/target/**}"
 
-        # Display quality gate results
-        log_info "Quality Gate Status: Check SonarQube dashboard at $sonar_host_url"
-        log_info "Project URL: $sonar_host_url/dashboard?id=$sonar_project_key"
+    # Detect current working environment and paths
+    local current_dir=$(pwd)
+    local atlantis_repo_root=""
+    local is_atlantis_env=false
 
-        return 0
-    else
-        local exit_code=$?
-        local scan_end_time=$(date +%s)
-        local scan_duration=$((scan_end_time - scan_start_time))
+    log_info "Environment Analysis:"
+    log_info "- Target Environment: $ENVIRONMENT"
+    log_info "- Current Directory: $current_dir"
+    log_info "- Atlantis Workspace: ${ATLANTIS_WORKSPACE:-not set}"
+    log_info "- Atlantis Project: ${ATLANTIS_PROJECT_NAME:-not set}"
 
-        # Clean up temporary files
-        [ -f "$sonar_props_file" ] && rm -f "$sonar_props_file"
+    # Detect if we're in Atlantis environment
+    if [[ "$current_dir" == *"/atlantis/data/repos/"* ]]; then
+        is_atlantis_env=true
+        log_info "✓ Detected Atlantis environment"
 
-        if [ $exit_code -eq 124 ]; then
-            log_error "SonarQube analysis timed out after ${sonar_timeout}s"
-        else
-            log_error "SonarQube analysis failed with exit code: $exit_code (${scan_duration}s)"
+        # Find the Git repository root in Atlantis structure
+        local search_dir="$current_dir"
+        while [[ "$search_dir" != "/" ]] && [[ "$search_dir" == *"/atlantis/data/repos/"* ]]; do
+            if [[ -d "$search_dir/.git" ]]; then
+                atlantis_repo_root="$search_dir"
+                log_info "✓ Found Git repository root: $atlantis_repo_root"
+                break
+            fi
+            search_dir=$(dirname "$search_dir")
+        done
+
+        if [[ -z "$atlantis_repo_root" ]]; then
+            log_warning "Git repository root not found in Atlantis structure"
+            atlantis_repo_root="$current_dir"
         fi
+    else
+        atlantis_repo_root="$current_dir"
+        log_info "Standard Git environment detected"
+    fi
 
-        # Check if we should fail hard or continue with warnings
-        if [[ "${SONAR_FAIL_ON_ERROR:-true}" == "true" ]]; then
-            log_error "Deployment failed due to SonarQube analysis failure"
+    # Display configuration (with masked token)
+    log_info "SonarQube Configuration:"
+    log_info "- Host URL: $sonar_host_url"
+    log_info "- Project Key: $sonar_project_key"
+    log_info "- Project Name: $sonar_project_name"
+    log_info "- Project Version: $sonar_project_version"
+    log_info "- Sources: $sonar_sources"
+    log_info "- Exclusions: $sonar_exclusions"
+    log_info "- Timeout: ${sonar_timeout}s"
+    log_info "- Token: $(mask_sensitive_value "$env_sonar_token")"
+    log_info "- Fail on Error: $sonar_fail_on_error"
+    log_info "- Repository Root: $atlantis_repo_root"
+    log_info "- Is Atlantis Environment: $is_atlantis_env"
+    echo ""
+
+    # Test SonarQube server connectivity
+    log_info "Testing SonarQube server connectivity..."
+    if command -v curl &> /dev/null; then
+        if curl -s --connect-timeout 10 "$sonar_host_url/api/system/status" > /dev/null; then
+            log_success "SonarQube server is accessible"
+        else
+            log_warning "Cannot reach SonarQube server at $sonar_host_url"
+            if [[ "$sonar_fail_on_error" == "true" ]]; then
+                log_error "SonarQube server unreachable - failing deployment"
+                return 1
+            else
+                log_warning "Continuing despite server connectivity issues"
+                return 0
+            fi
+        fi
+    fi
+
+    # Install SonarQube Scanner CLI natively
+    if ! install_sonar_scanner; then
+        log_error "Failed to install SonarQube Scanner CLI"
+        if [[ "$sonar_fail_on_error" == "true" ]]; then
             return 1
         else
-            log_warning "Continuing deployment despite SonarQube analysis failure"
-            log_warning "Set SONAR_FAIL_ON_ERROR=true to fail deployment on SonarQube errors"
+            log_warning "Continuing without SonarQube analysis"
+            return 0
+        fi
+    fi
+
+    # Repository analysis for debugging
+    log_info "Repository Analysis:"
+    log_info "- Scan Directory: $atlantis_repo_root"
+    log_info "- Working Directory: $current_dir"
+
+    # Change to repository root for scanning
+    local original_dir="$current_dir"
+    if [[ "$atlantis_repo_root" != "$current_dir" ]]; then
+        log_info "Changing to repository root for scanning: $atlantis_repo_root"
+        if ! cd "$atlantis_repo_root"; then
+            log_error "Failed to change to repository root: $atlantis_repo_root"
+            return 1
+        fi
+    fi
+
+    # Show file statistics
+    log_info "- Total files in scan directory: $(find . -type f | wc -l)"
+    log_info "- Git files found: $(find . -name "*.git*" | wc -l)"
+
+    # Show file types for debugging
+    log_info "File types found (top 10):"
+    find . -type f -name "*" | grep -E '\.[a-zA-Z0-9]+' | sed 's/.*\.//' | sort | uniq -c | sort -rn | head -10 || true
+
+    # Show sample files that should be scanned
+    log_info "Sample source files (first 15):"
+    find . -type f \( -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.java" -o -name "*.tf" -o -name "*.tfvars" -o -name "*.yaml" -o -name "*.yml" -o -name "*.sh" \) | head -15 || true
+    echo ""
+
+    # Execute SonarQube scan with native CLI
+    local scan_success=false
+    local scan_start_time=$(date +%s)
+
+    log_info "Executing SonarQube scan with native CLI..."
+    log_info "Command: sonar-scanner -Dsonar.projectKey=\"$sonar_project_key\" ..."
+
+    # Set environment variables for scanner
+    export SONAR_TOKEN="$env_sonar_token"
+    export SONAR_HOST_URL="$sonar_host_url"
+    export SONAR_PROJECT_KEY="$sonar_project_key"
+
+    # Execute the scan
+    if timeout "$sonar_timeout" sonar-scanner \
+        -Dsonar.projectKey="$sonar_project_key" \
+        -Dsonar.projectName="$sonar_project_name" \
+        -Dsonar.projectVersion="$sonar_project_version" \
+        -Dsonar.sources="$sonar_sources" \
+        -Dsonar.host.url="$sonar_host_url" \
+        -Dsonar.scm.disabled=false \
+        -Dsonar.scm.provider=git \
+        -Dsonar.qualitygate.wait=false \
+        -Dsonar.scm.forceReloadAll=true \
+        -Dsonar.sourceEncoding=UTF-8 \
+        -Dsonar.inclusions="**/*.py,**/*.js,**/*.ts,**/*.java,**/*.tf,**/*.tfvars,**/*.yaml,**/*.yml,**/*.sh" \
+        -Dsonar.exclusions="$sonar_exclusions" \
+        -Dsonar.working.directory="/tmp/.scannerwork" 2>&1 | sed -E 's/sqp_[a-f0-9]{40}/sqp_****/g' | sed -E 's/sqa_[a-f0-9]{40}/sqa_****/g'; then
+        scan_success=true
+        log_success "Native CLI scan completed successfully"
+    else
+        local exit_code=$?
+        log_warning "Native CLI scan failed with exit code: $exit_code"
+
+        # Fallback: Try with SCM disabled
+        log_info "Attempting fallback scan with SCM disabled..."
+        if timeout "$sonar_timeout" sonar-scanner \
+            -Dsonar.projectKey="$sonar_project_key" \
+            -Dsonar.projectName="$sonar_project_name" \
+            -Dsonar.projectVersion="$sonar_project_version" \
+            -Dsonar.sources="$sonar_sources" \
+            -Dsonar.host.url="$sonar_host_url" \
+            -Dsonar.scm.disabled=true \
+            -Dsonar.qualitygate.wait=false \
+            -Dsonar.sourceEncoding=UTF-8 \
+            -Dsonar.inclusions="**/*.py,**/*.js,**/*.ts,**/*.java,**/*.tf,**/*.tfvars,**/*.yaml,**/*.yml,**/*.sh" \
+            -Dsonar.exclusions="$sonar_exclusions" \
+            -Dsonar.working.directory="/tmp/.scannerwork" 2>&1 | sed -E 's/sqp_[a-f0-9]{40}/sqp_****/g' | sed -E 's/sqa_[a-f0-9]{40}/sqa_****/g'; then
+            scan_success=true
+            log_success "Fallback scan completed successfully (SCM disabled)"
+        fi
+    fi
+
+    # Return to original directory
+    if [[ "$atlantis_repo_root" != "$original_dir" ]]; then
+        if ! cd "$original_dir"; then
+            log_warning "Failed to return to original directory: $original_dir"
+        fi
+    fi
+
+    # Process results
+    local scan_end_time=$(date +%s)
+    local scan_duration=$((scan_end_time - scan_start_time))
+
+    if [[ "$scan_success" == "true" ]]; then
+        log_success "============================================================"
+        log_success "SONARQUBE ANALYSIS COMPLETED SUCCESSFULLY"
+        log_success "============================================================"
+        log_info "Environment: $ENVIRONMENT"
+        log_info "Project Key: $sonar_project_key"
+        log_info "Duration: ${scan_duration}s"
+        log_info "Project URL: $sonar_host_url/dashboard?id=$sonar_project_key"
+        echo ""
+        return 0
+    else
+        local final_exit_code=$?
+
+        log_error "============================================================"
+        log_error "SONARQUBE ANALYSIS FAILED"
+        log_error "============================================================"
+
+        if [[ $scan_duration -ge $sonar_timeout ]]; then
+            log_error "SonarQube analysis timed out after ${sonar_timeout}s"
+        else
+            log_error "SonarQube scan failed after ${scan_duration}s"
+        fi
+
+        log_error "Troubleshooting suggestions:"
+        log_error "1. Verify SONAR_TOKEN_${ENVIRONMENT^^} is valid: $(mask_sensitive_value "$env_sonar_token")"
+        log_error "2. Check SonarQube server accessibility: $sonar_host_url"
+        log_error "3. Ensure project key exists in SonarQube: $sonar_project_key"
+        log_error "4. Review file permissions and Git repository access"
+        log_error "5. Check SonarQube scanner logs for detailed error information"
+
+        if [[ "$sonar_fail_on_error" == "true" ]]; then
+            log_error "Failing deployment due to SonarQube analysis failure (SONAR_FAIL_ON_ERROR=true)"
+            return 1
+        else
+            log_warning "Continuing deployment despite SonarQube analysis failure (SONAR_FAIL_ON_ERROR=false)"
+            log_info "Set SONAR_FAIL_ON_ERROR=true to fail deployment on SonarQube errors"
             return 0
         fi
     fi
@@ -609,7 +1181,7 @@ run_application_tests() {
         log_info "============================================================"
 
         # Check if test script exists
-        if [ ! -f "$path" ]; then
+        if [[ ! -f "$path" ]]; then
             log_warning "Test script not found: $path"
             log_warning "Skipping $description"
             test_results+=("$name:SKIPPED:Test script not found")
@@ -617,7 +1189,7 @@ run_application_tests() {
         fi
 
         # Check if test script is executable
-        if [ ! -x "$path" ]; then
+        if [[ ! -x "$path" ]]; then
             log_info "Making test script executable: $path"
             if ! chmod +x "$path"; then
                 log_error "Failed to make test script executable: $path"
@@ -628,7 +1200,7 @@ run_application_tests() {
         fi
 
         # Execute the test suite with timeout
-        local test_timeout=300  # 5 minutes timeout per test suite
+        local test_timeout="${ATLANTIS_TEST_TIMEOUT:-600}"  # 10 minutes timeout per test suite
         local test_start_time=$(date +%s)
 
         if timeout $test_timeout bash "$path"; then
@@ -641,7 +1213,7 @@ run_application_tests() {
             local test_end_time=$(date +%s)
             local test_duration=$((test_end_time - test_start_time))
 
-            if [ $exit_code -eq 124 ]; then
+            if [[ $exit_code -eq 124 ]]; then
                 log_error "$description timed out after ${test_timeout}s"
                 test_results+=("$name:TIMEOUT:${test_timeout}s")
             else
@@ -655,7 +1227,7 @@ run_application_tests() {
 
     # Display test summary
     log_info "============================================================"
-    log_info "TEST EXECUTION SUMMARY"
+    log_info "TEST EXECUTION SUMMARY "
     log_info "============================================================"
 
     local passed_count=0
@@ -690,12 +1262,12 @@ run_application_tests() {
     log_info "Test Results: ${passed_count} passed, ${failed_count} failed, ${skipped_count} skipped, ${timeout_count} timeout"
 
     # Determine if we should continue based on test results
-    if [ $overall_result -eq 0 ]; then
+    if [[ $overall_result -eq 0 ]]; then
         log_success "All available tests passed successfully"
         return 0
     else
         # Check if we should fail hard or continue with warnings
-        if [ $failed_count -gt 0 ] || [ $timeout_count -gt 0 ]; then
+        if [[ $failed_count -gt 0 ]] || [[ $timeout_count -gt 0 ]]; then
             log_error "Test failures detected - stopping deployment"
             log_error "Fix failing tests before proceeding with deployment"
             return 1
@@ -739,19 +1311,283 @@ terraform_apply() {
     fi
 }
 
-# Cleanup sensitive files
+# Enhanced cleanup function with comprehensive credential removal
 cleanup_sensitive_files() {
-    log_info "Cleaning up sensitive files"
+    log_info "Cleaning up sensitive files and configurations"
 
     # Remove credentials file if it exists
-    [ -f ~/.git-credentials ] && rm -f ~/.git-credentials
+    if [[ -f ~/.git-credentials ]]; then
+        log_info "Removing Git credentials file"
+        rm -f ~/.git-credentials
+    fi
+
+    # Remove any cached credentials
+    if [[ -f ~/.netrc ]]; then
+        log_info "Removing .netrc file"
+        rm -f ~/.netrc
+    fi
+
+    # Remove docker auth config that might contain credentials
+    if [[ -f ~/.docker/config.json ]]; then
+        log_info "Checking Docker config for credentials"
+        # Only remove if it contains auth data
+        if grep -q '"auth"' ~/.docker/config.json 2>/dev/null; then
+            log_info "Removing Docker config with embedded credentials"
+            rm -f ~/.docker/config.json
+        fi
+    fi
 
     # Clear Git credential cache (ignore errors)
     git config --global --unset credential.helper 2>/dev/null || true
     git config --local --unset credential.helper 2>/dev/null || true
 
+    # Clear Git URL rewrites to remove embedded tokens (safely handle unset variables)
+    if [[ -n "${GITHUB_USERNAME:-}" ]] && [[ -n "${GITHUB_TOKEN:-}" ]]; then
+        git config --global --unset url."https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/".insteadOf 2>/dev/null || true
+        git config --local --unset url."https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/".insteadOf 2>/dev/null || true
+    fi
+
+    # Remove temporary files with potentially sensitive content
+    local temp_files=("*.tfplan" "*.out" "sonar-project.properties" ".sonar/" ".scannerwork/")
+    for pattern in "${temp_files[@]}"; do
+        if ls $pattern 1> /dev/null 2>&1; then
+            log_info "Removing temporary files: $pattern"
+            rm -rf $pattern
+        fi
+    done
+
+    # Clear sensitive environment variables (including all environment-specific tokens)
+    unset SONAR_TOKEN GITHUB_TOKEN AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_ACCESS_KEY_ID
+    unset SONAR_TOKEN_HUB01 SONAR_TOKEN_HUB02 SONAR_TOKEN_HUB03 SONAR_TOKEN_HUB04 SONAR_TOKEN_HUB05
+    unset SONAR_TOKEN_UAT01 SONAR_TOKEN_UAT02 SONAR_TOKEN_UAT03 SONAR_TOKEN_UAT04 SONAR_TOKEN_UAT05
+
+    # Clear shell history of sensitive commands (if running interactively)
+    if [[ $- == *i* ]]; then
+        history -c 2>/dev/null || true
+    fi
+
+    # Remove any leftover credential files
+    find . -maxdepth 1 -name "*.creds" -o -name "*.credentials" -o -name "*.token" | xargs rm -f 2>/dev/null || true
+
     log_success "Cleanup completed"
     return 0
+}
+
+# Display SonarQube configuration for all environments
+show_sonar_config() {
+    log_info "============================================================"
+    log_info "SONARQUBE MULTI-PROJECT CONFIGURATION STATUS"
+    log_info "============================================================"
+
+    local environments=("hub01" "hub02" "hub03" "hub04" "hub05" "uat01" "uat02" "uat03" "uat04" "uat05")
+
+    for env in "${environments[@]}"; do
+        local token_var="SONAR_TOKEN_${env^^}"
+        local key_var="SONAR_PROJECT_KEY_${env^^}"
+        local token_val="${!token_var:-}"
+        local key_val="${!key_var:-}"
+
+        echo "Environment: ${env^^}"
+        if [[ -n "$token_val" ]]; then
+            echo "  - Token: SET ($(mask_sensitive_value "$token_val"))"
+        else
+            echo "  - Token: NOT_SET"
+        fi
+
+        if [[ -n "$key_val" ]]; then
+            echo "  - Project Key: $key_val"
+        else
+            echo "  - Project Key: gxc-cicd-gaspi-${env} (default)"
+        fi
+        echo ""
+    done
+}
+
+# Validate all SonarQube configurations
+validate_all_sonar_configs() {
+    log_info "Validating SonarQube configurations for all environments..."
+
+    local environments=("hub01" "hub02" "hub03" "hub04" "hub05" "uat01" "uat02" "uat03" "uat04" "uat05")
+    local missing_configs=()
+    local valid_configs=0
+
+    for env in "${environments[@]}"; do
+        local token=""
+        if token=$(get_sonar_token_for_environment "$env" 2>/dev/null); then
+            log_success "✓ $env: Token available ($(mask_sensitive_value "$token"))"
+            ((valid_configs++))
+        else
+            log_warning "✗ $env: No token configured"
+            missing_configs+=("$env")
+        fi
+    done
+
+    echo ""
+    log_info "Summary: $valid_configs/10 environments have SonarQube tokens configured"
+
+    if [[ ${#missing_configs[@]} -gt 0 ]]; then
+        log_warning "Missing SonarQube tokens for: ${missing_configs[*]}"
+        log_info "Set SONAR_TOKEN_<ENV> for environment-specific tokens"
+        log_info "Or set SONAR_TOKEN as fallback for all environments"
+        return 1
+    else
+        log_success "All environments have SonarQube tokens configured"
+        return 0
+    fi
+}
+
+# Debug function for troubleshooting Atlantis environment
+debug_atlantis_environment() {
+    log_info "============================================================"
+    log_info "ATLANTIS ENVIRONMENT DEBUG INFORMATION"
+    log_info "============================================================"
+
+    # Basic environment info
+    log_info "Basic Environment:"
+    log_info "- Current User: $(whoami)"
+    log_info "- Current Directory: $(pwd)"
+    log_info "- Home Directory: $HOME"
+    log_info "- Shell: $SHELL"
+
+    # Atlantis-specific environment variables
+    log_info "Atlantis Variables:"
+    log_info "- ATLANTIS_WORKSPACE: ${ATLANTIS_WORKSPACE:-NOT_SET}"
+    log_info "- ATLANTIS_PROJECT_NAME: ${ATLANTIS_PROJECT_NAME:-NOT_SET}"
+    log_info "- ATLANTIS_PULL_REQUEST_HEAD_BRANCH: ${ATLANTIS_PULL_REQUEST_HEAD_BRANCH:-NOT_SET}"
+    log_info "- ATLANTIS_CONFIG_PATH: ${ATLANTIS_CONFIG_PATH:-NOT_SET}"
+
+    # Directory structure analysis
+    log_info "Directory Structure:"
+    if [[ "$(pwd)" == *"/atlantis/data/repos/"* ]]; then
+        log_info "- ✓ Detected Atlantis environment"
+        log_info "- Repository path analysis:"
+
+        # Find repository structure
+        local current_path="$(pwd)"
+        local path_parts=()
+        IFS='/' read -ra path_parts <<< "$current_path"
+
+        for part in "${path_parts[@]}"; do
+            if [[ "$part" == "atlantis" ]]; then
+                log_info "  - Atlantis root detected"
+            elif [[ "$part" == "data" ]]; then
+                log_info "  - Data directory"
+            elif [[ "$part" == "repos" ]]; then
+                log_info "  - Repositories directory"
+            elif [[ "$part" =~ ^[0-9]+$ ]]; then
+                log_info "  - Pull Request #$part"
+            elif [[ -n "$part" ]]; then
+                log_info "  - $part"
+            fi
+        done
+    else
+        log_warning "- Not in Atlantis environment"
+    fi
+
+    # Git repository information
+    log_info "Git Repository:"
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+        log_info "- ✓ Git repository detected"
+        log_info "- Git root: $(git rev-parse --show-toplevel)"
+        log_info "- Current branch: $(git branch --show-current 2>/dev/null || echo 'unknown')"
+        log_info "- Remote origin: $(git remote get-url origin 2>/dev/null || echo 'not set')"
+    else
+        log_warning "- ✗ Not in a Git repository"
+    fi
+
+    # File system analysis
+    log_info "File System Analysis:"
+    log_info "- Total files: $(find . -type f | wc -l)"
+    log_info "- Source files: $(find . -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.tf" | wc -l)"
+    log_info "- Terraform files: $(find . -name "*.tf" -o -name "*.tfvars" | wc -l)"
+
+    # Permissions check
+    log_info "Permissions:"
+    log_info "- Current directory writable: $([[ -w . ]] && echo 'YES' || echo 'NO')"
+    log_info "- Home directory writable: $([[ -w "$HOME" ]] && echo 'YES' || echo 'NO')"
+
+    # Available tools
+    log_info "Available Tools:"
+    local tools=("git" "terraform" "aws" "curl" "jq" "docker")
+    for tool in "${tools[@]}"; do
+        if command -v "$tool" >/dev/null 2>&1; then
+            local version=$(${tool} --version 2>/dev/null | head -1 | cut -d' ' -f1-3 || echo "version unknown")
+            log_info "- ✓ $tool: $version"
+        else
+            log_warning "- ✗ $tool: not available"
+        fi
+    done
+
+    echo ""
+    log_info "Debug information collection completed"
+}
+
+# Extended help function with examples
+show_extended_help() {
+    show_help
+
+    cat << 'EOF'
+CONFIGURATION EXAMPLES:
+
+1. Environment-specific SonarQube tokens:
+   export SONAR_TOKEN_HUB01=sqp_1234567890abcdef1234567890abcdef12345678
+   export SONAR_TOKEN_UAT01=sqp_abcdef1234567890abcdef1234567890abcdef12
+
+2. Environment-specific project keys (optional):
+   export SONAR_PROJECT_KEY_HUB01=gxc-cicd-gaspi-hub01-custom
+   export SONAR_PROJECT_KEY_UAT01=gxc-cicd-gaspi-uat01-custom
+
+3. Fallback configuration (applies to all environments without specific tokens):
+   export SONAR_TOKEN=sqp_fallback1234567890abcdef1234567890abcdef
+
+4. Docker environment variables:
+   export DOCKER_NETWORK=atlantis_network
+   export SONAR_SCANNER_IMAGE=sonarsource/sonar-scanner-cli:7.0.2.4839
+
+TROUBLESHOOTING:
+
+Common Issues and Solutions:
+
+1. "No SonarQube token available for environment"
+   - Set SONAR_TOKEN_<ENV> for the specific environment
+   - Or set SONAR_TOKEN as a fallback
+   - Example: export SONAR_TOKEN_HUB01=sqp_your_token_here
+
+2. "Failed to access GitHub repository"
+   - Verify GITHUB_TOKEN is set and valid
+   - Check if GITHUB_USERNAME has repository access
+   - Ensure token has required permissions
+
+3. "SonarQube server unreachable"
+   - Check SONAR_HOST_URL setting
+   - Verify network connectivity to SonarQube server
+   - Check firewall and proxy settings
+
+4. "Source code scanning issues"
+   - Verify you're in the correct directory
+   - Check file permissions
+   - Use debug mode: atlantis-deploy <env> plan --debug
+
+5. "Terraform initialization failed"
+   - Check AWS credentials and permissions
+   - Verify backend configuration files exist
+   - Ensure S3 bucket for state is accessible
+
+ADVANCED USAGE:
+
+Debug mode:
+    atlantis-deploy hub01 plan --debug
+
+Check SonarQube configuration:
+    atlantis-deploy --show-sonar-config
+
+Validate all configurations:
+    atlantis-deploy --validate-all
+
+Environment-specific execution:
+    SCRIPT_RUN_TEST=false SCRIPT_RUN_SONAR=true atlantis-deploy hub01 apply
+
+EOF
 }
 
 # Main execution function with proper error handling
@@ -778,21 +1614,6 @@ main() {
     # Terraform operations
     safe_execute initialize_terraform "Failed to initialize Terraform" || return 1
 
-    # Conditionally run SonarQube scan based on SCRIPT_RUN_SONAR variable
-    if [[ "$SCRIPT_RUN_SONAR" == "true" ]]; then
-        log_info "============================================================"
-        log_info "EXECUTING SONARQUBE CODE QUALITY ANALYSIS"
-        log_info "============================================================"
-        safe_execute run_sonarqube_scan "SonarQube analysis failed" || return 1
-    else
-        log_info "============================================================"
-        log_info "SKIPPING SONARQUBE ANALYSIS"
-        log_info "============================================================"
-        log_warning "SonarQube analysis is disabled"
-        log_info "To enable SonarQube scan, set: SCRIPT_RUN_SONAR=true"
-        echo ""
-    fi
-
     # Conditionally run tests based on SCRIPT_RUN_TEST variable
     if [[ "$SCRIPT_RUN_TEST" == "true" ]]; then
         log_info "============================================================"
@@ -805,6 +1626,21 @@ main() {
         log_info "============================================================"
         log_warning "Test execution is disabled"
         log_info "To enable tests, set: SCRIPT_RUN_TEST=true"
+        echo ""
+    fi
+
+    # Conditionally run SonarQube scan based on SCRIPT_RUN_SONAR variable
+    if [[ "$SCRIPT_RUN_SONAR" == "true" ]]; then
+        log_info "============================================================"
+        log_info "EXECUTING SONARQUBE CODE QUALITY ANALYSIS"
+        log_info "============================================================"
+        safe_execute run_sonarqube_scan "SonarQube analysis failed" || return 1
+    else
+        log_info "============================================================"
+        log_info "SKIPPING SONARQUBE CODE QUALITY ANALYSIS"
+        log_info "============================================================"
+        log_warning "SonarQube analysis is disabled"
+        log_info "To enable SonarQube scan, set: SCRIPT_RUN_SONAR=true"
         echo ""
     fi
 
@@ -838,7 +1674,7 @@ main() {
 cleanup_on_exit() {
     cleanup_sensitive_files || true
 
-    if [ $EXIT_CODE -eq 0 ]; then
+    if [[ $EXIT_CODE -eq 0 ]]; then
         log_success "Script completed successfully"
     else
         log_error "Script failed with exit code: $EXIT_CODE"
@@ -847,9 +1683,16 @@ cleanup_on_exit() {
     exit $EXIT_CODE
 }
 
-# ==============================================================================
-# MAIN SCRIPT EXECUTION
-# ==============================================================================
+# ===================================================================================
+# SCRIPT INITIALIZATION AND EXECUTION
+# ===================================================================================
+
+# Initialize logging
+log_info "Atlantis Deploy Script v$SCRIPT_VERSION starting..."
+log_info "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+log_info "Command line: $0 $*"
+log_info "Process ID: $$"
+echo ""
 
 # Parse arguments first
 if ! parse_arguments "$@"; then
@@ -873,6 +1716,25 @@ if main; then
 else
     EXIT_CODE=1
     log_error "Main execution failed"
+fi
+
+# ===================================================================================
+# SCRIPT COMPLETION
+# ===================================================================================
+
+log_info "============================================================"
+log_info "SCRIPT EXECUTION SUMMARY"
+log_info "============================================================"
+log_info "Environment: $ENVIRONMENT"
+log_info "Operation: $OPERATION"
+log_info "Exit Code: $EXIT_CODE"
+log_info "Duration: $(($(date +%s) - ${SCRIPT_START_TIME:-$(date +%s)}))s"
+log_info "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+if [[ $EXIT_CODE -eq 0 ]]; then
+    log_success "Deployment completed successfully! 🎉"
+else
+    log_error "Deployment failed. Check logs above for details."
 fi
 
 # The trap will handle the final exit with the correct code

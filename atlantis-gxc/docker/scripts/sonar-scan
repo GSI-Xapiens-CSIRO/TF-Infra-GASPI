@@ -26,7 +26,7 @@ log_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 log_error() { echo -e "${RED}❌ $1${NC}" >&2; }
 
 # Script metadata
-SCRIPT_VERSION="1.0.0"
+SCRIPT_VERSION="1.1.0"
 SCRIPT_NAME="sonar-scan"
 SCRIPT_AUTHOR="GXC DevOps-Team"
 SCRIPT_EMAIL="support.gxc@xapiens.id"
@@ -159,21 +159,25 @@ parse_arguments() {
 setup_configuration() {
     # Set defaults based on environment if provided
     if [[ -n "$ENVIRONMENT" ]]; then
-        SONAR_PROJECT_KEY="${SONAR_PROJECT_KEY:-gxc-gaspi-${ENVIRONMENT}}"
-        SONAR_PROJECT_NAME="${SONAR_PROJECT_NAME:-GXC-GASPI-${ENVIRONMENT^^}}"
+        SONAR_PROJECT_KEY="${SONAR_PROJECT_KEY:-gxc-cicd-gaspi-${ENVIRONMENT}}"
+        SONAR_PROJECT_NAME="${SONAR_PROJECT_NAME:-GXC-Atlantis-SonarQube-CICD-${ENVIRONMENT^^}}"
     else
-        SONAR_PROJECT_KEY="${SONAR_PROJECT_KEY:-gxc-gaspi-default}"
-        SONAR_PROJECT_NAME="${SONAR_PROJECT_NAME:-GXC-GASPI-Default}"
+        SONAR_PROJECT_KEY="${SONAR_PROJECT_KEY:-gxc-cicd-gaspi}"
+        SONAR_PROJECT_NAME="${SONAR_PROJECT_NAME:-GXC-Atlantis-SonarQube-CICD}"
     fi
 
-   # Set other defaults - Update these with your actual SonarQube server details
-    SONAR_HOST_URL="${SONAR_HOST_URL:-http://your-sonarqube-server:9000}"
-    SONAR_TOKEN="${SONAR_TOKEN:-your_sonarqube_token}"
-    SONAR_PROJECT_VERSION="${SONAR_PROJECT_VERSION:-1.0.0}"
+    # Set other defaults
+    SONAR_HOST_URL="${SONAR_HOST_URL:-http://16.79.20.54:9000}"
+    SONAR_TOKEN="${SONAR_TOKEN:-sqp_073f88f3e94f00e6fbf78ad3c05c7d2a5ab283c9}"
+    SONAR_PROJECT_VERSION="${SONAR_PROJECT_VERSION:-1.1.0}"
     SONAR_SOURCES="${SONAR_SOURCES:-.}"
     SONAR_EXCLUSIONS="${SONAR_EXCLUSIONS:-**/*.tfvars,**/*.tf.example,**/node_modules/**,**/.terraform/**,**/.git/**,**/.DS_Store,**/coverage/**,**/build/**,**/dist/**}"
     SONAR_TIMEOUT="${SONAR_TIMEOUT:-600}"
     SONAR_FAIL_ON_ERROR="${SONAR_FAIL_ON_ERROR:-true}"
+
+    # Container settings
+    SONAR_SCANNER_CONTAINER="${SONAR_SCANNER_CONTAINER:-gxc_sonar_scanner}"
+    SONAR_SCANNER_IMAGE="${SONAR_SCANNER_IMAGE:-sonarsource/sonar-scanner-cli:latest}"
 
     # Validate required parameters
     if [[ -z "$SONAR_TOKEN" ]] || [[ "$SONAR_TOKEN" == "your_sonarqube_token" ]]; then
@@ -201,6 +205,7 @@ display_configuration() {
     log_info "- Timeout: ${SONAR_TIMEOUT}s"
     log_info "- Fail on Error: $SONAR_FAIL_ON_ERROR"
     log_info "- Working Directory: $(pwd)"
+    log_info "- Scanner Container: $SONAR_SCANNER_CONTAINER"
     echo ""
 }
 
@@ -210,17 +215,11 @@ validate_prerequisites() {
 
     # Check if Docker is available
     if ! command -v docker &> /dev/null; then
-        log_error "Docker is not available - SonarQube scan requires Docker"
+        log_error "Docker is required but not found"
         exit 1
     fi
 
-    # Check if Docker daemon is running
-    if ! docker info &> /dev/null; then
-        log_error "Docker daemon is not running - cannot execute SonarQube scan"
-        exit 1
-    fi
-
-    # Test SonarQube server connectivity (optional)
+    # Test SonarQube server connectivity
     if command -v curl &> /dev/null; then
         log_info "Testing SonarQube server connectivity..."
         if curl -s --connect-timeout 10 "$SONAR_HOST_URL/api/system/status" > /dev/null; then
@@ -239,6 +238,10 @@ create_sonar_properties() {
     local sonar_props_file="sonar-project.properties"
 
     log_info "Creating SonarQube project configuration: $sonar_props_file"
+
+    # Ensure we're in the right directory
+    local working_dir=$(pwd)
+    log_info "Working directory: $working_dir"
 
     cat > "$sonar_props_file" << EOF
 # SonarQube Project Configuration
@@ -272,40 +275,58 @@ sonar.buildString=$(date +%Y%m%d-%H%M%S)
 sonar.exclusions=$SONAR_EXCLUSIONS
 
 EOF
-
-    log_success "SonarQube configuration file created"
-    return 0
+    if [[ -f "$sonar_props_file" ]]; then
+        log_success "SonarQube configuration file created successfully"
+        log_info "Configuration file contents:"
+        echo "----------------------------------------"
+        cat "$sonar_props_file"
+        echo "----------------------------------------"
+        return 0
+    else
+        log_error "Failed to create SonarQube configuration file"
+        return 1
+    fi
 }
 
-# Run SonarQube scan
-run_sonar_scan() {
-    if [[ "$DRY_RUN" == "true" ]]; then
-        log_info "DRY RUN MODE - Would execute SonarQube scan with above configuration"
-        log_info "Docker command that would be executed:"
-        echo "docker run --rm \\"
-        echo "  -e SONAR_HOST_URL=\"$SONAR_HOST_URL\" \\"
-        echo "  -e SONAR_TOKEN=\"[REDACTED]\" \\"
-        echo "  -v \"$(pwd):/usr/src\" \\"
-        echo "  -w /usr/src \\"
-        echo "  sonarsource/sonar-scanner-cli"
-        return 0
-    fi
-
+# Run SonarQube scan using Docker
+run_sonar_scan_docker() {
     local scan_start_time=$(date +%s)
-    log_info "Starting SonarQube analysis..."
+    log_info "Starting SonarQube analysis using Docker..."
+
+    # Get current working directory
+    local current_dir=$(pwd)
+    log_info "Scanning directory: $current_dir"
 
     # Create properties file
-    create_sonar_properties
+    if ! create_sonar_properties; then
+        log_error "Failed to create SonarQube properties file"
+        return 1
+    fi
 
     # Prepare Docker command
     local docker_cmd=(
         docker run --rm
-        -e SONAR_HOST_URL="$SONAR_HOST_URL"
-        -e SONAR_TOKEN="$SONAR_TOKEN"
-        -v "$(pwd):/usr/src"
+        --name "sonar-scan-$$"
+        --network "atlantis_net"
+        -v "$current_dir:/usr/src"
         -w /usr/src
-        sonarsource/sonar-scanner-cli
+        -e "SONAR_HOST_URL=$SONAR_HOST_URL"
+        -e "SONAR_TOKEN=$SONAR_TOKEN"
+        -e "SONAR_SCANNER_OPTS=-Xmx2048m"
+        "$SONAR_SCANNER_IMAGE"
+        sonar-scanner
+        -Dsonar.projectKey="$SONAR_PROJECT_KEY"
+        -Dsonar.projectName="$SONAR_PROJECT_NAME"
+        -Dsonar.projectVersion="$SONAR_PROJECT_VERSION"
+        -Dsonar.sources="$SONAR_SOURCES"
+        -Dsonar.exclusions="$SONAR_EXCLUSIONS"
+        -Dsonar.host.url="$SONAR_HOST_URL"
+        -Dsonar.token="$SONAR_TOKEN"
     )
+
+    log_info "Executing Docker command:"
+    log_info "${docker_cmd[*]}"
+    echo ""
 
     # Execute scan with timeout
     if timeout "$SONAR_TIMEOUT" "${docker_cmd[@]}"; then
@@ -337,11 +358,112 @@ run_sonar_scan() {
 
         if [[ "$SONAR_FAIL_ON_ERROR" == "true" ]]; then
             log_error "Failing due to SonarQube scan error (SONAR_FAIL_ON_ERROR=true)"
-            exit 1
+            return 1
         else
             log_warning "Continuing despite SonarQube scan error (SONAR_FAIL_ON_ERROR=false)"
             return 0
         fi
+    fi
+}
+
+# Run SonarQube scan using existing container
+run_sonar_scan_container() {
+    local scan_start_time=$(date +%s)
+    log_info "Starting SonarQube analysis using existing container..."
+
+    # Check if container exists
+    if ! docker ps -a --format "table {{.Names}}" | grep -q "^$SONAR_SCANNER_CONTAINER$"; then
+        log_warning "Container $SONAR_SCANNER_CONTAINER not found, using Docker run method"
+        return run_sonar_scan_docker
+    fi
+
+    # Get current working directory
+    local current_dir=$(pwd)
+    log_info "Scanning directory: $current_dir"
+
+    # Create properties file
+    if ! create_sonar_properties; then
+        log_error "Failed to create SonarQube properties file"
+        return 1
+    fi
+
+    # Prepare Docker exec command
+    local docker_cmd=(
+        docker exec
+        -w /usr/src
+        -e "SONAR_HOST_URL=$SONAR_HOST_URL"
+        -e "SONAR_TOKEN=$SONAR_TOKEN"
+        -e "SONAR_SCANNER_OPTS=-Xmx2048m"
+        "$SONAR_SCANNER_CONTAINER"
+        sonar-scanner
+        -Dsonar.projectKey="$SONAR_PROJECT_KEY"
+        -Dsonar.projectName="$SONAR_PROJECT_NAME"
+        -Dsonar.projectVersion="$SONAR_PROJECT_VERSION"
+        -Dsonar.sources="$SONAR_SOURCES"
+        -Dsonar.exclusions="$SONAR_EXCLUSIONS"
+        -Dsonar.host.url="$SONAR_HOST_URL"
+        -Dsonar.token="$SONAR_TOKEN"
+    )
+
+    log_info "Executing Docker exec command:"
+    log_info "${docker_cmd[*]}"
+    echo ""
+
+    # Execute scan with timeout
+    if timeout "$SONAR_TIMEOUT" "${docker_cmd[@]}"; then
+        local scan_end_time=$(date +%s)
+        local scan_duration=$((scan_end_time - scan_start_time))
+        log_success "SonarQube analysis completed successfully (${scan_duration}s)"
+
+        # Display results
+        log_info "Quality Gate Status: Check SonarQube dashboard"
+        log_info "Project URL: $SONAR_HOST_URL/dashboard?id=$SONAR_PROJECT_KEY"
+
+        # Clean up
+        [ -f "sonar-project.properties" ] && rm -f "sonar-project.properties"
+
+        return 0
+    else
+        local exit_code=$?
+        local scan_end_time=$(date +%s)
+        local scan_duration=$((scan_end_time - scan_start_time))
+
+        # Clean up
+        [ -f "sonar-project.properties" ] && rm -f "sonar-project.properties"
+
+        if [ $exit_code -eq 124 ]; then
+            log_error "SonarQube analysis timed out after ${SONAR_TIMEOUT}s"
+        else
+            log_error "SonarQube analysis failed with exit code: $exit_code (${scan_duration}s)"
+        fi
+
+        if [[ "$SONAR_FAIL_ON_ERROR" == "true" ]]; then
+            log_error "Failing due to SonarQube scan error (SONAR_FAIL_ON_ERROR=true)"
+            return 1
+        else
+            log_warning "Continuing despite SonarQube scan error (SONAR_FAIL_ON_ERROR=false)"
+            return 0
+        fi
+    fi
+}
+
+# Main scan function
+run_sonar_scan() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_info "DRY RUN MODE - Configuration only"
+        create_sonar_properties
+        log_info "Would execute SonarQube scan with above configuration"
+        [ -f "sonar-project.properties" ] && rm -f "sonar-project.properties"
+        return 0
+    fi
+
+    # Try container method first, fall back to Docker run
+    if docker ps --format "table {{.Names}}" | grep -q "^$SONAR_SCANNER_CONTAINER$"; then
+        log_info "Using existing container: $SONAR_SCANNER_CONTAINER"
+        run_sonar_scan_container
+    else
+        log_info "Using Docker run method with image: $SONAR_SCANNER_IMAGE"
+        run_sonar_scan_docker
     fi
 }
 
@@ -353,7 +475,7 @@ main() {
     echo "================================================================"
     echo -e "${NC}"
     echo "Version: $SCRIPT_VERSION"
-    echo "Author: $SCRIPT_AUTHOR"
+    echo "Author:  $SCRIPT_AUTHOR"
     echo "Company: $SCRIPT_COMPANY"
     echo ""
 
