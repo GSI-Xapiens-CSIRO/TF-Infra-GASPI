@@ -848,7 +848,7 @@ security_audit() {
     return 0
 }
 
-# Install SonarQube Scanner CLI natively (like your example)
+# Install SonarQube Scanner CLI natively
 install_sonar_scanner() {
     local sonar_version="${SONAR_SCANNER_VERSION:-7.0.2.4839}"
     local sonar_home="$HOME/.sonar/sonar-scanner-$sonar_version-linux-x64"
