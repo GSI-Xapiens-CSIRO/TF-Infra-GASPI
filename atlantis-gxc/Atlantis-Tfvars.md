@@ -55,7 +55,7 @@
   svep-method-queue-size          = 100
 
   ses-source-email = "devops@example.com"
-  enable-inspector=false
+  enable-inspector = true
 
   hub_name = "RSCM"
   svep-warning-thresholds = {
@@ -228,7 +228,7 @@
   svep-method-queue-size          = 100
 
   ses-source-email = "devops@example.com"
-  enable-inspector = false
+  enable-inspector = true
 
   hub_name = "RSSARDJITO"
   max-request-rate-per-5mins = 1000
@@ -515,7 +515,7 @@
   svep-method-queue-size          = 100
 
   ses-source-email = "devops@example.com"
-  enable-inspector = false
+  enable-inspector = true
 
   hub_name         = "RSIGNG"
   lookup_configuration = {
