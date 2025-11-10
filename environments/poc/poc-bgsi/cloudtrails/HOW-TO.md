@@ -1,4 +1,4 @@
-# Terraform CloudTrails with OpenSearch for 111122223333
+# Terraform CloudTrails with OpenSearch for 442799077487
 
 ## How-to-Use
 
@@ -32,15 +32,15 @@
   ```
   $HOME/.aws/credentials
   ---
-  [BGSI-TF-User-Executor-HUB01]
+  [BGSI-TF-User-Executor-RSCM]
   aws_access_key_id =
   aws_secret_access_key =
 
   $HOME/.aws/config
   ---
-  [profile BGSI-TF-User-Executor-HUB01]
-  role_arn = arn:aws:iam::111122223333:role/TF-Central-Role_111122223333
-  source_profile = BGSI-TF-User-Executor-HUB01
+  [profile BGSI-TF-User-Executor-RSCM]
+  role_arn = arn:aws:iam::442799077487:role/TF-Central-Role_442799077487
+  source_profile = BGSI-TF-User-Executor-RSCM
   region = ap-southeast-3
   output = json
   ```
@@ -50,7 +50,7 @@
   ```
   unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
 
-  export AWS_PROFILE=BGSI-TF-User-Executor-HUB01
+  export AWS_PROFILE=BGSI-TF-User-Executor-RSCM
   export AWS_DEFAULT_REGION=ap-southeast-3
 
   aws sts get-caller-identity --profile $AWS_PROFILE

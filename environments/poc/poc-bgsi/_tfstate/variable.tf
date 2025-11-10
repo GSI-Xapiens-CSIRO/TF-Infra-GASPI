@@ -1,5 +1,5 @@
 # ==========================================================================
-#  111122223333 - TFState: variable.tf
+#  442799077487 - TFState: variable.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Global Variable
@@ -24,10 +24,10 @@ variable "kms_key" {
   type        = map(string)
   description = "KMS Key References"
   default = {
-    default = "arn:aws:kms:ap-southeast-3:111122223333:key/HASH_NUMBER"
-    lab     = "arn:aws:kms:ap-southeast-3:111122223333:key/HASH_NUMBER"
-    staging = "arn:aws:kms:ap-southeast-3:111122223333:key/HASH_NUMBER"
-    prod    = "arn:aws:kms:ap-southeast-3:111122223333:key/HASH_NUMBER"
+    default = "arn:aws:kms:ap-southeast-3:442799077487:key/HASH_NUMBER"
+    lab     = "arn:aws:kms:ap-southeast-3:442799077487:key/HASH_NUMBER"
+    staging = "arn:aws:kms:ap-southeast-3:442799077487:key/HASH_NUMBER"
+    prod    = "arn:aws:kms:ap-southeast-3:442799077487:key/HASH_NUMBER"
   }
 }
 
@@ -54,25 +54,25 @@ variable "aws_region" {
 variable "aws_account_id_source" {
   description = "The AWS Account ID management"
   type        = string
-  default     = "111122223333"
+  default     = "442799077487"
 }
 
 variable "aws_account_id_destination" {
-  description = "The AWS Account ID to deploy the Budget in"
+  description = "The AWS Account ID to deploy the TFState in"
   type        = string
-  default     = "111122223333"
+  default     = "442799077487"
 }
 
 variable "aws_account_profile_source" {
   description = "The AWS Profile management"
   type        = string
-  default     = "BGSI-TF-User-Executor-HUB01"
+  default     = "BGSI-TF-User-Executor-RSCM"
 }
 
 variable "aws_account_profile_destination" {
-  description = "The AWS Profile to deploy the Budget in"
+  description = "The AWS Profile to deploy the TFState in"
   type        = string
-  default     = "BGSI-TF-User-Executor-"
+  default     = "BGSI-TF-User-Executor-RSCM"
 }
 
 variable "aws_access_key" {
@@ -139,13 +139,13 @@ variable "department" {
 variable "tfstate_bucket" {
   description = "Name of bucket to store tfstate"
   type        = string
-  default     = "tf-state-111122223333-ap-southeast-3"
+  default     = "tf-state-442799077487-ap-southeast-3"
 }
 
 variable "tfstate_dynamodb_table" {
   description = "Name of dynamodb table to store tfstate"
   type        = string
-  default     = "ddb-tf-state-111122223333-ap-southeast-3"
+  default     = "ddb-tf-state-442799077487-ap-southeast-3"
 }
 
 variable "tfstate_path" {
