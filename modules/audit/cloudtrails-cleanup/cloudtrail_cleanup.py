@@ -548,7 +548,7 @@ class CloudTrailInfrastructureCleanup:
             ("Lambda Function", self.config.get('lambda_function_name', 'N/A')),
             ("CloudTrail", self.config.get('cloudtrail_arn', 'N/A').split('/')[-1] if self.config.get('cloudtrail_arn') else 'N/A'),
             ("S3 Bucket", self.config.get('cloudtrail_bucket', 'N/A')),
-            ("SSM Parameter", self.config.get('opensearch_password_parameter', 'N/A')),
+            ("SSM Parameter", '***REDACTED***'),
         ]
 
         for resource_type, resource_name in resources:
