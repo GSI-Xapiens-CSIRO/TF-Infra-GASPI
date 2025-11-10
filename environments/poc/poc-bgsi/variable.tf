@@ -21,11 +21,11 @@ variable "kms_key" {
   type        = map(string)
   description = "KMS Key References"
   default = {
-    default = "arn:aws:kms:ap-southeast-3:111122223333:key/HASH_NUMBER"
-    lab     = "arn:aws:kms:ap-southeast-3:111122223333:key/HASH_NUMBER"
-    staging = "arn:aws:kms:ap-southeast-3:111122223333:key/HASH_NUMBER"
-    nonprod = "arn:aws:kms:ap-southeast-3:111122223333:key/HASH_NUMBER"
-    prod    = "arn:aws:kms:ap-southeast-3:111122223333:key/HASH_NUMBER"
+    default = "arn:aws:kms:ap-southeast-3:442799077487:key/HASH_NUMBER"
+    lab     = "arn:aws:kms:ap-southeast-3:442799077487:key/HASH_NUMBER"
+    staging = "arn:aws:kms:ap-southeast-3:442799077487:key/HASH_NUMBER"
+    nonprod = "arn:aws:kms:ap-southeast-3:442799077487:key/HASH_NUMBER"
+    prod    = "arn:aws:kms:ap-southeast-3:442799077487:key/HASH_NUMBER"
   }
 }
 
@@ -52,13 +52,13 @@ variable "aws_region" {
 variable "aws_account_id" {
   description = "The AWS Account ID"
   type        = string
-  default     = "111122223333"
+  default     = "442799077487"
 }
 
 variable "aws_account_profile" {
   description = "The AWS Profile"
   type        = string
-  default     = "BGSI-TF-User-Executor-HUB01"
+  default     = "BGSI-TF-User-Executor-RSCM"
 }
 
 variable "aws_access_key" {

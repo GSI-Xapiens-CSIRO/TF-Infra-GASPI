@@ -1,5 +1,5 @@
 # ==========================================================================
-#  111122223333 - Core: main.tf
+#  442799077487 - Core: main.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Main Terraform Module
@@ -32,7 +32,7 @@ locals {
 #  Reuse Module: Core
 # --------------------------------------------------------------------------
 module "core" {
-  source = "../../../modules//core-nat-ec2"
+  source = "../../../../modules//core-nat-ec2"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source

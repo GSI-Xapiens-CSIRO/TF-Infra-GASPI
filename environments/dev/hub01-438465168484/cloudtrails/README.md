@@ -20,7 +20,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_cloudtrail"></a> [cloudtrail](#module\_cloudtrail) | ../../../modules/audit/cloudtrails-opensearch | n/a |
+| <a name="module_cloudtrail"></a> [cloudtrail](#module\_cloudtrail) | ../../../../modules/audit/cloudtrails-opensearch | n/a |
 
 ## Resources
 

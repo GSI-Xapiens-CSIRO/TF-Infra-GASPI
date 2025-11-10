@@ -9,7 +9,7 @@
         "s3:ListBucketMultipartUploads",
         "s3:ListBucketVersions"
       ],
-      "Resource": "arn:aws:s3:::genomic-snapshot-111122223333"
+      "Resource": "arn:aws:s3:::genomic-snapshot-442799077487"
     },
     {
       "Effect": "Allow",
@@ -20,7 +20,7 @@
         "s3:AbortMultipartUpload",
         "s3:ListMultipartUploadParts"
       ],
-      "Resource": "arn:aws:s3:::genomic-snapshot-111122223333/*"
+      "Resource": "arn:aws:s3:::genomic-snapshot-442799077487/*"
     }
   ]
 }
