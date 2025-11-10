@@ -20,7 +20,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_hub_logging_roles"></a> [hub\_logging\_roles](#module\_hub\_logging\_roles) | ../../../modules/iam-logging | n/a |
+| <a name="module_hub_logging_roles"></a> [hub\_logging\_roles](#module\_hub\_logging\_roles) | ../../../../modules/iam-logging | n/a |
 
 ## Resources
 

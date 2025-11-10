@@ -32,7 +32,7 @@ locals {
 #  Reuse Module: Core
 # --------------------------------------------------------------------------
 module "core" {
-  source = "../../../../modules//core-cfn-ml"
+  source = "../../../../../modules//core-cfn-ml"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source

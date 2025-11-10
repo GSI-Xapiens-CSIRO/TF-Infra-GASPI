@@ -72,7 +72,7 @@ variable "aws_account_profile_source" {
 variable "aws_account_profile_destination" {
   description = "The AWS Profile to deploy the Budget in"
   type        = string
-  default     = "BGSI-TF-User-Executor-HUB01"
+  default     = "BGSI-TF-User-Executor-"
 }
 
 variable "aws_access_key" {

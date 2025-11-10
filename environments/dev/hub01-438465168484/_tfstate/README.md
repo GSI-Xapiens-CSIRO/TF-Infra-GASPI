@@ -18,7 +18,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_tfstate"></a> [tfstate](#module\_tfstate) | ../../../modules//tfstate | n/a |
+| <a name="module_tfstate"></a> [tfstate](#module\_tfstate) | ../../../../modules//tfstate | n/a |
 
 ## Resources
 
