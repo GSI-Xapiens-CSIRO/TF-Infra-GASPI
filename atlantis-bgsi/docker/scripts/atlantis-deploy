@@ -32,7 +32,7 @@ log_error() {
 }
 
 # Script metadata
-SCRIPT_VERSION="2.4.0-BGSI-SECURE-MULTI-SONAR"
+SCRIPT_VERSION="2.5.0-BGSI-SECURE-MULTI-SONAR"
 SCRIPT_NAME="atlantis-deploy"
 SCRIPT_AUTHOR="BGSI DevOps-Team"
 SCRIPT_EMAIL="devops@bgsi.com"
