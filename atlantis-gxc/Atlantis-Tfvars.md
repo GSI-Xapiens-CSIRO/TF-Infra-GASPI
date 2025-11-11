@@ -10,7 +10,7 @@
       region         = "ap-southeast-3"
       bucket         = "tf-state-460722568061-ap-southeast-3"
       dynamodb_table = "ddb-tf-state-460722568061-ap-southeast-3"
-      key            = "gxc-consortium/460722568061/gaspi-infra-deployment/terraform.tfstate"
+      key            = "bgsi/460722568061/gaspi-infra-deployment/terraform.tfstate"
       encrypt        = true
     }
   }
@@ -22,17 +22,17 @@
   region         = "ap-southeast-3"
   bucket         = "tf-state-460722568061-ap-southeast-3"
   dynamodb_table = "ddb-tf-state-460722568061-ap-southeast-3"
-  key            = "gxc-consortium/460722568061/gaspi-infra-deployment/terraform.tfstate"
+  key            = "bgsi/460722568061/gaspi-infra-deployment/terraform.tfstate"
   encrypt        = true
   ```
 
-- **hub01.tfvars**
+- **rscm.tfvars**
 
   ```
   region = "ap-southeast-3"
   common-tags = {
     "Owner"       = "gaspi"
-    "Environment" = "uat"
+    "Environment" = "prod"
   }
 
   # cognito users
@@ -43,10 +43,10 @@
   gaspi-admin-email    = "devops@example.com"
 
   # buckets
-  variants-bucket-prefix      = "gasi-variants-"
-  metadata-bucket-prefix      = "gasi-metadata-"
-  lambda-layers-bucket-prefix = "gasi-lambda-layers-"
-  dataportal-bucket-prefix    = "gasi-dataportal-"
+  variants-bucket-prefix      = "gaspi-variants-"
+  metadata-bucket-prefix      = "gaspi-metadata-"
+  lambda-layers-bucket-prefix = "gaspi-lambda-layers-"
+  dataportal-bucket-prefix    = "gaspi-dataportal-"
 
   max-request-rate-per-5mins      = 1000
   sbeacon-method-queue-size       = 100
@@ -85,7 +85,7 @@
 
 ---
 
-## HUB03: RSPON (PGX / PhamCAT)
+## HUB02: RSPON (PGX / PhamCAT)
 
 - **backend.tf**
 
@@ -95,7 +95,7 @@
       region         = "ap-southeast-3"
       bucket         = "tf-state-111122223333-ap-southeast-3"
       dynamodb_table = "ddb-tf-state-111122223333-ap-southeast-3"
-      key            = "gxc-consortium/111122223333/gaspi-infra-deployment/terraform.tfstate"
+      key            = "bgsi/111122223333/gaspi-infra-deployment/terraform.tfstate"
       encrypt        = true
     }
   }
@@ -107,17 +107,17 @@
   region         = "ap-southeast-3"
   bucket         = "tf-state-111122223333-ap-southeast-3"
   dynamodb_table = "ddb-tf-state-111122223333-ap-southeast-3"
-  key            = "gxc-consortium/111122223333/gaspi-infra-deployment/terraform.tfstate"
+  key            = "bgsi/111122223333/gaspi-infra-deployment/terraform.tfstate"
   encrypt        = true
   ```
 
-- **hub03.tfvars**
+- **rspon.tfvars**
 
   ```
   region = "ap-southeast-3"
   common-tags = {
     "Owner"       = "gaspi"
-    "Environment" = "uat"
+    "Environment" = "prod"
   }
 
   # cognito users
@@ -128,10 +128,10 @@
   gaspi-admin-email    = "devops@example.com"
 
   # buckets
-  variants-bucket-prefix      = "gasi-variants-"
-  metadata-bucket-prefix      = "gasi-metadata-"
-  lambda-layers-bucket-prefix = "gasi-lambda-layers-"
-  dataportal-bucket-prefix    = "gasi-dataportal-"
+  variants-bucket-prefix      = "gaspi-variants-"
+  metadata-bucket-prefix      = "gaspi-metadata-"
+  lambda-layers-bucket-prefix = "gaspi-lambda-layers-"
+  dataportal-bucket-prefix    = "gaspi-dataportal-"
 
   max-request-rate-per-5mins      = 1000
   sbeacon-method-queue-size       = 100
@@ -173,7 +173,7 @@
 
 ---
 
-## UAT03: SARDJITO (Rare Desease)
+## HUB03: SARDJITO (Rare Desease)
 
 - **backend.tf**
 
@@ -183,7 +183,7 @@
       region         = "ap-southeast-3"
       bucket         = "tf-state-444455556666-ap-southeast-3"
       dynamodb_table = "ddb-tf-state-444455556666-ap-southeast-3"
-      key            = "gxc-consortium/444455556666/gaspi-infra-deployment/terraform.tfstate"
+      key            = "bgsi/444455556666/gaspi-infra-deployment/terraform.tfstate"
       encrypt        = true
     }
   }
@@ -195,17 +195,17 @@
   region         = "ap-southeast-3"
   bucket         = "tf-state-444455556666-ap-southeast-3"
   dynamodb_table = "ddb-tf-state-444455556666-ap-southeast-3"
-  key            = "gxc-consortium/444455556666/gaspi-infra-deployment/terraform.tfstate"
+  key            = "bgsi/444455556666/gaspi-infra-deployment/terraform.tfstate"
   encrypt        = true
   ```
 
-- **uat03.tfvars**
+- **sardjito.tfvars**
 
   ```
   region = "ap-southeast-3"
   common-tags = {
     "Owner"       = "gaspi"
-    "Environment" = "uat"
+    "Environment" = "prod"
   }
 
   # cognito users
@@ -216,10 +216,10 @@
   gaspi-admin-email    = "devops@example.com"
 
   # buckets
-  variants-bucket-prefix      = "gasi-variants-"
-  metadata-bucket-prefix      = "gasi-metadata-"
-  lambda-layers-bucket-prefix = "gasi-lambda-layers-"
-  dataportal-bucket-prefix    = "gasi-dataportal-"
+  variants-bucket-prefix      = "gaspi-variants-"
+  metadata-bucket-prefix      = "gaspi-metadata-"
+  lambda-layers-bucket-prefix = "gaspi-lambda-layers-"
+  dataportal-bucket-prefix    = "gaspi-dataportal-"
 
   max-request-rate-per-5mins      = 1000
   sbeacon-method-queue-size       = 100
@@ -460,7 +460,7 @@
 
 ---
 
-## UAT04: IGNG (PGX / Lookup)
+## HUB04: IGNG (PGX / Lookup)
 
 - **backend.tf**
 
@@ -470,7 +470,7 @@
       region         = "ap-southeast-3"
       bucket         = "tf-state-777788889999-ap-southeast-3"
       dynamodb_table = "ddb-tf-state-777788889999-ap-southeast-3"
-      key            = "gxc-consortium/777788889999/gaspi-infra-deployment/terraform.tfstate"
+      key            = "bgsi/777788889999/gaspi-infra-deployment/terraform.tfstate"
       encrypt        = true
     }
   }
@@ -482,17 +482,17 @@
   region         = "ap-southeast-3"
   bucket         = "tf-state-777788889999-ap-southeast-3"
   dynamodb_table = "ddb-tf-state-777788889999-ap-southeast-3"
-  key            = "gxc-consortium/777788889999/gaspi-infra-deployment/terraform.tfstate"
+  key            = "bgsi/777788889999/gaspi-infra-deployment/terraform.tfstate"
   encrypt        = true
   ```
 
-- **uat04.tfvars**
+- **igng.tfvars**
 
   ```
   region = "ap-southeast-3"
   common-tags = {
     "Owner"       = "gaspi"
-    "Environment" = "uat"
+    "Environment" = "prod"
   }
 
   # cognito users
@@ -503,10 +503,10 @@
   gaspi-admin-email    = "devops@example.com"
 
   # buckets
-  variants-bucket-prefix      = "gasi-variants-"
-  metadata-bucket-prefix      = "gasi-metadata-"
-  lambda-layers-bucket-prefix = "gasi-lambda-layers-"
-  dataportal-bucket-prefix    = "gasi-dataportal-"
+  variants-bucket-prefix      = "gaspi-variants-"
+  metadata-bucket-prefix      = "gaspi-metadata-"
+  lambda-layers-bucket-prefix = "gaspi-lambda-layers-"
+  dataportal-bucket-prefix    = "gaspi-dataportal-"
 
   max-request-rate-per-5mins      = 1000
   sbeacon-method-queue-size       = 100
@@ -528,7 +528,7 @@
 
 ---
 
-## UAT05: RSJPD (PGX / PhamCAT & Lookup)
+## HUB05: RSJPD (PGX / PhamCAT & Lookup)
 
 - **backend.tf**
 
@@ -538,7 +538,7 @@
       region         = "ap-southeast-3"
       bucket         = "tf-state-123412341234-ap-southeast-3"
       dynamodb_table = "ddb-tf-state-123412341234-ap-southeast-3"
-      key            = "gxc-consortium/123412341234/gaspi-infra-deployment/terraform.tfstate"
+      key            = "bgsi/123412341234/gaspi-infra-deployment/terraform.tfstate"
       encrypt        = true
     }
   }
@@ -550,17 +550,17 @@
   region         = "ap-southeast-3"
   bucket         = "tf-state-123412341234-ap-southeast-3"
   dynamodb_table = "ddb-tf-state-123412341234-ap-southeast-3"
-  key            = "gxc-consortium/123412341234/gaspi-infra-deployment/terraform.tfstate"
+  key            = "bgsi/123412341234/gaspi-infra-deployment/terraform.tfstate"
   encrypt        = true
   ```
 
-- **uat05.tfvars**
+- **rsjpd.tfvars**
 
   ```
   region = "ap-southeast-3"
   common-tags = {
     "Owner"       = "gaspi"
-    "Environment" = "uat"
+    "Environment" = "prod"
   }
 
   # cognito users
@@ -571,10 +571,10 @@
   gaspi-admin-email    = "devops@example.com"
 
   # buckets
-  variants-bucket-prefix      = "gasi-variants-"
-  metadata-bucket-prefix      = "gasi-metadata-"
-  lambda-layers-bucket-prefix = "gasi-lambda-layers-"
-  dataportal-bucket-prefix    = "gasi-dataportal-"
+  variants-bucket-prefix      = "gaspi-variants-"
+  metadata-bucket-prefix      = "gaspi-metadata-"
+  lambda-layers-bucket-prefix = "gaspi-lambda-layers-"
+  dataportal-bucket-prefix    = "gaspi-dataportal-"
 
   max-request-rate-per-5mins      = 1000
   sbeacon-method-queue-size       = 100

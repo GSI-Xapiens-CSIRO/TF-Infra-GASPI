@@ -26,13 +26,14 @@
   encrypt        = true
   ```
 
-- **hub01.tfvars**
+- **rscm.tfvars**
 
   ```
   region = "ap-southeast-3"
   common-tags = {
     "Owner"       = "bgsi"
     "Environment" = "prod"
+    "Workflow"    = "RSCM"
   }
 
   # cognito users
@@ -111,13 +112,14 @@
   encrypt        = true
   ```
 
-- **hub02.tfvars**
+- **rspon.tfvars**
 
   ```
   region = "ap-southeast-3"
   common-tags = {
     "Owner"       = "bgsi"
     "Environment" = "prod"
+    "Workflow"    = "RSPON"
   }
 
   # cognito users
@@ -199,13 +201,14 @@
   encrypt        = true
   ```
 
-- **hub03.tfvars**
+- **sardjito.tfvars**
 
   ```
   region = "ap-southeast-3"
   common-tags = {
     "Owner"       = "bgsi"
     "Environment" = "prod"
+    "Workflow"    = "SARDJITO"
   }
 
   # cognito users
@@ -486,13 +489,14 @@
   encrypt        = true
   ```
 
-- **hub04.tfvars**
+- **igng.tfvars**
 
   ```
   region = "ap-southeast-3"
   common-tags = {
     "Owner"       = "bgsi"
     "Environment" = "prod"
+    "Workflow"    = "IGNG"
   }
 
   # cognito users
@@ -554,13 +558,14 @@
   encrypt        = true
   ```
 
-- **hub05.tfvars**
+- **rsjpd.tfvars**
 
   ```
   region = "ap-southeast-3"
   common-tags = {
     "Owner"       = "bgsi"
     "Environment" = "prod"
+    "Workflow"    = "RSJPD"
   }
 
   # cognito users
