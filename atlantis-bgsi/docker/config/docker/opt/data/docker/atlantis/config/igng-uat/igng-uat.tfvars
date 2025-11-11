@@ -1,7 +1,8 @@
 region = "ap-southeast-3"
 common-tags = {
-  "Owner"       = "gaspi"
+  "Owner"       = "bgsi"
   "Environment" = "uat"
+  "Workflow"    = "IGNG"
 }
 
 # cognito users
@@ -12,10 +13,10 @@ gaspi-admin-password = "Admin@Example123!"
 gaspi-admin-email    = "devops@example.com"
 
 # buckets
-variants-bucket-prefix      = "gasi-variants-"
-metadata-bucket-prefix      = "gasi-metadata-"
-lambda-layers-bucket-prefix = "gasi-lambda-layers-"
-dataportal-bucket-prefix    = "gasi-dataportal-"
+variants-bucket-prefix      = "gaspi-variants-"
+metadata-bucket-prefix      = "gaspi-metadata-"
+lambda-layers-bucket-prefix = "gaspi-lambda-layers-"
+dataportal-bucket-prefix    = "gaspi-dataportal-"
 
 max-request-rate-per-5mins      = 1000
 sbeacon-method-queue-size       = 100
@@ -24,21 +25,12 @@ svep-method-max-request-rate    = 10
 svep-method-queue-size          = 100
 
 ses-source-email = "devops@example.com"
-enable-inspector = false
-hub_name         = "RSCM"
-svep-filters = {
-  clinvar_exclude = [
-    "Benign",
-    "Benign/Likely benign",
-    "Likely benign",
-    "not provided",
-  ]
-  consequence_rank = 14
-  max_maf          = 0.05
-  min_qual         = 10
-  genes = [
-    "APOB",
-    "LDLR",
-    "PCSK9",
-  ]
+enable-inspector = true
+
+hub_name = "RSIGNG"
+lookup_configuration = {
+  assoc_matrix_filename = "RSIGNG_association_matrix.csv"
+  chr_header            = "chr"
+  start_header          = "start"
+  end_header            = "end"
 }

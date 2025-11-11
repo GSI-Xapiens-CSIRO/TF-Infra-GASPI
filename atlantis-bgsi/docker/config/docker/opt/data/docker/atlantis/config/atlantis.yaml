@@ -28,104 +28,104 @@ projects:
     enabled: true
   plan_requirements: [approved]
   apply_requirements: [approved]
-  workflow: hub01-workflow
+  workflow: rscm-workflow
 
-- name: bgsi-hub01
-  branch: /hub01/
+- name: bgsi-rscm
+  branch: /rscm/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 2
   autoplan:
     when_modified: *tf_files
-  workflow: hub01-workflow
+  workflow: rscm-workflow
 
-- name: bgsi-hub02
-  branch: /hub02/
+- name: bgsi-rspon
+  branch: /rspon/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 3
   autoplan:
     when_modified: *tf_files
-  workflow: hub02-workflow
+  workflow: rspon-workflow
 
-- name: bgsi-hub03
-  branch: /hub03/
+- name: bgsi-sardjito
+  branch: /sardjito/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 4
   autoplan:
     when_modified: *tf_files
-  workflow: hub03-workflow
+  workflow: sardjito-workflow
 
-- name: bgsi-hub04
-  branch: /hub04/
+- name: bgsi-igng
+  branch: /igng/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 5
   autoplan:
     when_modified: *tf_files
-  workflow: hub04-workflow
+  workflow: igng-workflow
 
-- name: bgsi-hub05
-  branch: /hub05/
+- name: bgsi-rsjpd
+  branch: /rsjpd/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 6
   autoplan:
     when_modified: *tf_files
-  workflow: hub05-workflow
+  workflow: rsjpd-workflow
 
-- name: bgsi-uat01
-  branch: /uat01/
+- name: bgsi-rscm-uat
+  branch: /rscm-uat/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 7
   autoplan:
     when_modified: *tf_files
-  workflow: uat01-workflow
+  workflow: rscm-uat-workflow
 
-- name: bgsi-uat02
-  branch: /uat02/
+- name: bgsi-rspon-uat
+  branch: /rspon-uat/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 8
   autoplan:
     when_modified: *tf_files
-  workflow: uat02-workflow
+  workflow: rspon-uat-workflow
 
-- name: bgsi-uat03
-  branch: /uat03/
+- name: bgsi-sardjito-uat
+  branch: /sardjito-uat/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 9
   autoplan:
     when_modified: *tf_files
-  workflow: uat03-workflow
+  workflow: sardjito-uat-workflow
 
-- name: bgsi-uat04
-  branch: /uat04/
+- name: bgsi-igng-uat
+  branch: /igng-uat/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 10
   autoplan:
     when_modified: *tf_files
-  workflow: uat04-workflow
+  workflow: igng-uat-workflow
 
-- name: bgsi-uat05
-  branch: /uat05/
+- name: bgsi-rsjpd-uat
+  branch: /rsjpd-uat/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 11
   autoplan:
     when_modified: *tf_files
-  workflow: uat05-workflow
+  workflow: rsjpd-uat-workflow

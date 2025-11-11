@@ -12,81 +12,90 @@ workflows:
   dynamic-workflow:
     plan:
       steps:
-      - run: atlantis-deploy hub01 plan
+      - run: atlantis-deploy rscm plan
     apply:
       steps:
-      - run: atlantis-deploy hub01 apply
+      - run: atlantis-deploy rscm apply
 
   # HUB Workflows
-  hub01-workflow:
+  rscm-workflow:
     plan:
       steps:
-      - run: atlantis-deploy hub01 plan
+      - run: atlantis-deploy rscm plan
     apply:
       steps:
-      - run: atlantis-deploy hub01 apply
+      - run: atlantis-deploy rscm apply
 
-  hub02-workflow:
+  rspon-workflow:
     plan:
       steps:
-      - run: atlantis-deploy hub02 plan
+      - run: atlantis-deploy rspon plan
     apply:
       steps:
-      - run: atlantis-deploy hub02 apply
+      - run: atlantis-deploy rspon apply
 
-  hub03-workflow:
+  sardjito-workflow:
     plan:
       steps:
-      - run: atlantis-deploy hub03 plan
+      - run: atlantis-deploy sardjito plan
     apply:
       steps:
-      - run: atlantis-deploy hub03 apply
+      - run: atlantis-deploy sardjito apply
 
-  hub04-workflow:
+  igng-workflow:
     plan:
       steps:
-      - run: atlantis-deploy hub04 plan
+      - run: atlantis-deploy igng plan
     apply:
       steps:
-      - run: atlantis-deploy hub04 apply
+      - run: atlantis-deploy igng apply
+
+  rsjpd-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy rsjpd plan
+    apply:
+      steps:
+      - run: atlantis-deploy rsjpd apply
+
 
   # UAT Workflows
-  uat01-workflow:
+  rscm-uat-workflow:
     plan:
       steps:
-      - run: atlantis-deploy uat01 plan
+      - run: atlantis-deploy rscm-uat plan
     apply:
       steps:
-      - run: atlantis-deploy uat01 apply
+      - run: atlantis-deploy rscm-uat apply
 
-  uat02-workflow:
+  rspon-uat-workflow:
     plan:
       steps:
-      - run: atlantis-deploy uat02 plan
+      - run: atlantis-deploy rspon-uat plan
     apply:
       steps:
-      - run: atlantis-deploy uat02 apply
+      - run: atlantis-deploy rspon-uat apply
 
-  uat03-workflow:
+  sardjito-uat-workflow:
     plan:
       steps:
-      - run: atlantis-deploy uat03 plan
+      - run: atlantis-deploy sardjito-uat plan
     apply:
       steps:
-      - run: atlantis-deploy uat03 apply
+      - run: atlantis-deploy sardjito-uat apply
 
-  uat04-workflow:
+  igng-uat-workflow:
     plan:
       steps:
-      - run: atlantis-deploy uat04 plan
+      - run: atlantis-deploy igng-uat plan
     apply:
       steps:
-      - run: atlantis-deploy uat04 apply
+      - run: atlantis-deploy igng-uat apply
 
-  uat05-workflow:
+  rsjpd-uat-workflow:
     plan:
       steps:
-      - run: atlantis-deploy uat05 plan
+      - run: atlantis-deploy rsjpd-uat plan
     apply:
       steps:
-      - run: atlantis-deploy uat05 apply
+      - run: atlantis-deploy rsjpd-uat apply
