@@ -86,7 +86,7 @@
 
 ---
 
-## HUB02: RSPON (PGX / PhamCAT)
+## HUB02: RSPON (PGX / PharmCAT)
 
 - **backend.tf**
 
@@ -532,7 +532,7 @@
 
 ---
 
-## HUB05: RSJPD (PGX / PhamCAT & Lookup)
+## HUB05: RSJPD (PGX / PharmCAT & Lookup)
 
 - **backend.tf**
 
