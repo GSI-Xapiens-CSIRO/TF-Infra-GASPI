@@ -1,6 +1,6 @@
 # Terraform Variables for BGSI Atlantis CI/CD
 
-## HUB01: RSCM (Rare Desease)
+## HUB01: RSCM (Rare Disease)
 
 - **backend.tf**
 
@@ -175,7 +175,7 @@
 
 ---
 
-## HUB03: SARDJITO (Rare Desease)
+## HUB03: SARDJITO (Rare Disease)
 
 - **backend.tf**
 
