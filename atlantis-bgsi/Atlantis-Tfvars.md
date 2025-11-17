@@ -463,7 +463,7 @@
 
 ---
 
-## HUB04: IGNG (PGX / Lookup)
+## HUB04: RSNGOERAH (PGX / Lookup)
 
 - **backend.tf**
 
