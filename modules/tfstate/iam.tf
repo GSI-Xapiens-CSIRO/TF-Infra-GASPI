@@ -37,11 +37,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       type = "AWS"
       identifiers = [
         aws_iam_role.bucket.arn,
-        "arn:aws:iam::688567276772:root",
-        "arn:aws:iam::586794473955:root",
-        "arn:aws:iam::307946671795:root",
-        "arn:aws:iam::864899849921:root",
-        "arn:aws:iam::127214202110:root"
+        "arn:aws:iam::${var.aws_account_id_destination}:root"
       ]
     }
 
@@ -85,11 +81,7 @@ data "aws_iam_policy_document" "dynamodb_policy" {
       type = "AWS"
       identifiers = [
         aws_iam_role.dynamodb.arn,
-        "arn:aws:iam::688567276772:root",
-        "arn:aws:iam::586794473955:root",
-        "arn:aws:iam::307946671795:root",
-        "arn:aws:iam::864899849921:root",
-        "arn:aws:iam::127214202110:root"
+        "arn:aws:iam::${var.aws_account_id_destination}:root"
       ]
     }
 

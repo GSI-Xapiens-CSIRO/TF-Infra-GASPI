@@ -13,7 +13,7 @@
 # --------------------------------------------------------------------------
 
 locals {
-  iam_xti_tags = {
+  iam_gxc_tags = {
     "Team" = "XTI"
   }
 
@@ -21,8 +21,8 @@ locals {
     "Team" = "BGSI"
   }
 
-  xti_team_developer      = var.xti_team_developer
-  xti_team_administrator  = var.xti_team_administrator
+  gxc_team_developer      = var.gxc_team_developer
+  gxc_team_administrator  = var.gxc_team_administrator
   bgsi_team_developer     = var.bgsi_team_developer
   bgsi_team_administrator = var.bgsi_team_administrator
 }
@@ -30,19 +30,19 @@ locals {
 # --------------------------------------------------------------------------
 #  XTI Developer Team
 # --------------------------------------------------------------------------
-resource "aws_iam_user" "xti_developer" {
+resource "aws_iam_user" "gxc_developer" {
   provider = aws.destination
 
   ## Group: Developer
   for_each = toset(
-    local.xti_team_developer
+    local.gxc_team_developer
   )
 
   name = each.key
 
   tags = merge(
     local.tags,
-    local.iam_xti_tags,
+    local.iam_gxc_tags,
     {
       Name          = "${lower(each.key)}"
       ResourceGroup = "IAM-GXC"
@@ -54,19 +54,19 @@ resource "aws_iam_user" "xti_developer" {
 # --------------------------------------------------------------------------
 #  XTI Administrator Team
 # --------------------------------------------------------------------------
-resource "aws_iam_user" "xti_admin" {
+resource "aws_iam_user" "gxc_admin" {
   provider = aws.destination
 
   ## Group: Administrator
   for_each = toset(
-    local.xti_team_administrator
+    local.gxc_team_administrator
   )
 
   name = each.key
 
   tags = merge(
     local.tags,
-    local.iam_xti_tags,
+    local.iam_gxc_tags,
     {
       Name          = "${lower(each.key)}"
       ResourceGroup = "IAM-GXC"

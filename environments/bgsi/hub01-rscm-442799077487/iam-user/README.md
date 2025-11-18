@@ -48,8 +48,8 @@ No resources.
 | <a name="input_tf_user_executor"></a> [tf\_user\_executor](#input\_tf\_user\_executor) | TF User Executor | `string` | `"TF-User-Executor-442799077487"` | no |
 | <a name="input_workspace_env"></a> [workspace\_env](#input\_workspace\_env) | Workspace Environment Selection | `map(string)` | <pre>{<br/>  "default": "default",<br/>  "lab": "rnd",<br/>  "prod": "prod",<br/>  "staging": "staging"<br/>}</pre> | no |
 | <a name="input_workspace_name"></a> [workspace\_name](#input\_workspace\_name) | Workspace Environment Name | `string` | `"default"` | no |
-| <a name="input_xti_team_administrator"></a> [xti\_team\_administrator](#input\_xti\_team\_administrator) | XTI Administrator Team Member | `list(any)` | <pre>[<br/>  "xti.admin01@xapiens.id",<br/>  "xti.admin02@xapiens.id"<br/>]</pre> | no |
-| <a name="input_xti_team_developer"></a> [xti\_team\_developer](#input\_xti\_team\_developer) | XTI Developer Team Member | `list(any)` | <pre>[<br/>  "xti.developer01@xapiens.id",<br/>  "xti.developer02@xapiens.id",<br/>  "xti.developer03@xapiens.id"<br/>]</pre> | no |
+| <a name="input_gxc_team_administrator"></a> [xti\_team\_administrator](#input\_xti\_team\_administrator) | XTI Administrator Team Member | `list(any)` | <pre>[<br/>  "xti.admin01@xapiens.id",<br/>  "xti.admin02@xapiens.id"<br/>]</pre> | no |
+| <a name="input_gxc_team_developer"></a> [xti\_team\_developer](#input\_xti\_team\_developer) | XTI Developer Team Member | `list(any)` | <pre>[<br/>  "xti.developer01@xapiens.id",<br/>  "xti.developer02@xapiens.id",<br/>  "xti.developer03@xapiens.id"<br/>]</pre> | no |
 
 ## Outputs
 
@@ -63,7 +63,7 @@ No resources.
 | <a name="output_gxc_developer_policy_arn"></a> [gxc\_developer\_policy\_arn](#output\_gxc\_developer\_policy\_arn) | BGSI Developer Policy ARN |
 | <a name="output_list_bgsi_administrator"></a> [list\_bgsi\_administrator](#output\_list\_bgsi\_administrator) | BGSI Administrator Account |
 | <a name="output_list_bgsi_developer"></a> [list\_bgsi\_developer](#output\_list\_bgsi\_developer) | BGSI Developer Account |
-| <a name="output_list_xti_administrator"></a> [list\_xti\_administrator](#output\_list\_xti\_administrator) | XTI Administrator Account |
-| <a name="output_list_xti_developer"></a> [list\_xti\_developer](#output\_list\_xti\_developer) | XTI Developer Account |
+| <a name="output_list_gxc_administrator"></a> [list\_xti\_administrator](#output\_list\_xti\_administrator) | XTI Administrator Account |
+| <a name="output_list_gxc_developer"></a> [list\_xti\_developer](#output\_list\_xti\_developer) | XTI Developer Account |
 | <a name="output_summary"></a> [summary](#output\_summary) | Summary IAM User Configuration |
 <!-- END_TF_DOCS -->

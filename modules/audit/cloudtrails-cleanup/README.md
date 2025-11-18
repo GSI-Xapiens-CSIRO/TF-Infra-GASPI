@@ -62,7 +62,7 @@ terraform output > cloudtrails.txt
 cat > .env << EOF
 AWS_REGION=ap-southeast-3
 AWS_ACCOUNT_ID=209479276142
-TERRAFORM_DIR=./environments/gxc-consortium-hub01/cloudtrails
+TERRAFORM_DIR=./environments/bgsi-hub01/cloudtrails
 OPENSEARCH_DOMAIN_NAME=opensearch-209479276142
 EOF
 ```

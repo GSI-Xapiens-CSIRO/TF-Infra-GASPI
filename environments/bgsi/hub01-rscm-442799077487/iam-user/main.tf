@@ -52,8 +52,8 @@ module "iam-user" {
   policy_gxc_developer     = var.policy_gxc_developer
   policy_gxc_administrator = var.policy_gxc_administrator
   tf_user_executor         = var.tf_user_executor
-  xti_team_developer       = var.xti_team_developer
-  xti_team_administrator   = var.xti_team_administrator
+  gxc_team_developer       = var.gxc_team_developer
+  gxc_team_administrator   = var.gxc_team_administrator
   bgsi_team_developer      = var.bgsi_team_developer
   bgsi_team_administrator  = var.bgsi_team_administrator
 }
