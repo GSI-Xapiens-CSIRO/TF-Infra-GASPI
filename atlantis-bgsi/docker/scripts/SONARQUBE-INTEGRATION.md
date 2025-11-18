@@ -53,8 +53,8 @@ Or set the environment variables directly in your Atlantis configuration.
 The SonarQube scan runs automatically as part of the `atlantis-deploy` workflow when `SCRIPT_RUN_SONAR=true` (default).
 
 ```bash
-./atlantis-deploy hub01 plan   # Includes SonarQube scan
-./atlantis-deploy uat02 apply  # Includes SonarQube scan
+./atlantis-deploy rscm plan   # Includes SonarQube scan
+./atlantis-deploy rspon-uat apply  # Includes SonarQube scan
 ```
 
 ### Manual SonarQube Scan
@@ -63,7 +63,7 @@ You can also run the SonarQube scan independently:
 
 ```bash
 # Scan with environment-specific configuration
-./sonar-scan hub01
+./sonar-scan rscm
 
 # Scan with default configuration
 ./sonar-scan
@@ -80,7 +80,7 @@ You can also run the SonarQube scan independently:
 To skip SonarQube scanning in the deployment workflow:
 
 ```bash
-SCRIPT_RUN_SONAR=false ./atlantis-deploy hub01 plan
+SCRIPT_RUN_SONAR=false ./atlantis-deploy rscm plan
 ```
 
 ## Environment Variables
@@ -134,8 +134,8 @@ The SonarQube integration is positioned in the deployment workflow as follows:
 
 The SonarQube scan automatically creates environment-specific projects:
 
-- Hub environments: `bgsi-gaspi-hub01`, `bgsi-gaspi-hub02`, etc.
-- UAT environments: `bgsi-gaspi-uat01`, `bgsi-gaspi-uat02`, etc.
+- Hub environments: `bgsi-gaspi-rscm`, `bgsi-gaspi-rspon`, etc.
+- UAT environments: `bgsi-gaspi-rscm-uat`, `bgsi-gaspi-rspon-uat`, etc.
 - Default: `bgsi-gaspi-default`
 
 ## Exclusions
