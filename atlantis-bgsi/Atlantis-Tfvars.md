@@ -8,9 +8,9 @@
   terraform {
     backend "s3" {
       region         = "ap-southeast-3"
-      bucket         = "tf-state-460722568061-ap-southeast-3"
-      dynamodb_table = "ddb-tf-state-460722568061-ap-southeast-3"
-      key            = "bgsi/460722568061/gaspi-infra-deployment/terraform.tfstate"
+      bucket         = "tf-state-442799077487-ap-southeast-3"
+      dynamodb_table = "ddb-tf-state-442799077487-ap-southeast-3"
+      key            = "bgsi/442799077487/gaspi-infra-deployment/terraform.tfstate"
       encrypt        = true
     }
   }
@@ -20,9 +20,9 @@
 
   ```
   region         = "ap-southeast-3"
-  bucket         = "tf-state-460722568061-ap-southeast-3"
-  dynamodb_table = "ddb-tf-state-460722568061-ap-southeast-3"
-  key            = "bgsi/460722568061/gaspi-infra-deployment/terraform.tfstate"
+  bucket         = "tf-state-442799077487-ap-southeast-3"
+  dynamodb_table = "ddb-tf-state-442799077487-ap-southeast-3"
+  key            = "bgsi/442799077487/gaspi-infra-deployment/terraform.tfstate"
   encrypt        = true
   ```
 
@@ -94,9 +94,9 @@
   terraform {
     backend "s3" {
       region         = "ap-southeast-3"
-      bucket         = "tf-state-111122223333-ap-southeast-3"
-      dynamodb_table = "ddb-tf-state-111122223333-ap-southeast-3"
-      key            = "bgsi/111122223333/gaspi-infra-deployment/terraform.tfstate"
+      bucket         = "tf-state-829990487185-ap-southeast-3"
+      dynamodb_table = "ddb-tf-state-829990487185-ap-southeast-3"
+      key            = "bgsi/829990487185/gaspi-infra-deployment/terraform.tfstate"
       encrypt        = true
     }
   }
@@ -106,9 +106,9 @@
 
   ```
   region         = "ap-southeast-3"
-  bucket         = "tf-state-111122223333-ap-southeast-3"
-  dynamodb_table = "ddb-tf-state-111122223333-ap-southeast-3"
-  key            = "bgsi/111122223333/gaspi-infra-deployment/terraform.tfstate"
+  bucket         = "tf-state-829990487185-ap-southeast-3"
+  dynamodb_table = "ddb-tf-state-829990487185-ap-southeast-3"
+  key            = "bgsi/829990487185/gaspi-infra-deployment/terraform.tfstate"
   encrypt        = true
   ```
 
@@ -183,9 +183,9 @@
   terraform {
     backend "s3" {
       region         = "ap-southeast-3"
-      bucket         = "tf-state-444455556666-ap-southeast-3"
-      dynamodb_table = "ddb-tf-state-444455556666-ap-southeast-3"
-      key            = "bgsi/444455556666/gaspi-infra-deployment/terraform.tfstate"
+      bucket         = "tf-state-938674806253-ap-southeast-3"
+      dynamodb_table = "ddb-tf-state-938674806253-ap-southeast-3"
+      key            = "bgsi/938674806253/gaspi-infra-deployment/terraform.tfstate"
       encrypt        = true
     }
   }
@@ -195,9 +195,9 @@
 
   ```
   region         = "ap-southeast-3"
-  bucket         = "tf-state-444455556666-ap-southeast-3"
-  dynamodb_table = "ddb-tf-state-444455556666-ap-southeast-3"
-  key            = "bgsi/444455556666/gaspi-infra-deployment/terraform.tfstate"
+  bucket         = "tf-state-938674806253-ap-southeast-3"
+  dynamodb_table = "ddb-tf-state-938674806253-ap-southeast-3"
+  key            = "bgsi/938674806253/gaspi-infra-deployment/terraform.tfstate"
   encrypt        = true
   ```
 
@@ -471,9 +471,9 @@
   terraform {
     backend "s3" {
       region         = "ap-southeast-3"
-      bucket         = "tf-state-777788889999-ap-southeast-3"
-      dynamodb_table = "ddb-tf-state-777788889999-ap-southeast-3"
-      key            = "bgsi/777788889999/gaspi-infra-deployment/terraform.tfstate"
+      bucket         = "tf-state-136839993415-ap-southeast-3"
+      dynamodb_table = "ddb-tf-state-136839993415-ap-southeast-3"
+      key            = "bgsi/136839993415/gaspi-infra-deployment/terraform.tfstate"
       encrypt        = true
     }
   }
@@ -483,9 +483,9 @@
 
   ```
   region         = "ap-southeast-3"
-  bucket         = "tf-state-777788889999-ap-southeast-3"
-  dynamodb_table = "ddb-tf-state-777788889999-ap-southeast-3"
-  key            = "bgsi/777788889999/gaspi-infra-deployment/terraform.tfstate"
+  bucket         = "tf-state-136839993415-ap-southeast-3"
+  dynamodb_table = "ddb-tf-state-136839993415-ap-southeast-3"
+  key            = "bgsi/136839993415/gaspi-infra-deployment/terraform.tfstate"
   encrypt        = true
   ```
 
@@ -540,9 +540,9 @@
   terraform {
     backend "s3" {
       region         = "ap-southeast-3"
-      bucket         = "tf-state-123412341234-ap-southeast-3"
-      dynamodb_table = "ddb-tf-state-123412341234-ap-southeast-3"
-      key            = "bgsi/123412341234/gaspi-infra-deployment/terraform.tfstate"
+      bucket         = "tf-state-602006056899-ap-southeast-3"
+      dynamodb_table = "ddb-tf-state-602006056899-ap-southeast-3"
+      key            = "bgsi/602006056899/gaspi-infra-deployment/terraform.tfstate"
       encrypt        = true
     }
   }
@@ -552,9 +552,9 @@
 
   ```
   region         = "ap-southeast-3"
-  bucket         = "tf-state-123412341234-ap-southeast-3"
-  dynamodb_table = "ddb-tf-state-123412341234-ap-southeast-3"
-  key            = "bgsi/123412341234/gaspi-infra-deployment/terraform.tfstate"
+  bucket         = "tf-state-602006056899-ap-southeast-3"
+  dynamodb_table = "ddb-tf-state-602006056899-ap-southeast-3"
+  key            = "bgsi/602006056899/gaspi-infra-deployment/terraform.tfstate"
   encrypt        = true
   ```
 

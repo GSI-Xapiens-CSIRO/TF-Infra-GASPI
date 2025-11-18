@@ -1,5 +1,5 @@
 region         = "ap-southeast-3"
-bucket         = "tf-state-111122223333-ap-southeast-3"
-dynamodb_table = "ddb-tf-state-111122223333-ap-southeast-3"
-key            = "bgsi/111122223333/gaspi-infra-deployment/terraform.tfstate"
+bucket         = "tf-state-741464515101-ap-southeast-3"
+dynamodb_table = "ddb-tf-state-741464515101-ap-southeast-3"
+key            = "bgsi/741464515101/gaspi-infra-deployment/terraform.tfstate"
 encrypt        = true
