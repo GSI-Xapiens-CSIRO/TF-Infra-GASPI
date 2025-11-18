@@ -932,7 +932,7 @@ run_sonarqube_scan() {
     env_sonar_project_key=$(get_sonar_project_key_for_environment "$ENVIRONMENT")
 
     # Set SonarQube configuration with secure defaults
-    local sonar_host_url="${SONAR_HOST_URL:-https://sonarqube-bgsi.xapiens.id}"
+    local sonar_host_url="${SONAR_HOST_URL:-https://sonarqube-bgsi.kemkes.go.id}"
     local sonar_project_key="$env_sonar_project_key"
     local sonar_project_name="${SONAR_PROJECT_NAME:-BGSI-Atlantis-SonarQube-CICD-${ENVIRONMENT^^}}"
     local sonar_project_version="${SONAR_PROJECT_VERSION:-$(date +%Y%m%d-%H%M%S)}"
