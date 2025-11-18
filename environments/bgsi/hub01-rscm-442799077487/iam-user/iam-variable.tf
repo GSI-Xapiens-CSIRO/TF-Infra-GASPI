@@ -54,22 +54,22 @@ variable "tf_user_executor" {
 # --------------------------------------------------------------------------
 #  User Team
 # --------------------------------------------------------------------------
-variable "xti_team_developer" {
+variable "gxc_team_developer" {
   description = "XTI Developer Team Member"
   type        = list(any)
   default = [
-    "xti.developer01@xapiens.id",
-    "xti.developer02@xapiens.id",
-    "xti.developer03@xapiens.id"
+    "gxc.developer01@xapiens.id",
+    "gxc.developer02@xapiens.id",
+    "gxc.developer03@xapiens.id"
   ]
 }
 
-variable "xti_team_administrator" {
+variable "gxc_team_administrator" {
   description = "XTI Administrator Team Member"
   type        = list(any)
   default = [
-    "xti.admin01@xapiens.id",
-    "xti.admin02@xapiens.id"
+    "gxc.admin01@xapiens.id",
+    "gxc.admin02@xapiens.id"
   ]
 }
 

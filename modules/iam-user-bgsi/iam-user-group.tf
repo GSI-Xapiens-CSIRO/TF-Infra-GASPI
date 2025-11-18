@@ -11,10 +11,10 @@
 # --------------------------------------------------------------------------
 #  IAM User Group (Developer)
 # --------------------------------------------------------------------------
-resource "aws_iam_user_group_membership" "xti_developer" {
+resource "aws_iam_user_group_membership" "gxc_developer" {
   provider = aws.destination
   for_each = toset(
-    local.xti_team_developer
+    local.gxc_team_developer
   )
 
   user = lower(each.key)
@@ -41,10 +41,10 @@ resource "aws_iam_user_group_membership" "bgsi_developer" {
 # --------------------------------------------------------------------------
 #  IAM User Group (Administrator)
 # --------------------------------------------------------------------------
-resource "aws_iam_user_group_membership" "xti_team_administrator" {
+resource "aws_iam_user_group_membership" "gxc_team_administrator" {
   provider = aws.destination
   for_each = toset(
-    local.xti_team_administrator
+    local.gxc_team_administrator
   )
 
   user = lower(each.key)

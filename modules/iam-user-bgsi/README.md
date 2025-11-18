@@ -39,12 +39,12 @@ No modules.
 | [aws_iam_policy.gxc_poweruser_acess](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_user.bgsi_admin](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user.bgsi_developer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
-| [aws_iam_user.xti_admin](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
-| [aws_iam_user.xti_developer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
+| [aws_iam_user.gxc_admin](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
+| [aws_iam_user.gxc_developer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user_group_membership.bgsi_developer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_group_membership) | resource |
 | [aws_iam_user_group_membership.bgsi_team_administrator](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_group_membership) | resource |
-| [aws_iam_user_group_membership.xti_developer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_group_membership) | resource |
-| [aws_iam_user_group_membership.xti_team_administrator](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_group_membership) | resource |
+| [aws_iam_user_group_membership.gxc_developer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_group_membership) | resource |
+| [aws_iam_user_group_membership.gxc_team_administrator](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_group_membership) | resource |
 
 ## Inputs
 
@@ -70,8 +70,8 @@ No modules.
 | <a name="input_tf_user_executor"></a> [tf\_user\_executor](#input\_tf\_user\_executor) | TF User Executor | `string` | n/a | yes |
 | <a name="input_workspace_env"></a> [workspace\_env](#input\_workspace\_env) | Workspace Environment Selection | `map(string)` | n/a | yes |
 | <a name="input_workspace_name"></a> [workspace\_name](#input\_workspace\_name) | Workspace Environment Name | `string` | n/a | yes |
-| <a name="input_xti_team_administrator"></a> [xti\_team\_administrator](#input\_xti\_team\_administrator) | XTI Administrator Team Member | `list(any)` | n/a | yes |
-| <a name="input_xti_team_developer"></a> [xti\_team\_developer](#input\_xti\_team\_developer) | XTI Developer Team Member | `list(any)` | n/a | yes |
+| <a name="input_gxc_team_administrator"></a> [xti\_team\_administrator](#input\_xti\_team\_administrator) | XTI Administrator Team Member | `list(any)` | n/a | yes |
+| <a name="input_gxc_team_developer"></a> [xti\_team\_developer](#input\_xti\_team\_developer) | XTI Developer Team Member | `list(any)` | n/a | yes |
 
 ## Outputs
 
@@ -85,7 +85,7 @@ No modules.
 | <a name="output_gxc_developer_policy_arn"></a> [gxc\_developer\_policy\_arn](#output\_gxc\_developer\_policy\_arn) | GXC Developer Policy ARN |
 | <a name="output_list_bgsi_administrator"></a> [list\_bgsi\_administrator](#output\_list\_bgsi\_administrator) | BGSI Administrator Account |
 | <a name="output_list_bgsi_developer"></a> [list\_bgsi\_developer](#output\_list\_bgsi\_developer) | BGSI Developer Account |
-| <a name="output_list_xti_administrator"></a> [list\_xti\_administrator](#output\_list\_xti\_administrator) | XTI Administrator Account |
-| <a name="output_list_xti_developer"></a> [list\_xti\_developer](#output\_list\_xti\_developer) | XTI Developer Account |
+| <a name="output_list_gxc_administrator"></a> [list\_xti\_administrator](#output\_list\_xti\_administrator) | XTI Administrator Account |
+| <a name="output_list_gxc_developer"></a> [list\_xti\_developer](#output\_list\_xti\_developer) | XTI Developer Account |
 | <a name="output_summary"></a> [summary](#output\_summary) | Summary IAM User Configuration |
 <!-- END_TF_DOCS -->

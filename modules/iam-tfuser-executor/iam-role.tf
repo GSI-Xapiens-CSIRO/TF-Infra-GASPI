@@ -18,12 +18,7 @@ locals {
         "Principal" : {
           "AWS" : [
             "arn:aws:iam::${var.aws_account_id_destination}:user/TF-User-Executor-${var.aws_account_id_destination}",
-            "arn:aws:iam::307946671795:root",
-            "arn:aws:iam::864899849921:root",
-            "arn:aws:iam::688567276772:root",
-            "arn:aws:iam::127214202110:root",
-            "arn:aws:iam::112233445566:root",
-            "arn:aws:iam::586794473955:root"
+            "arn:aws:iam::${var.aws_account_id_destination}:root"
           ]
         },
         "Action" : [

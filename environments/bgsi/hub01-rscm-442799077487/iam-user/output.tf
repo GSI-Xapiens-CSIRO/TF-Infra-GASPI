@@ -49,14 +49,14 @@ output "gxc_developer_policy_arn" {
 # --------------------------------------------------------------------------
 #  List User
 # --------------------------------------------------------------------------
-output "list_xti_developer" {
+output "list_gxc_developer" {
   description = "XTI Developer Account"
-  value       = module.iam-user.list_xti_developer
+  value       = module.iam-user.list_gxc_developer
 }
 
-output "list_xti_administrator" {
+output "list_gxc_administrator" {
   description = "XTI Administrator Account"
-  value       = module.iam-user.list_xti_administrator
+  value       = module.iam-user.list_gxc_administrator
 }
 
 output "list_bgsi_developer" {
