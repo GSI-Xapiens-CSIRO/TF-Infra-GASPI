@@ -60,15 +60,15 @@ projects:
     when_modified: *tf_files
   workflow: sardjito-workflow
 
-- name: bgsi-igng
-  branch: /igng/
+- name: bgsi-rsngoerah
+  branch: /rsngoerah/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 5
   autoplan:
     when_modified: *tf_files
-  workflow: igng-workflow
+  workflow: rsngoerah-workflow
 
 - name: bgsi-rsjpd
   branch: /rsjpd/
@@ -110,15 +110,15 @@ projects:
     when_modified: *tf_files
   workflow: sardjito-uat-workflow
 
-- name: bgsi-igng-uat
-  branch: /igng-uat/
+- name: bgsi-rsngoerah-uat
+  branch: /rsngoerah-uat/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 10
   autoplan:
     when_modified: *tf_files
-  workflow: igng-uat-workflow
+  workflow: rsngoerah-uat-workflow
 
 - name: bgsi-rsjpd-uat
   branch: /rsjpd-uat/

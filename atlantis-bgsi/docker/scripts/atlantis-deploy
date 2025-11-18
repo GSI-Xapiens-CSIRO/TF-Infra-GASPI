@@ -63,27 +63,27 @@ TAG_ID=$(echo $(date '+%Y%m%d'))
 # MULTI-SONARQUBE PROJECT CONFIGURATION
 # =================================================================================
 # Environment-specific SonarQube tokens
-SONAR_TOKEN_HUB01="${SONAR_TOKEN_HUB01:-}"
-SONAR_TOKEN_HUB02="${SONAR_TOKEN_HUB02:-}"
-SONAR_TOKEN_HUB03="${SONAR_TOKEN_HUB03:-}"
-SONAR_TOKEN_HUB04="${SONAR_TOKEN_HUB04:-}"
-SONAR_TOKEN_HUB05="${SONAR_TOKEN_HUB05:-}"
-SONAR_TOKEN_UAT01="${SONAR_TOKEN_UAT01:-}"
-SONAR_TOKEN_UAT02="${SONAR_TOKEN_UAT02:-}"
-SONAR_TOKEN_UAT03="${SONAR_TOKEN_UAT03:-}"
-SONAR_TOKEN_UAT04="${SONAR_TOKEN_UAT04:-}"
-SONAR_TOKEN_UAT05="${SONAR_TOKEN_UAT05:-}"
+SONAR_TOKEN_RSCM="${SONAR_TOKEN_RSCM:-}"
+SONAR_TOKEN_RSPON="${SONAR_TOKEN_RSPON:-}"
+SONAR_TOKEN_SARDJITO="${SONAR_TOKEN_SARDJITO:-}"
+SONAR_TOKEN_RSNGOERAH="${SONAR_TOKEN_RSNGOERAH:-}"
+SONAR_TOKEN_RSJPD="${SONAR_TOKEN_RSJPD:-}"
+SONAR_TOKEN_RSCM-UAT="${SONAR_TOKEN_RSCM-UAT:-}"
+SONAR_TOKEN_RSPON-UAT="${SONAR_TOKEN_RSPON-UAT:-}"
+SONAR_TOKEN_SARDJITO-UAT="${SONAR_TOKEN_SARDJITO-UAT:-}"
+SONAR_TOKEN_RSNGOERAH-UAT="${SONAR_TOKEN_RSNGOERAH-UAT:-}"
+SONAR_TOKEN_RSJPD-UAT="${SONAR_TOKEN_RSJPD-UAT:-}"
 # Environment-specific SonarQube project keys
-SONAR_PROJECT_KEY_HUB01="${SONAR_PROJECT_KEY_HUB01:-bgsi-cicd-gaspi-hub01}"
-SONAR_PROJECT_KEY_HUB02="${SONAR_PROJECT_KEY_HUB02:-bgsi-cicd-gaspi-hub02}"
-SONAR_PROJECT_KEY_HUB03="${SONAR_PROJECT_KEY_HUB03:-bgsi-cicd-gaspi-hub03}"
-SONAR_PROJECT_KEY_HUB04="${SONAR_PROJECT_KEY_HUB04:-bgsi-cicd-gaspi-hub04}"
-SONAR_PROJECT_KEY_HUB05="${SONAR_PROJECT_KEY_HUB05:-bgsi-cicd-gaspi-hub05}"
-SONAR_PROJECT_KEY_UAT01="${SONAR_PROJECT_KEY_UAT01:-bgsi-cicd-gaspi-uat01}"
-SONAR_PROJECT_KEY_UAT02="${SONAR_PROJECT_KEY_UAT02:-bgsi-cicd-gaspi-uat02}"
-SONAR_PROJECT_KEY_UAT03="${SONAR_PROJECT_KEY_UAT03:-bgsi-cicd-gaspi-uat03}"
-SONAR_PROJECT_KEY_UAT04="${SONAR_PROJECT_KEY_UAT04:-bgsi-cicd-gaspi-uat04}"
-SONAR_PROJECT_KEY_UAT05="${SONAR_PROJECT_KEY_UAT05:-bgsi-cicd-gaspi-uat05}"
+SONAR_PROJECT_KEY_RSCM="${SONAR_PROJECT_KEY_RSCM:-bgsi-cicd-gaspi-rscm}"
+SONAR_PROJECT_KEY_RSPON="${SONAR_PROJECT_KEY_RSPON:-bgsi-cicd-gaspi-rspon}"
+SONAR_PROJECT_KEY_SARDJITO="${SONAR_PROJECT_KEY_SARDJITO:-bgsi-cicd-gaspi-sardjito}"
+SONAR_PROJECT_KEY_RSNGOERAH="${SONAR_PROJECT_KEY_RSNGOERAH:-bgsi-cicd-gaspi-rsngoerah}"
+SONAR_PROJECT_KEY_RSJPD="${SONAR_PROJECT_KEY_RSJPD:-bgsi-cicd-gaspi-rsjpd}"
+SONAR_PROJECT_KEY_RSCM-UAT="${SONAR_PROJECT_KEY_RSCM-UAT:-bgsi-cicd-gaspi-rscm-uat}"
+SONAR_PROJECT_KEY_RSPON-UAT="${SONAR_PROJECT_KEY_RSPON-UAT:-bgsi-cicd-gaspi-rspon-uat}"
+SONAR_PROJECT_KEY_SARDJITO-UAT="${SONAR_PROJECT_KEY_SARDJITO-UAT:-bgsi-cicd-gaspi-sardjito-uat}"
+SONAR_PROJECT_KEY_RSNGOERAH-UAT="${SONAR_PROJECT_KEY_RSNGOERAH-UAT:-bgsi-cicd-gaspi-rsngoerah-uat}"
+SONAR_PROJECT_KEY_RSJPD-UAT="${SONAR_PROJECT_KEY_RSJPD-UAT:-bgsi-cicd-gaspi-rsjpd-uat}"
 
 # Function to get environment-specific SonarQube token
 get_sonar_token_for_environment() {
@@ -157,7 +157,7 @@ show_version() {
     show_logo
     echo -e "${GREEN}$SCRIPT_NAME version $SCRIPT_VERSION${NC}"
     echo -e "${BLUE}Build for Terraform Infrastructure Automation with Multi-SonarQube Support${NC}"
-    echo -e "${BLUE}Supports environments: hub01-05, uat01-05${NC}"
+    echo -e "${BLUE}Supports environments: rscm-05, rscm-uat-05${NC}"
     echo ""
     exit 0
 }
@@ -170,13 +170,13 @@ USAGE:
     $SCRIPT_NAME <environment> [operation]
 
 ARGUMENTS:
-    environment    Target environment (hub01, hub02, hub03, hub04, hub05, uat01, uat02, uat03, uat04, uat05)
+    environment    Target environment (rscm, rspon, sardjito, rsngoerah, rsjpd, rscm-uat, rspon-uat, sardjito-uat, rsngoerah-uat, rsjpd-uat)
     operation      Operation to perform (plan, apply) [default: plan]
 
 EXAMPLES:
-    $SCRIPT_NAME hub01 plan            # Plan deployment for hub01
-    $SCRIPT_NAME uat02 apply           # Apply deployment for uat02
-    $SCRIPT_NAME hub01                 # Plan deployment for hub01 (default)
+    $SCRIPT_NAME rscm plan            # Plan deployment for rscm
+    $SCRIPT_NAME rspon-uat apply      # Apply deployment for rspon-uat
+    $SCRIPT_NAME rscm                 # Plan deployment for rscm (default)
 
 ENVIRONMENT VARIABLES:
     GITHUB_TOKEN                       Required: GitHub Personal Access Token
@@ -193,28 +193,28 @@ SONARQUBE INTEGRATION (Multi-Project Support):
     SONAR_HOST_URL                     SonarQube server URL (default: https://sonarqube-bgsi.xapiens.id)
 
     # Environment-specific tokens (preferred)
-    SONAR_TOKEN_HUB01                  SonarQube token for hub01 environment
-    SONAR_TOKEN_HUB02                  SonarQube token for hub02 environment
-    SONAR_TOKEN_HUB03                  SonarQube token for hub03 environment
-    SONAR_TOKEN_HUB04                  SonarQube token for hub04 environment
-    SONAR_TOKEN_HUB05                  SonarQube token for hub05 environment
-    SONAR_TOKEN_UAT01                  SonarQube token for uat01 environment
-    SONAR_TOKEN_UAT02                  SonarQube token for uat02 environment
-    SONAR_TOKEN_UAT03                  SonarQube token for uat03 environment
-    SONAR_TOKEN_UAT04                  SonarQube token for uat04 environment
-    SONAR_TOKEN_UAT05                  SonarQube token for uat05 environment
+    SONAR_TOKEN_RSCM                   SonarQube token for rscm environment
+    SONAR_TOKEN_RSPON                  SonarQube token for rspon environment
+    SONAR_TOKEN_SARDJITO               SonarQube token for sardjito environment
+    SONAR_TOKEN_RSNGOERAH              SonarQube token for rsngoerah environment
+    SONAR_TOKEN_RSJPD                  SonarQube token for rsjpd environment
+    SONAR_TOKEN_RSCM-UAT               SonarQube token for rscm-uat environment
+    SONAR_TOKEN_RSPON-UAT              SonarQube token for rspon-uat environment
+    SONAR_TOKEN_SARDJITO-UAT           SonarQube token for sardjito-uat environment
+    SONAR_TOKEN_RSNGOERAH-UAT          SonarQube token for rsngoerah-uat environment
+    SONAR_TOKEN_RSJPD-UAT              SonarQube token for rsjpd-uat environment
 
     # Environment-specific project keys (optional)
-    SONAR_PROJECT_KEY_HUB01            Project key for hub01 (default: bgsi-cicd-gaspi-hub01)
-    SONAR_PROJECT_KEY_HUB02            Project key for hub02 (default: bgsi-cicd-gaspi-hub02)
-    SONAR_PROJECT_KEY_HUB03            Project key for hub03 (default: bgsi-cicd-gaspi-hub03)
-    SONAR_PROJECT_KEY_HUB04            Project key for hub04 (default: bgsi-cicd-gaspi-hub04)
-    SONAR_PROJECT_KEY_HUB05            Project key for hub05 (default: bgsi-cicd-gaspi-hub05)
-    SONAR_PROJECT_KEY_UAT01            Project key for uat01 (default: bgsi-cicd-gaspi-uat01)
-    SONAR_PROJECT_KEY_UAT02            Project key for uat02 (default: bgsi-cicd-gaspi-uat02)
-    SONAR_PROJECT_KEY_UAT03            Project key for uat03 (default: bgsi-cicd-gaspi-uat03)
-    SONAR_PROJECT_KEY_UAT04            Project key for uat04 (default: bgsi-cicd-gaspi-uat04)
-    SONAR_PROJECT_KEY_UAT05            Project key for uat05 (default: bgsi-cicd-gaspi-uat05)
+    SONAR_PROJECT_KEY_RSCM             Project key for rscm (default: bgsi-cicd-gaspi-rscm)
+    SONAR_PROJECT_KEY_RSPON            Project key for rspon (default: bgsi-cicd-gaspi-rspon)
+    SONAR_PROJECT_KEY_SARDJITO         Project key for sardjito (default: bgsi-cicd-gaspi-sardjito)
+    SONAR_PROJECT_KEY_RSNGOERAH        Project key for rsngoerah (default: bgsi-cicd-gaspi-rsngoerah)
+    SONAR_PROJECT_KEY_RSJPD            Project key for rsjpd (default: bgsi-cicd-gaspi-rsjpd)
+    SONAR_PROJECT_KEY_RSCM-UAT         Project key for rscm-uat (default: bgsi-cicd-gaspi-rscm-uat)
+    SONAR_PROJECT_KEY_RSPON-UAT        Project key for rspon-uat (default: bgsi-cicd-gaspi-rspon-uat)
+    SONAR_PROJECT_KEY_SARDJITO-UAT     Project key for sardjito-uat (default: bgsi-cicd-gaspi-sardjito-uat)
+    SONAR_PROJECT_KEY_RSNGOERAH-UAT    Project key for rsngoerah-uat (default: bgsi-cicd-gaspi-rsngoerah-uat)
+    SONAR_PROJECT_KEY_RSJPD-UAT        Project key for rsjpd-uat (default: bgsi-cicd-gaspi-rsjpd-uat)
 
     # Fallback general configuration
     SONAR_TOKEN                        General SonarQube token (fallback if environment-specific not set)
@@ -231,8 +231,8 @@ SECURITY CONTROLS:
     LOG_LEVEL                          Logging level (DEBUG, INFO, WARN, ERROR)
 
 SUPPORTED ENVIRONMENTS:
-    HUB environments: hub01, hub02, hub03, hub04, hub05
-    UAT environments: uat01, uat02, uat03, uat04, uat05
+    HUB environments: rscm, rspon, sardjito, rsngoerah, rsjpd
+    UAT environments: rscm-uat, rspon-uat, sardjito-uat, rsngoerah-uat, rsjpd-uat
 
 OPTIONS:
     -h, --help                Show this help message
@@ -330,16 +330,16 @@ safe_log_command() {
         "${AWS_SESSION_TOKEN:-}"
         "${AWS_ACCESS_KEY_ID:-}"
         # Add environment-specific tokens
-        "${SONAR_TOKEN_HUB01:-}"
-        "${SONAR_TOKEN_HUB02:-}"
-        "${SONAR_TOKEN_HUB03:-}"
-        "${SONAR_TOKEN_HUB04:-}"
-        "${SONAR_TOKEN_HUB05:-}"
-        "${SONAR_TOKEN_UAT01:-}"
-        "${SONAR_TOKEN_UAT02:-}"
-        "${SONAR_TOKEN_UAT03:-}"
-        "${SONAR_TOKEN_UAT04:-}"
-        "${SONAR_TOKEN_UAT05:-}"
+        "${SONAR_TOKEN_RSCM:-}"
+        "${SONAR_TOKEN_RSPON:-}"
+        "${SONAR_TOKEN_SARDJITO:-}"
+        "${SONAR_TOKEN_RSNGOERAH:-}"
+        "${SONAR_TOKEN_RSJPD:-}"
+        "${SONAR_TOKEN_RSCM-UAT:-}"
+        "${SONAR_TOKEN_RSPON-UAT:-}"
+        "${SONAR_TOKEN_SARDJITO-UAT:-}"
+        "${SONAR_TOKEN_RSNGOERAH-UAT:-}"
+        "${SONAR_TOKEN_RSJPD-UAT:-}"
     )
 
     # Only mask non-empty values
@@ -362,13 +362,13 @@ safe_log_command() {
 # Validate environment
 validate_environment() {
     case $ENVIRONMENT in
-        hub01|hub02|hub03|hub04|hub05|uat01|uat02|uat03|uat04|uat05)
+        rscm|rspon|sardjito|rsngoerah|rsjpd|rscm-uat|rspon-uat|sardjito-uat|rsngoerah-uat|rsjpd-uat)
             log_info "Processing $OPERATION for environment: $ENVIRONMENT"
             return 0
             ;;
         *)
             log_error "Unsupported environment: $ENVIRONMENT"
-            echo "Supported environments: hub01-05, uat01-05"
+            echo "Supported environments: rscm-05, rscm-uat-05"
             return 1
             ;;
     esac
@@ -1358,8 +1358,8 @@ cleanup_sensitive_files() {
 
     # Clear sensitive environment variables (including all environment-specific tokens)
     unset SONAR_TOKEN GITHUB_TOKEN AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_ACCESS_KEY_ID
-    unset SONAR_TOKEN_HUB01 SONAR_TOKEN_HUB02 SONAR_TOKEN_HUB03 SONAR_TOKEN_HUB04 SONAR_TOKEN_HUB05
-    unset SONAR_TOKEN_UAT01 SONAR_TOKEN_UAT02 SONAR_TOKEN_UAT03 SONAR_TOKEN_UAT04 SONAR_TOKEN_UAT05
+    unset SONAR_TOKEN_RSCM SONAR_TOKEN_RSPON SONAR_TOKEN_SARDJITO SONAR_TOKEN_RSNGOERAH SONAR_TOKEN_RSJPD
+    unset SONAR_TOKEN_RSCM-UAT SONAR_TOKEN_RSPON-UAT SONAR_TOKEN_SARDJITO-UAT SONAR_TOKEN_RSNGOERAH-UAT SONAR_TOKEN_RSJPD-UAT
 
     # Clear shell history of sensitive commands (if running interactively)
     if [[ $- == *i* ]]; then
@@ -1379,7 +1379,7 @@ show_sonar_config() {
     log_info "SONARQUBE MULTI-PROJECT CONFIGURATION STATUS"
     log_info "============================================================"
 
-    local environments=("hub01" "hub02" "hub03" "hub04" "hub05" "uat01" "uat02" "uat03" "uat04" "uat05")
+    local environments=("rscm" "rspon" "sardjito" "rsngoerah" "rsjpd" "rscm-uat" "rspon-uat" "sardjito-uat" "rsngoerah-uat" "rsjpd-uat")
 
     for env in "${environments[@]}"; do
         local token_var="SONAR_TOKEN_${env^^}"
@@ -1407,7 +1407,7 @@ show_sonar_config() {
 validate_all_sonar_configs() {
     log_info "Validating SonarQube configurations for all environments..."
 
-    local environments=("hub01" "hub02" "hub03" "hub04" "hub05" "uat01" "uat02" "uat03" "uat04" "uat05")
+    local environments=("rscm" "rspon" "sardjito" "rsngoerah" "rsjpd" "rscm-uat" "rspon-uat" "sardjito-uat" "rsngoerah-uat" "rsjpd-uat")
     local missing_configs=()
     local valid_configs=0
 
@@ -1530,12 +1530,12 @@ show_extended_help() {
 CONFIGURATION EXAMPLES:
 
 1. Environment-specific SonarQube tokens:
-   export SONAR_TOKEN_HUB01=sqp_1234567890abcdef1234567890abcdef12345678
-   export SONAR_TOKEN_UAT01=sqp_abcdef1234567890abcdef1234567890abcdef12
+   export SONAR_TOKEN_RSCM=sqp_1234567890abcdef1234567890abcdef12345678
+   export SONAR_TOKEN_RSCM-UAT=sqp_abcdef1234567890abcdef1234567890abcdef12
 
 2. Environment-specific project keys (optional):
-   export SONAR_PROJECT_KEY_HUB01=bgsi-cicd-gaspi-hub01-custom
-   export SONAR_PROJECT_KEY_UAT01=bgsi-cicd-gaspi-uat01-custom
+   export SONAR_PROJECT_KEY_RSCM=bgsi-cicd-gaspi-rscm-custom
+   export SONAR_PROJECT_KEY_RSCM-UAT=bgsi-cicd-gaspi-rscm-uat-custom
 
 3. Fallback configuration (applies to all environments without specific tokens):
    export SONAR_TOKEN=sqp_fallback1234567890abcdef1234567890abcdef
@@ -1551,7 +1551,7 @@ Common Issues and Solutions:
 1. "No SonarQube token available for environment"
    - Set SONAR_TOKEN_<ENV> for the specific environment
    - Or set SONAR_TOKEN as a fallback
-   - Example: export SONAR_TOKEN_HUB01=sqp_your_token_here
+   - Example: export SONAR_TOKEN_RSCM=sqp_your_token_here
 
 2. "Failed to access GitHub repository"
    - Verify GITHUB_TOKEN is set and valid
@@ -1576,7 +1576,7 @@ Common Issues and Solutions:
 ADVANCED USAGE:
 
 Debug mode:
-    atlantis-deploy hub01 plan --debug
+    atlantis-deploy rscm plan --debug
 
 Check SonarQube configuration:
     atlantis-deploy --show-sonar-config
@@ -1585,7 +1585,7 @@ Validate all configurations:
     atlantis-deploy --validate-all
 
 Environment-specific execution:
-    SCRIPT_RUN_TEST=false SCRIPT_RUN_SONAR=true atlantis-deploy hub01 apply
+    SCRIPT_RUN_TEST=false SCRIPT_RUN_SONAR=true atlantis-deploy rscm apply
 
 EOF
 }

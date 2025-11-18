@@ -489,7 +489,7 @@
   encrypt        = true
   ```
 
-- **igng.tfvars**
+- **rsngoerah.tfvars**
 
   ```
   region = "ap-southeast-3"
@@ -521,9 +521,9 @@
   ses-source-email = "devops@example.com"
   enable-inspector = true
 
-  hub_name         = "RSIGNG"
+  hub_name         = "RSNGOERAH"
   lookup_configuration = {
-    assoc_matrix_filename = "RSIGNG_association_matrix.csv"
+    assoc_matrix_filename = "RSNGOERAH_association_matrix.csv"
     chr_header            = "chr"
     start_header          = "start"
     end_header            = "end"

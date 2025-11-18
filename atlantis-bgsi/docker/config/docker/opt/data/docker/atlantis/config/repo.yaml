@@ -42,13 +42,13 @@ workflows:
       steps:
       - run: atlantis-deploy sardjito apply
 
-  igng-workflow:
+  rsngoerah-workflow:
     plan:
       steps:
-      - run: atlantis-deploy igng plan
+      - run: atlantis-deploy rsngoerah plan
     apply:
       steps:
-      - run: atlantis-deploy igng apply
+      - run: atlantis-deploy rsngoerah apply
 
   rsjpd-workflow:
     plan:
@@ -84,13 +84,13 @@ workflows:
       steps:
       - run: atlantis-deploy sardjito-uat apply
 
-  igng-uat-workflow:
+  rsngoerah-uat-workflow:
     plan:
       steps:
-      - run: atlantis-deploy igng-uat plan
+      - run: atlantis-deploy rsngoerah-uat plan
     apply:
       steps:
-      - run: atlantis-deploy igng-uat apply
+      - run: atlantis-deploy rsngoerah-uat apply
 
   rsjpd-uat-workflow:
     plan:
