@@ -4,21 +4,21 @@
 - HUB01: `RSCM`
 - HUB02: `RSPON`
 - HUB03: `SARDJITO`
-- HUB04: `IGNG`
+- HUB04: `RSNGOERAH`
 - HUB05: `RSJPD`
 - UAT01: `RSCM-UAT`
 - UAT02: `RSPON-UAT`
 - UAT03: `SARDJITO-UAT`
-- UAT04: `IGNG-UAT`
+- UAT04: `RSNGOERAH-UAT`
 - UAT05: `RSJPD-UAT`
 
 
 ## AWS Config Profile
 
 ```
-$HOME/.aws/config
-------------------------------------------------------------------------------
-##### HUB #####
+#  $HOME/.aws/config #
+
+## PROD ##
 [profile BGSI-TF-User-Executor-RSCM]
 role_arn = arn:aws:iam::442799077487:role/TF-Central-Role_442799077487
 source_profile = BGSI-TF-User-Executor-RSCM
@@ -26,56 +26,57 @@ region = ap-southeast-3
 output = json
 
 [profile BGSI-TF-User-Executor-RSPON]
-role_arn = arn:aws:iam::AWS_RSPON_ACCOUNT:role/TF-Central-Role_AWS_RSPON_ACCOUNT
+role_arn = arn:aws:iam::829990487185:role/TF-Central-Role_829990487185
 source_profile = BGSI-TF-User-Executor-RSPON
 region = ap-southeast-3
 output = json
 
 [profile BGSI-TF-User-Executor-SARDJITO]
-role_arn = arn:aws:iam::AWS_SARDJITO_ACCOUNT:role/TF-Central-Role_AWS_SARDJITO_ACCOUNT
+role_arn = arn:aws:iam::938674806253:role/TF-Central-Role_AWS_ACCOUNT_ID
 source_profile = BGSI-TF-User-Executor-SARDJITO
 region = ap-southeast-3
 output = json
 
-[profile BGSI-TF-User-Executor-IGNG]
-role_arn = arn:aws:iam::AWS_IGNG_ACCOUNT:role/TF-Central-Role_AWS_IGNG_ACCOUNT
-source_profile = BGSI-TF-User-Executor-IGNG
+[profile BGSI-TF-User-Executor-RSNGOERAH]
+role_arn = arn:aws:iam::136839993415:role/TF-Central-Role_136839993415
+source_profile = BGSI-TF-User-Executor-RSNGOERAH
 region = ap-southeast-3
 output = json
 
 [profile BGSI-TF-User-Executor-RSJPD]
-role_arn = arn:aws:iam::AWS_RSJPD_ACCOUNT:role/TF-Central-Role_AWS_RSJPD_ACCOUNT
+role_arn = arn:aws:iam::602006056899:role/TF-Central-Role_602006056899
 source_profile = BGSI-TF-User-Executor-RSJPD
 region = ap-southeast-3
 output = json
 
-##### UAT #####
+
+## UAT ##
 [profile BGSI-TF-User-Executor-RSCM-UAT]
-role_arn = arn:aws:iam::AWS_RSCM-UAT_ACCOUNT:role/TF-Central-Role_AWS_RSCM-UAT_ACCOUNT
+role_arn = arn:aws:iam::695094375681:role/TF-Central-Role_695094375681
 source_profile = BGSI-TF-User-Executor-RSCM-UAT
 region = ap-southeast-3
 output = json
 
 [profile BGSI-TF-User-Executor-RSPON-UAT]
-role_arn = arn:aws:iam::AWS_RSPON-UAT_ACCOUNT:role/TF-Central-Role_AWS_RSPON-UAT_ACCOUNT
+role_arn = arn:aws:iam::741464515101:role/TF-Central-Role_741464515101
 source_profile = BGSI-TF-User-Executor-RSPON-UAT
 region = ap-southeast-3
 output = json
 
 [profile BGSI-TF-User-Executor-SARDJITO-UAT]
-role_arn = arn:aws:iam::AWS_SARDJITO-UAT_ACCOUNT:role/TF-Central-Role_AWS_SARDJITO-UAT_ACCOUNT
+role_arn = arn:aws:iam::819520291687:role/TF-Central-Role_819520291687
 source_profile = BGSI-TF-User-Executor-SARDJITO-UAT
 region = ap-southeast-3
 output = json
 
-[profile BGSI-TF-User-Executor-IGNG-UAT]
-role_arn = arn:aws:iam::AWS_IGNG-UAT_ACCOUNT:role/TF-Central-Role_AWS_IGNG-UAT_ACCOUNT
-source_profile = BGSI-TF-User-Executor-IGNG-UAT
+[profile BGSI-TF-User-Executor-RSNGOERAH-UAT]
+role_arn = arn:aws:iam::899630542732:role/TF-Central-Role_899630542732
+source_profile = BGSI-TF-User-Executor-RSNGOERAH-UAT
 region = ap-southeast-3
 output = json
 
 [profile BGSI-TF-User-Executor-RSJPD-UAT]
-role_arn = arn:aws:iam::AWS_RSJPD-UAT_ACCOUNT:role/Temp-TF-Central-Role_AWS_RSJPD-UAT_ACCOUNT
+role_arn = arn:aws:iam::148450585096:role/TF-Central-Role_148450585096
 source_profile = BGSI-TF-User-Executor-RSJPD-UAT
 region = ap-southeast-3
 output = json
@@ -98,7 +99,7 @@ aws_secret_access_key =
 aws_access_key_id =
 aws_secret_access_key =
 
-[BGSI-TF-User-Executor-IGNG]
+[BGSI-TF-User-Executor-RSNGOERAH]
 aws_access_key_id =
 aws_secret_access_key =
 
@@ -118,7 +119,7 @@ aws_secret_access_key =
 aws_access_key_id =
 aws_secret_access_key =
 
-[BGSI-TF-User-Executor-IGNG-UAT]
+[BGSI-TF-User-Executor-RSNGOERAH-UAT]
 aws_access_key_id =
 aws_secret_access_key =
 
@@ -175,13 +176,13 @@ workflows:
       steps:
       - run: atlantis-deploy sardjito apply
 
-  igng-workflow:
+  rsngoerah-workflow:
     plan:
       steps:
-      - run: atlantis-deploy igng plan
+      - run: atlantis-deploy rsngoerah plan
     apply:
       steps:
-      - run: atlantis-deploy igng apply
+      - run: atlantis-deploy rsngoerah apply
 
   rsjpd-workflow:
     plan:
@@ -217,13 +218,13 @@ workflows:
       steps:
       - run: atlantis-deploy sardjito-uat apply
 
-  igng-uat-workflow:
+  rsngoerah-uat-workflow:
     plan:
       steps:
-      - run: atlantis-deploy igng-uat plan
+      - run: atlantis-deploy rsngoerah-uat plan
     apply:
       steps:
-      - run: atlantis-deploy igng-uat apply
+      - run: atlantis-deploy rsngoerah-uat apply
 
   rsjpd-uat-workflow:
     plan:
@@ -299,15 +300,15 @@ projects:
     when_modified: *tf_files
   workflow: sardjito-workflow
 
-- name: bgsi-igng
-  branch: /igng/
+- name: bgsi-rsngoerah
+  branch: /rsngoerah/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 5
   autoplan:
     when_modified: *tf_files
-  workflow: igng-workflow
+  workflow: rsngoerah-workflow
 
 - name: bgsi-rsjpd
   branch: /rsjpd/
@@ -349,15 +350,15 @@ projects:
     when_modified: *tf_files
   workflow: sardjito-uat-workflow
 
-- name: bgsi-igng-uat
-  branch: /igng-uat/
+- name: bgsi-rsngoerah-uat
+  branch: /rsngoerah-uat/
   dir: .
   workspace: default
   terraform_version: *tf_version
   execution_order_group: 10
   autoplan:
     when_modified: *tf_files
-  workflow: igng-uat-workflow
+  workflow: rsngoerah-uat-workflow
 
 - name: bgsi-rsjpd-uat
   branch: /rsjpd-uat/
