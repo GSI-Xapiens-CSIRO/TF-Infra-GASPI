@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 #================================================================================================
 # NETWORK SETUP
@@ -170,18 +170,26 @@ services:
       # SonarQube reports (shared volume)
       - vol_sonar_reports:/opt/sonar-reports
     environment:
-      # GitHub Configuration
+      #================================================================================================
+      # GITHUB CONFIGURATION
+      #================================================================================================
       - ATLANTIS_GH_HOSTNAME=github.com
       - ATLANTIS_GH_USER=${ATLANTIS_GH_USER:-bgsi-gh-user}
       - ATLANTIS_GH_TOKEN=${ATLANTIS_GH_TOKEN}
       - ATLANTIS_GH_WEBHOOK_SECRET=${ATLANTIS_GH_WEBHOOK_SECRET}
-      # Git Configuration
+
+      #================================================================================================
+      # GIT CONFIGURATION
+      #================================================================================================
       - GITHUB_USERNAME=${ATLANTIS_GH_USER:-bgsi-gh-user}
       - GITHUB_TOKEN=${ATLANTIS_GH_TOKEN}
       - GIT_USER_NAME=${GIT_USER_NAME:-BGSI DevOps}
       - GIT_USER_EMAIL=${ATLANTIS_GH_EMAIL:-devops@example.com}
       - CONFIG_PATH=${ATLANTIS_CONFIG_PATH:-/atlantis/config}
-      # Web Configuration
+
+      #================================================================================================
+      # WEB CONFIGURATION
+      #================================================================================================
       - ATLANTIS_WEB_HOSTNAME=${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
       - ATLANTIS_WEB_BASIC_AUTH=true
       - ATLANTIS_PORT=${PORT_ATLANTIS:-4141}
@@ -189,7 +197,10 @@ services:
       - ATLANTIS_WEB_BASIC_AUTH=${ATLANTIS_WEB_BASIC_AUTH:-true}
       - ATLANTIS_WEB_USERNAME=${NGINX_BASIC_AUTH_USER:-bgsi-admin}
       - ATLANTIS_WEB_PASSWORD=${NGINX_BASIC_AUTH_PASSWORD:-B4s1c-4uth}
-      # Database Configuration
+
+      #================================================================================================
+      # DATABASE CONFIGURATION
+      #================================================================================================
       - ATLANTIS_DB_TYPE=postgres
       - ATLANTIS_DB_HOST=${CONTAINER_IP_ATLANTIS_DB:-172.150.150.4}
       - ATLANTIS_DB_PORT=5432
@@ -197,13 +208,23 @@ services:
       - ATLANTIS_DB_USER=${ATLANTIS_DB_USER:-postgres}
       - ATLANTIS_DB_PASSWORD=${ATLANTIS_DB_PASSWORD}
       - ATLANTIS_DB_SSL_MODE=disable
-      # Data Directory
+
+      #================================================================================================
+      # DATA DIRECTORY
+      #================================================================================================
       - ATLANTIS_DATA_DIR=/atlantis/data
-      # AWS Configuration
+
+      #================================================================================================
+      # AWS CONFIGURATION
+      #================================================================================================
       - AWS_REGION=${AWS_REGION:-ap-southeast-3}
+      - AWS_DEFAULT_REGION=${AWS_REGION:-ap-southeast-3}
       - AWS_SHARED_CREDENTIALS_FILE=/home/atlantis/.aws/credentials
       - AWS_CONFIG_FILE=/home/atlantis/.aws/config
-      # Project Configuration
+
+      #================================================================================================
+      # PROJECT CONFIGURATION
+      #================================================================================================
       - ATLANTIS_CONFIG=/atlantis/atlantis.yaml
       - ATLANTIS_CONFIG_PATH=/atlantis/config
       - ATLANTIS_ALLOW_COMMANDS=version,plan,apply,unlock,approve_policies
@@ -220,6 +241,7 @@ services:
       - ATLANTIS_HIDE_PREV_PLAN_COMMENTS=true
       - ATLANTIS_TEST_TIMEOUT=${ATLANTIS_TEST_TIMEOUT:-600}
       - ATLANTIS_LOG_LEVEL=warn
+
       #================================================================================================
       # SONARQUBE INTEGRATION CONFIGURATION
       #================================================================================================
@@ -227,63 +249,88 @@ services:
       - ENABLE_SONARQUBE=${ENABLE_SONARQUBE:-true}
       - SONARQUBE_REQUIRED=${SONARQUBE_REQUIRED:-false}
       - SONARQUBE_QUALITY_GATE_REQUIRED=${SONARQUBE_QUALITY_GATE_REQUIRED:-false}
+
       # SonarQube Server Configuration
       - SONAR_HOST_URL=${SONAR_HOST_URL:-http://sonarqube-web:9000}
       - SONAR_SCANNER_IMAGE=${SONAR_SCANNER_IMAGE:-sonarsource/sonar-scanner-cli:latest}
       - SONAR_ANALYSIS_TIMEOUT=${SONAR_ANALYSIS_TIMEOUT:-600}
+
       # Internal SonarQube Service (when using local SonarQube)
       - SONAR_INTERNAL_URL=${SONAR_INTERNAL_URL:-http://sonarqube-local:9000}
       - SONAR_SCANNER_CONTAINER=${SONAR_SCANNER_CONTAINER:-bgsi_sonar_scanner}
+
       # Security and Testing Controls
       - SCRIPT_RUN_TEST=${SCRIPT_RUN_TEST:-true}
       - SCRIPT_RUN_SONAR=${SCRIPT_RUN_SONAR:-true}
+
+      #------------------------------------------------------------------------------------------------
+      # SonarQube Token Variables - Production Environments
+      #------------------------------------------------------------------------------------------------
       - SONAR_TOKEN_RSCM=${SONAR_TOKEN_RSCM}
       - SONAR_TOKEN_RSPON=${SONAR_TOKEN_RSPON}
       - SONAR_TOKEN_SARDJITO=${SONAR_TOKEN_SARDJITO}
       - SONAR_TOKEN_RSNGOERAH=${SONAR_TOKEN_RSNGOERAH}
       - SONAR_TOKEN_RSJPD=${SONAR_TOKEN_RSJPD}
-      - SONAR_TOKEN_RSCM-UAT=${SONAR_TOKEN_RSCM-UAT}
-      - SONAR_TOKEN_RSPON-UAT=${SONAR_TOKEN_RSPON-UAT}
-      - SONAR_TOKEN_SARDJITO-UAT=${SONAR_TOKEN_SARDJITO-UAT}
-      - SONAR_TOKEN_RSNGOERAH-UAT=${SONAR_TOKEN_RSNGOERAH-UAT}
-      - SONAR_TOKEN_RSJPD-UAT=${SONAR_TOKEN_RSJPD-UAT}
+
+      #------------------------------------------------------------------------------------------------
+      # SonarQube Token Variables - UAT Environments
+      #------------------------------------------------------------------------------------------------
+      - SONAR_TOKEN_RSCM_UAT=${SONAR_TOKEN_RSCM_UAT}
+      - SONAR_TOKEN_RSPON_UAT=${SONAR_TOKEN_RSPON_UAT}
+      - SONAR_TOKEN_SARDJITO_UAT=${SONAR_TOKEN_SARDJITO_UAT}
+      - SONAR_TOKEN_RSNGOERAH_UAT=${SONAR_TOKEN_RSNGOERAH_UAT}
+      - SONAR_TOKEN_RSJPD_UAT=${SONAR_TOKEN_RSJPD_UAT}
+
+      #------------------------------------------------------------------------------------------------
+      # SonarQube Project Key Variables - Production Environments
+      #------------------------------------------------------------------------------------------------
       - SONAR_PROJECT_KEY_RSCM=${SONAR_PROJECT_KEY_RSCM:-bgsi-cicd-gaspi-rscm}
       - SONAR_PROJECT_KEY_RSPON=${SONAR_PROJECT_KEY_RSPON:-bgsi-cicd-gaspi-rspon}
       - SONAR_PROJECT_KEY_SARDJITO=${SONAR_PROJECT_KEY_SARDJITO:-bgsi-cicd-gaspi-sardjito}
       - SONAR_PROJECT_KEY_RSNGOERAH=${SONAR_PROJECT_KEY_RSNGOERAH:-bgsi-cicd-gaspi-rsngoerah}
       - SONAR_PROJECT_KEY_RSJPD=${SONAR_PROJECT_KEY_RSJPD:-bgsi-cicd-gaspi-rsjpd}
-      - SONAR_PROJECT_KEY_RSCM-UAT=${SONAR_PROJECT_KEY_RSCM-UAT:-bgsi-cicd-gaspi-rscm-uat}
-      - SONAR_PROJECT_KEY_RSPON-UAT=${SONAR_PROJECT_KEY_RSPON-UAT:-bgsi-cicd-gaspi-rspon-uat}
-      - SONAR_PROJECT_KEY_SARDJITO-UAT=${SONAR_PROJECT_KEY_SARDJITO-UAT:-bgsi-cicd-gaspi-sardjito-uat}
-      - SONAR_PROJECT_KEY_RSNGOERAH-UAT=${SONAR_PROJECT_KEY_RSNGOERAH-UAT:-bgsi-cicd-gaspi-rsngoerah-uat}
-      - SONAR_PROJECT_KEY_RSJPD-UAT=${SONAR_PROJECT_KEY_RSJPD-UAT:-bgsi-cicd-gaspi-rsjpd-uat}
+
+      #------------------------------------------------------------------------------------------------
+      # SonarQube Project Key Variables - UAT Environments
+      #------------------------------------------------------------------------------------------------
+      - SONAR_PROJECT_KEY_RSCM_UAT=${SONAR_PROJECT_KEY_RSCM_UAT:-bgsi-cicd-gaspi-rscm-uat}
+      - SONAR_PROJECT_KEY_RSPON_UAT=${SONAR_PROJECT_KEY_RSPON_UAT:-bgsi-cicd-gaspi-rspon-uat}
+      - SONAR_PROJECT_KEY_SARDJITO_UAT=${SONAR_PROJECT_KEY_SARDJITO_UAT:-bgsi-cicd-gaspi-sardjito-uat}
+      - SONAR_PROJECT_KEY_RSNGOERAH_UAT=${SONAR_PROJECT_KEY_RSNGOERAH_UAT:-bgsi-cicd-gaspi-rsngoerah-uat}
+      - SONAR_PROJECT_KEY_RSJPD_UAT=${SONAR_PROJECT_KEY_RSJPD_UAT:-bgsi-cicd-gaspi-rsjpd-uat}
+
       #================================================================================================
-      # AWS ACCOUNT
+      # AWS ACCOUNT CONFIGURATION
       #================================================================================================
       # Organization Structure
       - BGSI_MANAGEMENT_ACCOUNT=${BGSI_MANAGEMENT_ACCOUNT}
       - BGSI_SECURITY_ACCOUNT=${BGSI_SECURITY_ACCOUNT}
       - BGSI_LOGS_ACCOUNT=${BGSI_LOGS_ACCOUNT}
       - BGSI_BILLING_ACCOUNT=${BGSI_BILLING_ACCOUNT}
+
+      # AWS Production Environments
       - BGSI_RSCM_ACCOUNT=${BGSI_RSCM_ACCOUNT}
       - BGSI_RSPON_ACCOUNT=${BGSI_RSPON_ACCOUNT}
       - BGSI_SARDJITO_ACCOUNT=${BGSI_SARDJITO_ACCOUNT}
       - BGSI_RSNGOERAH_ACCOUNT=${BGSI_RSNGOERAH_ACCOUNT}
       - BGSI_RSJPD_ACCOUNT=${BGSI_RSJPD_ACCOUNT}
-      - BGSI_RSCM-UAT_ACCOUNT=${BGSI_RSCM-UAT_ACCOUNT}
-      - BGSI_RSPON-UAT_ACCOUNT=${BGSI_RSPON-UAT_ACCOUNT}
-      - BGSI_SARDJITO-UAT_ACCOUNT=${BGSI_SARDJITO-UAT_ACCOUNT}
-      - BGSI_RSNGOERAH-UAT_ACCOUNT=${BGSI_RSNGOERAH-UAT_ACCOUNT}
-      - BGSI_RSJPD-UAT_ACCOUNT=${BGSI_RSJPD-UAT_ACCOUNT}
+
+      # AWS UAT Environments
+      - BGSI_RSCM_UAT_ACCOUNT=${BGSI_RSCM_UAT_ACCOUNT}
+      - BGSI_RSPON_UAT_ACCOUNT=${BGSI_RSPON_UAT_ACCOUNT}
+      - BGSI_SARDJITO_UAT_ACCOUNT=${BGSI_SARDJITO_UAT_ACCOUNT}
+      - BGSI_RSNGOERAH_UAT_ACCOUNT=${BGSI_RSNGOERAH_UAT_ACCOUNT}
+      - BGSI_RSJPD_UAT_ACCOUNT=${BGSI_RSJPD_UAT_ACCOUNT}
+
       #================================================================================================
-      # OTHERS
+      # OTHER CONFIGURATION
       #================================================================================================
-      # Other Configuration
       - ENABLE_SECURITY_AUDIT=true
       - LOG_LEVEL=INFO
       - DEFAULT_CONFTEST_VERSION=${CONFTEST_VERSION:-0.56.0}
       - TZ=Asia/Jakarta
       - PYTHONPATH=/usr/local/lib/python3.12/site-packages
+
     user: "100:100" # atlantis:atlantis
     privileged: true
     depends_on:
