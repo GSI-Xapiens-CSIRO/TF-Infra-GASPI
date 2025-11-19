@@ -1,0 +1,78 @@
+# ==========================================================================
+#  829990487185 - IAM: output.tf
+# --------------------------------------------------------------------------
+#  Description
+#    Output Terraform Value
+# --------------------------------------------------------------------------
+#    - List Group
+#    - List Policy
+#    - List Role
+#    - List User
+# ==========================================================================
+
+# --------------------------------------------------------------------------
+#  List Group
+# --------------------------------------------------------------------------
+output "developer_group_name" {
+  description = "Developer Group Name"
+  value       = module.iam-user.developer_group_name
+}
+
+output "developer_group_arn" {
+  description = "Developer Group Name"
+  value       = module.iam-user.developer_group_arn
+}
+
+output "admin_group_name" {
+  description = "Administrator Group Name"
+  value       = module.iam-user.admin_group_name
+}
+
+output "admin_group_arn" {
+  description = "Administrator Group Name"
+  value       = module.iam-user.admin_group_arn
+}
+
+# --------------------------------------------------------------------------
+#  List Policy
+# --------------------------------------------------------------------------
+output "gxc_developer_policy" {
+  description = "BGSI Developer Policy Name"
+  value       = module.iam-user.gxc_developer_policy
+}
+
+output "gxc_developer_policy_arn" {
+  description = "BGSI Developer Policy ARN"
+  value       = module.iam-user.gxc_developer_policy_arn
+}
+
+# --------------------------------------------------------------------------
+#  List User
+# --------------------------------------------------------------------------
+output "list_gxc_developer" {
+  description = "XTI Developer Account"
+  value       = module.iam-user.list_gxc_developer
+}
+
+output "list_gxc_administrator" {
+  description = "XTI Administrator Account"
+  value       = module.iam-user.list_gxc_administrator
+}
+
+output "list_bgsi_developer" {
+  description = "BGSI Developer Account"
+  value       = module.iam-user.list_bgsi_developer
+}
+
+output "list_bgsi_administrator" {
+  description = "BGSI Administrator Account"
+  value       = module.iam-user.list_bgsi_administrator
+}
+
+# --------------------------------------------------------------------------
+#  Summary
+# --------------------------------------------------------------------------
+output "summary" {
+  description = "Summary IAM User Configuration"
+  value       = module.iam-user.summary
+}
