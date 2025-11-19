@@ -40,7 +40,7 @@ provider "aws" {
   region  = var.aws_region
   profile = var.aws_account_profile_destination
   assume_role {
-    role_arn     = "arn:aws:iam::${var.aws_account_id_destination}:role/TF-Central-Role_${var.aws_account_id_destination}"
+    role_arn     = "arn:aws:iam::${var.aws_account_id_destination}:role/Temp-TF-Central-Role_${var.aws_account_id_destination}"
     session_name = "${var.aws_account_profile_destination}-session"
   }
 }

@@ -49,12 +49,12 @@ variable "tf_user_executor" {
 # --------------------------------------------------------------------------
 #  User Team
 # --------------------------------------------------------------------------
-variable "xti_team_developer" {
+variable "gxc_team_developer" {
   description = "XTI Developer Team Member"
   type        = list(any)
 }
 
-variable "xti_team_administrator" {
+variable "gxc_team_administrator" {
   description = "XTI Administrator Team Member"
   type        = list(any)
 }

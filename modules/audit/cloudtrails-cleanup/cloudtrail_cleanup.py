@@ -428,16 +428,16 @@ class CloudTrailInfrastructureCleanup:
             print("⚠️  No SSM parameters found in configuration")
             return
 
-        print(f"\n🔄 Deleting SSM parameters...")
+        print(f"\n🔄 Deleting SSM password parameter...")
 
         try:
             self.ssm.delete_parameter(Name=password_param)
-            print(f"✓ SSM parameter deleted: {password_param}")
+            print("✓ SSM password parameter deleted.")
         except ClientError as e:
             if e.response['Error']['Code'] == 'ParameterNotFound':
-                print(f"⚠️  SSM parameter {password_param} not found, skipping...")
+                print("⚠️  SSM password parameter not found, skipping...")
             else:
-                print(f"❌ Error deleting SSM parameter {password_param}: {str(e)}")
+                print(f"❌ Error deleting SSM password parameter: {str(e)}")
 
     def run_terraform_destroy(self, terraform_dir: str) -> None:
         """Run terraform destroy command"""

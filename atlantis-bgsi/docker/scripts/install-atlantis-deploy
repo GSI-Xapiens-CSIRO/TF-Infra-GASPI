@@ -34,7 +34,7 @@ if [ -x "$DEST_PATH" ]; then
     echo "✅ atlantis-deploy installed successfully!"
     echo "📍 Location: $DEST_PATH"
     echo "📖 Usage: atlantis-deploy <environment> [plan|apply]"
-    echo "💡 Example: atlantis-deploy hub01 plan"
+    echo "💡 Example: atlantis-deploy rscm plan"
 
     # Show version
     echo "🔍 Testing installation..."

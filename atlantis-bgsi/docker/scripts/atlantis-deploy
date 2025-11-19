@@ -63,32 +63,35 @@ TAG_ID=$(echo $(date '+%Y%m%d'))
 # MULTI-SONARQUBE PROJECT CONFIGURATION
 # =================================================================================
 # Environment-specific SonarQube tokens
-SONAR_TOKEN_HUB01="${SONAR_TOKEN_HUB01:-}"
-SONAR_TOKEN_HUB02="${SONAR_TOKEN_HUB02:-}"
-SONAR_TOKEN_HUB03="${SONAR_TOKEN_HUB03:-}"
-SONAR_TOKEN_HUB04="${SONAR_TOKEN_HUB04:-}"
-SONAR_TOKEN_HUB05="${SONAR_TOKEN_HUB05:-}"
-SONAR_TOKEN_UAT01="${SONAR_TOKEN_UAT01:-}"
-SONAR_TOKEN_UAT02="${SONAR_TOKEN_UAT02:-}"
-SONAR_TOKEN_UAT03="${SONAR_TOKEN_UAT03:-}"
-SONAR_TOKEN_UAT04="${SONAR_TOKEN_UAT04:-}"
-SONAR_TOKEN_UAT05="${SONAR_TOKEN_UAT05:-}"
+SONAR_TOKEN_RSCM="${SONAR_TOKEN_RSCM:-}"
+SONAR_TOKEN_RSPON="${SONAR_TOKEN_RSPON:-}"
+SONAR_TOKEN_SARDJITO="${SONAR_TOKEN_SARDJITO:-}"
+SONAR_TOKEN_RSNGOERAH="${SONAR_TOKEN_RSNGOERAH:-}"
+SONAR_TOKEN_RSJPD="${SONAR_TOKEN_RSJPD:-}"
+SONAR_TOKEN_RSCM_UAT="${SONAR_TOKEN_RSCM_UAT:-}"
+SONAR_TOKEN_RSPON_UAT="${SONAR_TOKEN_RSPON_UAT:-}"
+SONAR_TOKEN_SARDJITO_UAT="${SONAR_TOKEN_SARDJITO_UAT:-}"
+SONAR_TOKEN_RSNGOERAH_UAT="${SONAR_TOKEN_RSNGOERAH_UAT:-}"
+SONAR_TOKEN_RSJPD_UAT="${SONAR_TOKEN_RSJPD_UAT:-}"
 # Environment-specific SonarQube project keys
-SONAR_PROJECT_KEY_HUB01="${SONAR_PROJECT_KEY_HUB01:-bgsi-cicd-gaspi-hub01}"
-SONAR_PROJECT_KEY_HUB02="${SONAR_PROJECT_KEY_HUB02:-bgsi-cicd-gaspi-hub02}"
-SONAR_PROJECT_KEY_HUB03="${SONAR_PROJECT_KEY_HUB03:-bgsi-cicd-gaspi-hub03}"
-SONAR_PROJECT_KEY_HUB04="${SONAR_PROJECT_KEY_HUB04:-bgsi-cicd-gaspi-hub04}"
-SONAR_PROJECT_KEY_HUB05="${SONAR_PROJECT_KEY_HUB05:-bgsi-cicd-gaspi-hub05}"
-SONAR_PROJECT_KEY_UAT01="${SONAR_PROJECT_KEY_UAT01:-bgsi-cicd-gaspi-uat01}"
-SONAR_PROJECT_KEY_UAT02="${SONAR_PROJECT_KEY_UAT02:-bgsi-cicd-gaspi-uat02}"
-SONAR_PROJECT_KEY_UAT03="${SONAR_PROJECT_KEY_UAT03:-bgsi-cicd-gaspi-uat03}"
-SONAR_PROJECT_KEY_UAT04="${SONAR_PROJECT_KEY_UAT04:-bgsi-cicd-gaspi-uat04}"
-SONAR_PROJECT_KEY_UAT05="${SONAR_PROJECT_KEY_UAT05:-bgsi-cicd-gaspi-uat05}"
+SONAR_PROJECT_KEY_RSCM="${SONAR_PROJECT_KEY_RSCM:-bgsi-cicd-gaspi-rscm}"
+SONAR_PROJECT_KEY_RSPON="${SONAR_PROJECT_KEY_RSPON:-bgsi-cicd-gaspi-rspon}"
+SONAR_PROJECT_KEY_SARDJITO="${SONAR_PROJECT_KEY_SARDJITO:-bgsi-cicd-gaspi-sardjito}"
+SONAR_PROJECT_KEY_RSNGOERAH="${SONAR_PROJECT_KEY_RSNGOERAH:-bgsi-cicd-gaspi-rsngoerah}"
+SONAR_PROJECT_KEY_RSJPD="${SONAR_PROJECT_KEY_RSJPD:-bgsi-cicd-gaspi-rsjpd}"
+SONAR_PROJECT_KEY_RSCM_UAT="${SONAR_PROJECT_KEY_RSCM_UAT:-bgsi-cicd-gaspi-rscm-uat}"
+SONAR_PROJECT_KEY_RSPON_UAT="${SONAR_PROJECT_KEY_RSPON_UAT:-bgsi-cicd-gaspi-rspon-uat}"
+SONAR_PROJECT_KEY_SARDJITO_UAT="${SONAR_PROJECT_KEY_SARDJITO_UAT:-bgsi-cicd-gaspi-sardjito-uat}"
+SONAR_PROJECT_KEY_RSNGOERAH_UAT="${SONAR_PROJECT_KEY_RSNGOERAH_UAT:-bgsi-cicd-gaspi-rsngoerah-uat}"
+SONAR_PROJECT_KEY_RSJPD_UAT="${SONAR_PROJECT_KEY_RSJPD_UAT:-bgsi-cicd-gaspi-rsjpd-uat}"
 
 # Function to get environment-specific SonarQube token
 get_sonar_token_for_environment() {
     local env="$1"
-    local token_var="SONAR_TOKEN_${env^^}"
+
+    # Replace hyphens with underscores for bash variable compatibility
+    local env_var_safe="${env//-/_}"
+    local token_var="SONAR_TOKEN_${env_var_safe^^}"
     local token_value="${!token_var:-}"
 
     if [[ -n "$token_value" ]]; then
@@ -108,7 +111,10 @@ get_sonar_token_for_environment() {
 # Function to get environment-specific SonarQube project key
 get_sonar_project_key_for_environment() {
     local env="$1"
-    local key_var="SONAR_PROJECT_KEY_${env^^}"
+
+    # Replace hyphens with underscores for bash variable compatibility
+    local env_var_safe="${env//-/_}"
+    local key_var="SONAR_PROJECT_KEY_${env_var_safe^^}"
     local key_value="${!key_var:-}"
 
     if [[ -n "$key_value" ]]; then
@@ -119,6 +125,26 @@ get_sonar_project_key_for_environment() {
     # Fallback to default pattern
     echo "bgsi-cicd-gaspi-${env}"
     return 0
+}
+
+# Get expected AWS account ID for environment
+get_expected_account_id() {
+    case "$1" in
+        rscm)           echo "442799077487" ;;
+        rspon)          echo "829990487185" ;;
+        sardjito)       echo "938674806253" ;;
+        rsngoerah)      echo "136839993415" ;;
+        rsjpd)          echo "602006056899" ;;
+        rscm-uat)       echo "695094375681" ;;
+        rspon-uat)      echo "741464515101" ;;
+        sardjito-uat)   echo "819520291687" ;;
+        rsngoerah-uat)  echo "899630542732" ;;
+        rsjpd-uat)      echo "148450585096" ;;
+        *)
+            log_error "Unknown environment: $1"
+            return 1
+            ;;
+    esac
 }
 
 # Display logo and version
@@ -157,7 +183,9 @@ show_version() {
     show_logo
     echo -e "${GREEN}$SCRIPT_NAME version $SCRIPT_VERSION${NC}"
     echo -e "${BLUE}Build for Terraform Infrastructure Automation with Multi-SonarQube Support${NC}"
-    echo -e "${BLUE}Supports environments: hub01-05, uat01-05${NC}"
+    echo -e "${BLUE}Supports environments:${NC}"
+    echo -e "${BLUE} -) HUB: rscm, rspon, sardjito, rsngoerah, rsjpd${NC}"
+    echo -e "${BLUE} -) UAT: rscm-uat, rspon-uat, sardjito-uat, rsngoerah-uat, rsjpd-uat${NC}"
     echo ""
     exit 0
 }
@@ -170,13 +198,13 @@ USAGE:
     $SCRIPT_NAME <environment> [operation]
 
 ARGUMENTS:
-    environment    Target environment (hub01, hub02, hub03, hub04, hub05, uat01, uat02, uat03, uat04, uat05)
+    environment    Target environment (rscm, rspon, sardjito, rsngoerah, rsjpd, rscm-uat, rspon-uat, sardjito-uat, rsngoerah-uat, rsjpd-uat)
     operation      Operation to perform (plan, apply) [default: plan]
 
 EXAMPLES:
-    $SCRIPT_NAME hub01 plan            # Plan deployment for hub01
-    $SCRIPT_NAME uat02 apply           # Apply deployment for uat02
-    $SCRIPT_NAME hub01                 # Plan deployment for hub01 (default)
+    $SCRIPT_NAME rscm plan            # Plan deployment for rscm
+    $SCRIPT_NAME rscm-uat apply       # Apply deployment for rscm-uat
+    $SCRIPT_NAME rscm                 # Plan deployment for rscm (default)
 
 ENVIRONMENT VARIABLES:
     GITHUB_TOKEN                       Required: GitHub Personal Access Token
@@ -190,31 +218,31 @@ ENVIRONMENT VARIABLES:
 
 SONARQUBE INTEGRATION (Multi-Project Support):
     SCRIPT_RUN_SONAR                   Enable/disable SonarQube scan (default: true)
-    SONAR_HOST_URL                     SonarQube server URL (default: https://sonarqube-bgsi.xapiens.id)
+    SONAR_HOST_URL                     SonarQube server URL (default: https://sonarqube-bgsi.kemkes.go.id)
 
     # Environment-specific tokens (preferred)
-    SONAR_TOKEN_HUB01                  SonarQube token for hub01 environment
-    SONAR_TOKEN_HUB02                  SonarQube token for hub02 environment
-    SONAR_TOKEN_HUB03                  SonarQube token for hub03 environment
-    SONAR_TOKEN_HUB04                  SonarQube token for hub04 environment
-    SONAR_TOKEN_HUB05                  SonarQube token for hub05 environment
-    SONAR_TOKEN_UAT01                  SonarQube token for uat01 environment
-    SONAR_TOKEN_UAT02                  SonarQube token for uat02 environment
-    SONAR_TOKEN_UAT03                  SonarQube token for uat03 environment
-    SONAR_TOKEN_UAT04                  SonarQube token for uat04 environment
-    SONAR_TOKEN_UAT05                  SonarQube token for uat05 environment
+    SONAR_TOKEN_RSCM                   SonarQube token for rscm environment
+    SONAR_TOKEN_RSPON                  SonarQube token for rspon environment
+    SONAR_TOKEN_SARDJITO               SonarQube token for sardjito environment
+    SONAR_TOKEN_RSNGOERAH              SonarQube token for rsngoerah environment
+    SONAR_TOKEN_RSJPD                  SonarQube token for rsjpd environment
+    SONAR_TOKEN_RSCM_UAT               SonarQube token for rscm-uat environment
+    SONAR_TOKEN_RSPON_UAT              SonarQube token for rspon-uat environment
+    SONAR_TOKEN_SARDJITO_UAT           SonarQube token for sardjito-uat environment
+    SONAR_TOKEN_RSNGOERAH_UAT          SonarQube token for rsngoerah-uat environment
+    SONAR_TOKEN_RSJPD_UAT              SonarQube token for rsjpd-uat environment
 
     # Environment-specific project keys (optional)
-    SONAR_PROJECT_KEY_HUB01            Project key for hub01 (default: bgsi-cicd-gaspi-hub01)
-    SONAR_PROJECT_KEY_HUB02            Project key for hub02 (default: bgsi-cicd-gaspi-hub02)
-    SONAR_PROJECT_KEY_HUB03            Project key for hub03 (default: bgsi-cicd-gaspi-hub03)
-    SONAR_PROJECT_KEY_HUB04            Project key for hub04 (default: bgsi-cicd-gaspi-hub04)
-    SONAR_PROJECT_KEY_HUB05            Project key for hub05 (default: bgsi-cicd-gaspi-hub05)
-    SONAR_PROJECT_KEY_UAT01            Project key for uat01 (default: bgsi-cicd-gaspi-uat01)
-    SONAR_PROJECT_KEY_UAT02            Project key for uat02 (default: bgsi-cicd-gaspi-uat02)
-    SONAR_PROJECT_KEY_UAT03            Project key for uat03 (default: bgsi-cicd-gaspi-uat03)
-    SONAR_PROJECT_KEY_UAT04            Project key for uat04 (default: bgsi-cicd-gaspi-uat04)
-    SONAR_PROJECT_KEY_UAT05            Project key for uat05 (default: bgsi-cicd-gaspi-uat05)
+    SONAR_PROJECT_KEY_RSCM             Project key for rscm (default: bgsi-cicd-gaspi-rscm)
+    SONAR_PROJECT_KEY_RSPON            Project key for rspon (default: bgsi-cicd-gaspi-rspon)
+    SONAR_PROJECT_KEY_SARDJITO         Project key for sardjito (default: bgsi-cicd-gaspi-sardjito)
+    SONAR_PROJECT_KEY_RSNGOERAH        Project key for rsngoerah (default: bgsi-cicd-gaspi-rsngoerah)
+    SONAR_PROJECT_KEY_RSJPD            Project key for rsjpd (default: bgsi-cicd-gaspi-rsjpd)
+    SONAR_PROJECT_KEY_RSCM_UAT         Project key for rscm-uat (default: bgsi-cicd-gaspi-rscm-uat)
+    SONAR_PROJECT_KEY_RSPON_UAT        Project key for rspon-uat (default: bgsi-cicd-gaspi-rspon-uat)
+    SONAR_PROJECT_KEY_SARDJITO_UAT     Project key for sardjito-uat (default: bgsi-cicd-gaspi-sardjito-uat)
+    SONAR_PROJECT_KEY_RSNGOERAH_UAT    Project key for rsngoerah-uat (default: bgsi-cicd-gaspi-rsngoerah-uat)
+    SONAR_PROJECT_KEY_RSJPD_UAT        Project key for rsjpd-uat (default: bgsi-cicd-gaspi-rsjpd-uat)
 
     # Fallback general configuration
     SONAR_TOKEN                        General SonarQube token (fallback if environment-specific not set)
@@ -231,8 +259,8 @@ SECURITY CONTROLS:
     LOG_LEVEL                          Logging level (DEBUG, INFO, WARN, ERROR)
 
 SUPPORTED ENVIRONMENTS:
-    HUB environments: hub01, hub02, hub03, hub04, hub05
-    UAT environments: uat01, uat02, uat03, uat04, uat05
+    HUB environments: rscm, rspon, sardjito, rsngoerah, rsjpd
+    UAT environments: rscm-uat, rspon-uat, sardjito-uat, rsngoerah-uat, rsjpd-uat
 
 OPTIONS:
     -h, --help                Show this help message
@@ -330,16 +358,16 @@ safe_log_command() {
         "${AWS_SESSION_TOKEN:-}"
         "${AWS_ACCESS_KEY_ID:-}"
         # Add environment-specific tokens
-        "${SONAR_TOKEN_HUB01:-}"
-        "${SONAR_TOKEN_HUB02:-}"
-        "${SONAR_TOKEN_HUB03:-}"
-        "${SONAR_TOKEN_HUB04:-}"
-        "${SONAR_TOKEN_HUB05:-}"
-        "${SONAR_TOKEN_UAT01:-}"
-        "${SONAR_TOKEN_UAT02:-}"
-        "${SONAR_TOKEN_UAT03:-}"
-        "${SONAR_TOKEN_UAT04:-}"
-        "${SONAR_TOKEN_UAT05:-}"
+        "${SONAR_TOKEN_RSCM:-}"
+        "${SONAR_TOKEN_RSPON:-}"
+        "${SONAR_TOKEN_SARDJITO:-}"
+        "${SONAR_TOKEN_RSNGOERAH:-}"
+        "${SONAR_TOKEN_RSJPD:-}"
+        "${SONAR_TOKEN_RSCM_UAT:-}"
+        "${SONAR_TOKEN_RSPON_UAT:-}"
+        "${SONAR_TOKEN_SARDJITO_UAT:-}"
+        "${SONAR_TOKEN_RSNGOERAH_UAT:-}"
+        "${SONAR_TOKEN_RSJPD_UAT:-}"
     )
 
     # Only mask non-empty values
@@ -362,13 +390,15 @@ safe_log_command() {
 # Validate environment
 validate_environment() {
     case $ENVIRONMENT in
-        hub01|hub02|hub03|hub04|hub05|uat01|uat02|uat03|uat04|uat05)
+        rscm|rspon|sardjito|rsngoerah|rsjpd|rscm-uat|rspon-uat|sardjito-uat|rsngoerah-uat|rsjpd-uat)
             log_info "Processing $OPERATION for environment: $ENVIRONMENT"
             return 0
             ;;
         *)
             log_error "Unsupported environment: $ENVIRONMENT"
-            echo "Supported environments: hub01-05, uat01-05"
+            echo "Supported environments:"
+            echo "-) HUB: rscm, rspon, sardjito, rsngoerah, rsjpd"
+            echo "-) UAT: rscm-uat, rspon-uat, sardjito-uat, rsngoerah-uat, rsjpd-uat"
             return 1
             ;;
     esac
@@ -389,8 +419,8 @@ setup_environment_variables() {
 
     # Git configuration
     GIT_USER_NAME="${GIT_USER_NAME:-DevOps XTI}"                # Display name for commits
-    GIT_USER_EMAIL="${GIT_USER_EMAIL:-devops@bgsi.com}"  # Email for commits
-    GITHUB_USERNAME="${GITHUB_USERNAME:-bgsi-devops}"             # Actual GitHub username for auth
+    GIT_USER_EMAIL="${GIT_USER_EMAIL:-devops@bgsi.com}"         # Email for commits
+    GITHUB_USERNAME="${GITHUB_USERNAME:-bgsi-devops}"           # Actual GitHub username for auth
 
     log_info "Environment Type: $ENV_TYPE, Number: $ENV_NUMBER"
     log_info "AWS Profile: $AWS_PROFILE"
@@ -628,25 +658,67 @@ test_github_access() {
 setup_aws_credentials() {
     log_info "Setting up AWS credentials for profile: $AWS_PROFILE"
 
-    # Clean existing credentials
-    unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID AWS_SECURITY_TOKEN
+    # COMPREHENSIVE credential cleanup to prevent contamination
+    unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID \
+          AWS_SECURITY_TOKEN AWS_DEFAULT_REGION AWS_DEFAULT_PROFILE \
+          AWS_CONFIG_FILE AWS_SHARED_CREDENTIALS_FILE
 
-    # Set AWS profile and region
+    # Set profile and region explicitly
     export AWS_PROFILE="$AWS_PROFILE"
+    export AWS_DEFAULT_REGION="ap-southeast-3"
+    export AWS_REGION="ap-southeast-3"
 
-    # Verify AWS access
-    if aws sts get-caller-identity --output table > /dev/null 2>&1; then
-        local account_id=$(aws sts get-caller-identity --query Account --output text)
-        local caller_arn=$(aws sts get-caller-identity --query Arn --output text)
+    log_info "Verifying AWS credentials for profile: $AWS_PROFILE"
 
-        log_success "AWS authenticated successfully"
-        log_info "Account ID: $account_id"
-        log_info "Caller ARN: $(basename $caller_arn)"
-        return 0
-    else
-        log_error "AWS authentication failed for profile: $AWS_PROFILE"
+    # Force fresh credential retrieval
+    if ! aws sts get-caller-identity --profile "$AWS_PROFILE" > /dev/null 2>&1; then
+        log_error "Failed to assume role for profile: $AWS_PROFILE"
+        log_error "Check if profile exists in ~/.aws/config and credentials are valid"
         return 1
     fi
+
+    # Get account details for verification
+    local account_id=$(aws sts get-caller-identity --query Account --output text 2>/dev/null)
+    local caller_arn=$(aws sts get-caller-identity --query Arn --output text 2>/dev/null)
+    local user_id=$(aws sts get-caller-identity --query UserId --output text 2>/dev/null)
+
+    # CRITICAL: Verify against expected account ID
+    local expected_account_id=$(get_expected_account_id "$ENVIRONMENT")
+    if [[ -z "$expected_account_id" ]]; then
+        log_error "Failed to determine expected account ID for environment: $ENVIRONMENT"
+        return 1
+    fi
+
+    if [[ "$account_id" != "$expected_account_id" ]]; then
+        log_error "============================================================"
+        log_error "CRITICAL SECURITY ALERT: AWS ACCOUNT MISMATCH!"
+        log_error "============================================================"
+        log_error "Environment:      $ENVIRONMENT"
+        log_error "Expected Account: $expected_account_id"
+        log_error "Actual Account:   $account_id"
+        log_error "Profile Used:     $AWS_PROFILE"
+        log_error ""
+        log_error "This indicates a serious configuration issue that could result"
+        log_error "in deploying infrastructure to the WRONG AWS account!"
+        log_error ""
+        log_error "DEPLOYMENT BLOCKED FOR SAFETY"
+        log_error "============================================================"
+        return 1
+    fi
+
+    # All checks passed
+    log_success "============================================================"
+    log_success "AWS Authentication Verified Successfully"
+    log_success "============================================================"
+    log_info "Environment:      $ENVIRONMENT"
+    log_info "AWS Profile:      $AWS_PROFILE"
+    log_info "Account ID:       $account_id ✓ (verified)"
+    log_info "Region:           $AWS_DEFAULT_REGION"
+    log_info "User/Role ID:     $user_id"
+    log_info "Assumed Role:     $(basename "$caller_arn")"
+    log_success "============================================================"
+
+    return 0
 }
 
 # Initialize Git submodules
@@ -672,33 +744,73 @@ initialize_submodules() {
 setup_terraform_config() {
     log_info "Setting up Terraform configuration for $ENVIRONMENT"
 
-    # Configuration file paths
-    local backend_tf="${CONFIG_PATH}/backend.tf"
-    local backend_tfvars="${CONFIG_PATH}/backend.tfvars"
-    local terraform_tfvars="${CONFIG_PATH}/${ENVIRONMENT}.tfvars"
+    # Create unique working directory to prevent race conditions
+    local timestamp=$(date +%s)
+    local work_dir="/tmp/atlantis-work-${ENVIRONMENT}-$$-${timestamp}"
 
-    # Check if configuration files exist
-    local files=("$backend_tf" "$backend_tfvars" "$terraform_tfvars")
-
-    for file in "${files[@]}"; do
-        if [[ ! -f "$file" ]]; then
-            log_error "Configuration file not found: $file"
-            return 1
-        fi
-    done
-
-    # Copy configuration files to current directory
-    if ! cp "$backend_tf" . || \
-       ! cp "$backend_tfvars" . || \
-       ! cp "$terraform_tfvars" .; then
-        log_error "Failed to copy configuration files"
+    log_info "Creating isolated working directory..."
+    if ! mkdir -p "$work_dir"; then
+        log_error "Failed to create working directory: $work_dir"
         return 1
     fi
 
-    log_success "Configuration files copied:"
-    log_info "- backend.tf"
-    log_info "- backend.tfvars"
-    log_info "- ${ENVIRONMENT}.tfvars"
+    # Store original directory
+    ORIGINAL_WORK_DIR=$(pwd)
+
+    # Change to isolated working directory
+    if ! cd "$work_dir"; then
+        log_error "Failed to change to working directory: $work_dir"
+        rm -rf "$work_dir"
+        return 1
+    fi
+
+    log_success "Working in isolated directory: $work_dir"
+
+    # Configuration file paths
+    local config_base="${CONFIG_BASE_PATH}/${ENVIRONMENT}"
+    local backend_tf="${config_base}/backend.tf"
+    local backend_tfvars="${config_base}/backend.tfvars"
+    local terraform_tfvars="${config_base}/${ENVIRONMENT}.tfvars"
+
+    # Check files exist
+    local missing_files=()
+    for file in "$backend_tf" "$backend_tfvars" "$terraform_tfvars"; do
+        if [[ ! -f "$file" ]]; then
+            missing_files+=("$file")
+        fi
+    done
+
+    if [[ ${#missing_files[@]} -gt 0 ]]; then
+        log_error "Missing required configuration files:"
+        for file in "${missing_files[@]}"; do
+            log_error "  - $file"
+        done
+        cd "$ORIGINAL_WORK_DIR"
+        rm -rf "$work_dir"
+        return 1
+    fi
+
+    # Copy configuration files
+    log_info "Copying configuration files..."
+    if ! cp "$backend_tf" ./backend.tf || \
+       ! cp "$backend_tfvars" ./backend.tfvars || \
+       ! cp "$terraform_tfvars" ./"${ENVIRONMENT}.tfvars"; then
+        log_error "Failed to copy configuration files"
+        cd "$ORIGINAL_WORK_DIR"
+        rm -rf "$work_dir"
+        return 1
+    fi
+
+    log_success "Configuration files prepared:"
+    log_info "  ✓ backend.tf"
+    log_info "  ✓ backend.tfvars"
+    log_info "  ✓ ${ENVIRONMENT}.tfvars"
+    log_info "  Location: $work_dir"
+
+    # Export for cleanup
+    export ATLANTIS_WORK_DIR="$work_dir"
+    export ATLANTIS_ORIGINAL_DIR="$ORIGINAL_WORK_DIR"
+
     return 0
 }
 
@@ -932,7 +1044,7 @@ run_sonarqube_scan() {
     env_sonar_project_key=$(get_sonar_project_key_for_environment "$ENVIRONMENT")
 
     # Set SonarQube configuration with secure defaults
-    local sonar_host_url="${SONAR_HOST_URL:-https://sonarqube-bgsi.xapiens.id}"
+    local sonar_host_url="${SONAR_HOST_URL:-https://sonarqube-bgsi.kemkes.go.id}"
     local sonar_project_key="$env_sonar_project_key"
     local sonar_project_name="${SONAR_PROJECT_NAME:-BGSI-Atlantis-SonarQube-CICD-${ENVIRONMENT^^}}"
     local sonar_project_version="${SONAR_PROJECT_VERSION:-$(date +%Y%m%d-%H%M%S)}"
@@ -1348,7 +1460,7 @@ cleanup_sensitive_files() {
     fi
 
     # Remove temporary files with potentially sensitive content
-    local temp_files=("*.tfplan" "*.out" "sonar-project.properties" ".sonar/" ".scannerwork/")
+    local temp_files=(".terraform" "*.tfplan" "*.out" "sonar-project.properties" ".sonar/" ".scannerwork/")
     for pattern in "${temp_files[@]}"; do
         if ls $pattern 1> /dev/null 2>&1; then
             log_info "Removing temporary files: $pattern"
@@ -1356,10 +1468,27 @@ cleanup_sensitive_files() {
         fi
     done
 
+    # Clean up isolated working directory
+    if [[ -n "${ATLANTIS_WORK_DIR:-}" ]] && [[ -d "$ATLANTIS_WORK_DIR" ]]; then
+        log_info "Removing isolated working directory: $ATLANTIS_WORK_DIR"
+
+        # Return to original directory first
+        if [[ -n "${ATLANTIS_ORIGINAL_DIR:-}" ]] && [[ -d "$ATLANTIS_ORIGINAL_DIR" ]]; then
+            cd "$ATLANTIS_ORIGINAL_DIR" 2>/dev/null || cd /tmp
+        fi
+
+        # Remove working directory
+        rm -rf "$ATLANTIS_WORK_DIR" 2>/dev/null || {
+            log_warning "Failed to remove working directory: $ATLANTIS_WORK_DIR"
+        }
+    fi
+
     # Clear sensitive environment variables (including all environment-specific tokens)
-    unset SONAR_TOKEN GITHUB_TOKEN AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_ACCESS_KEY_ID
-    unset SONAR_TOKEN_HUB01 SONAR_TOKEN_HUB02 SONAR_TOKEN_HUB03 SONAR_TOKEN_HUB04 SONAR_TOKEN_HUB05
-    unset SONAR_TOKEN_UAT01 SONAR_TOKEN_UAT02 SONAR_TOKEN_UAT03 SONAR_TOKEN_UAT04 SONAR_TOKEN_UAT05
+    unset AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_ACCESS_KEY_ID AWS_SECURITY_TOKEN
+    unset ATLANTIS_WORK_DIR ATLANTIS_ORIGINAL_DIR
+    unset SONAR_TOKEN GITHUB_TOKEN
+    unset SONAR_TOKEN_RSCM SONAR_TOKEN_RSPON SONAR_TOKEN_SARDJITO SONAR_TOKEN_RSNGOERAH SONAR_TOKEN_RSJPD
+    unset SONAR_TOKEN_RSCM_UAT SONAR_TOKEN_RSPON_UAT SONAR_TOKEN_SARDJITO_UAT SONAR_TOKEN_RSNGOERAH_UAT SONAR_TOKEN_RSJPD_UAT
 
     # Clear shell history of sensitive commands (if running interactively)
     if [[ $- == *i* ]]; then
@@ -1379,7 +1508,7 @@ show_sonar_config() {
     log_info "SONARQUBE MULTI-PROJECT CONFIGURATION STATUS"
     log_info "============================================================"
 
-    local environments=("hub01" "hub02" "hub03" "hub04" "hub05" "uat01" "uat02" "uat03" "uat04" "uat05")
+    local environments=("rscm" "rspon" "sardjito" "rsngoerah" "rsjpd" "rscm-uat" "rspon-uat" "sardjito-uat" "rsngoerah-uat" "rsjpd-uat")
 
     for env in "${environments[@]}"; do
         local token_var="SONAR_TOKEN_${env^^}"
@@ -1407,7 +1536,7 @@ show_sonar_config() {
 validate_all_sonar_configs() {
     log_info "Validating SonarQube configurations for all environments..."
 
-    local environments=("hub01" "hub02" "hub03" "hub04" "hub05" "uat01" "uat02" "uat03" "uat04" "uat05")
+    local environments=("rscm" "rspon" "sardjito" "rsngoerah" "rsjpd" "rscm-uat" "rspon-uat" "sardjito-uat" "rsngoerah-uat" "rsjpd-uat")
     local missing_configs=()
     local valid_configs=0
 
@@ -1530,12 +1659,12 @@ show_extended_help() {
 CONFIGURATION EXAMPLES:
 
 1. Environment-specific SonarQube tokens:
-   export SONAR_TOKEN_HUB01=sqp_1234567890abcdef1234567890abcdef12345678
-   export SONAR_TOKEN_UAT01=sqp_abcdef1234567890abcdef1234567890abcdef12
+   export SONAR_TOKEN_RSCM=sqp_1234567890abcdef1234567890abcdef12345678
+   export SONAR_TOKEN_RSCM_UAT=sqp_abcdef1234567890abcdef1234567890abcdef12
 
 2. Environment-specific project keys (optional):
-   export SONAR_PROJECT_KEY_HUB01=bgsi-cicd-gaspi-hub01-custom
-   export SONAR_PROJECT_KEY_UAT01=bgsi-cicd-gaspi-uat01-custom
+   export SONAR_PROJECT_KEY_RSCM=bgsi-cicd-gaspi-rscm
+   export SONAR_PROJECT_KEY_RSCM_UAT=bgsi-cicd-gaspi-rscm-uat
 
 3. Fallback configuration (applies to all environments without specific tokens):
    export SONAR_TOKEN=sqp_fallback1234567890abcdef1234567890abcdef
@@ -1551,7 +1680,7 @@ Common Issues and Solutions:
 1. "No SonarQube token available for environment"
    - Set SONAR_TOKEN_<ENV> for the specific environment
    - Or set SONAR_TOKEN as a fallback
-   - Example: export SONAR_TOKEN_HUB01=sqp_your_token_here
+   - Example: export SONAR_TOKEN_RSCM=sqp_your_token_here
 
 2. "Failed to access GitHub repository"
    - Verify GITHUB_TOKEN is set and valid
@@ -1576,7 +1705,7 @@ Common Issues and Solutions:
 ADVANCED USAGE:
 
 Debug mode:
-    atlantis-deploy hub01 plan --debug
+    atlantis-deploy rscm plan --debug
 
 Check SonarQube configuration:
     atlantis-deploy --show-sonar-config
@@ -1585,7 +1714,7 @@ Validate all configurations:
     atlantis-deploy --validate-all
 
 Environment-specific execution:
-    SCRIPT_RUN_TEST=false SCRIPT_RUN_SONAR=true atlantis-deploy hub01 apply
+    SCRIPT_RUN_TEST=false SCRIPT_RUN_SONAR=true atlantis-deploy rscm apply
 
 EOF
 }

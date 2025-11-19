@@ -39,7 +39,7 @@ USAGE:
     $SCRIPT_NAME [environment] [options]
 
 ARGUMENTS:
-    environment    Target environment (hub01-05, uat01-05) [optional]
+    environment    Target environment (rscm-05, rscm-uat-05) [optional]
 
 OPTIONS:
     -h, --help              Show this help message
@@ -58,7 +58,7 @@ OPTIONS:
 
 EXAMPLES:
     $SCRIPT_NAME                    # Scan current directory with default settings
-    $SCRIPT_NAME hub01              # Scan for hub01 environment
+    $SCRIPT_NAME rscm              # Scan for rscm environment
     $SCRIPT_NAME --project-key my-project --sources ./src
     $SCRIPT_NAME --dry-run          # Show what would be scanned
 
@@ -142,7 +142,7 @@ parse_arguments() {
                 DRY_RUN=true
                 shift
                 ;;
-            hub01|hub02|hub03|hub04|hub05|uat01|uat02|uat03|uat04|uat05)
+            rscm|rspon|sardjito|rsngoerah|rsjpd|rscm-uat|rspon-uat|sardjito-uat|rsngoerah-uat|rsjpd-uat)
                 ENVIRONMENT="$1"
                 shift
                 ;;
