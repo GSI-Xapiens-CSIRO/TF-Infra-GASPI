@@ -1,5 +1,5 @@
 # ==========================================================================
-#  442799077487 - TFState: provider.tf
+#  829990487185 - Budget: provider.tf
 # --------------------------------------------------------------------------
 #  Description:
 #    Provider Modules
@@ -27,7 +27,6 @@ terraform {
       source  = "hashicorp/tls"
       version = ">= 3.0"
     }
-
     random = ">= 2.0"
   }
 }
@@ -40,7 +39,7 @@ provider "aws" {
   region  = var.aws_region
   profile = var.aws_account_profile_destination
   assume_role {
-    role_arn     = "arn:aws:iam::${var.aws_account_id_destination}:role/Temp-TF-Central-Role_${var.aws_account_id_destination}"
+    role_arn     = "arn:aws:iam::${var.aws_account_id_destination}:role/TF-Central-Role_${var.aws_account_id_destination}"
     session_name = "${var.aws_account_profile_destination}-session"
   }
 }
