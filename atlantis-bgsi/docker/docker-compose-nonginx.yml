@@ -1,0 +1,358 @@
+version: '3.9'
+
+#================================================================================================
+# NETWORK SETUP
+#================================================================================================
+networks:
+  atlantis_net:
+    name: atlantis_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.150.0.0/16
+
+#================================================================================================
+# VOLUME SETUP
+#================================================================================================
+volumes:
+  vol_atlantis:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_ATLANTIS:-/opt/data/docker/atlantis}
+  vol_atlantis_aws:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_ATLANTIS_AWS:-/opt/data/docker/atlantis/aws}
+  vol_atlantis_src:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_ATLANTIS_SRC:-/opt/data/docker/atlantis/src}
+  vol_atlantis_config:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}
+  vol_atlantis_data:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_ATLANTIS_DATA:-/opt/data/docker/atlantis/data}
+  vol_atlantis_repos:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_ATLANTIS_REPOS:-/opt/data/docker/atlantis/repos}
+  vol_atlantis_db:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_ATLANTIS_DB:-/opt/data/docker/atlantis/db}
+  vol_sonar_data:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_SONAR:-/opt/data/docker/sonarqube}
+  vol_sonar_reports:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_SONAR_REPORTS:-/opt/data/docker/sonarqube/reports}
+
+#================================================================================================
+# SERVICES
+#================================================================================================
+services:
+  #================================================================================================
+  # POSTGRESQL DATABASE FOR ATLANTIS
+  #================================================================================================
+  atlantis-db:
+    image: postgres:15-alpine
+    container_name: ${CONTAINER_ATLANTIS_DB:-bgsi_atlantis_db}
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${ATLANTIS_DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${ATLANTIS_DB_PASSWORD}
+      - POSTGRES_DB=${ATLANTIS_DB_NAME:-bgsi_atlantis_db}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - /etc/localtime:/etc/localtime:ro          ## Do not use it in mac
+      - /var/run/docker.sock:/var/run/docker.sock ## Do not use it in k8s
+      - vol_atlantis_db:/var/lib/postgresql/data
+    networks:
+      atlantis_net:
+        ipv4_address: ${CONTAINER_IP_ATLANTIS_DB:-172.150.150.4}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ATLANTIS_DB_USER:-atlantis} -d ${ATLANTIS_DB_NAME:-atlantis}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  #================================================================================================
+  # PORTAINER
+  #================================================================================================
+  portainer:
+    image: portainer/portainer-ce:${PORTAINER_VERSION:-2.30.1-alpine}
+    container_name: ${CONTAINER_PORTAINER:-bgsi_portainer}
+    restart: unless-stopped
+    ports:
+      - "${PORT_PORTAINER:-5212}:9000"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro          ## Do not use it in mac
+      - /var/run/docker.sock:/var/run/docker.sock ## Do not use it in k8s
+      - /opt/data/docker/portainer2.20:/data
+    environment:
+      - PORTAINER_TEMPLATE=generic
+      - PORTAINER_VERSION=${PORTAINER_VERSION:-2.30.1-alpine}
+    privileged: true
+    networks:
+      atlantis_net:
+        ipv4_address: ${CONTAINER_IP_PORTAINER:-172.150.150.5}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${CONTAINER_IP_PORTAINER:-172.150.150.5}:5212/api/status"]
+      interval: 60s
+      timeout: 5s
+      retries: 5
+
+  #================================================================================================
+  # ATLANTIS TERRAFORM
+  #================================================================================================
+  atlantis:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    #   args:
+    #     PYTHON_VERSION: 3.12
+    # image: ${ATLANTIS_IMAGE:-YOUR_AWS_ACCOUNT.dkr.ecr.ap-southeast-3.amazonaws.com/bgsi/atlantis-bgsi}:${ATLANTIS_VERSION:-latest}
+    # image: devopsxti/atlantis-bgsi:latest
+    image: devopsxti/atlantis-bgsi:2.4.0
+    container_name: ${CONTAINER_ATLANTIS:-bgsi_atlantis}
+    restart: unless-stopped
+    ports:
+      - "${PORT_ATLANTIS:-4141}:4141"
+    volumes:
+      # System mounts
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Project data
+      - vol_atlantis_src:/atlantis/src:ro
+      # AWS credentials
+      - ${DATA_ATLANTIS_AWS:-/opt/data/docker/atlantis/aws}/credentials:/home/atlantis/.aws/credentials:ro
+      - ${DATA_ATLANTIS_AWS:-/opt/data/docker/atlantis/aws}/config:/home/atlantis/.aws/config:ro
+      # Atlantis configuration
+      - ${DATA_ATLANTIS:-/opt/data/docker/atlantis}/atlantis.yaml:/atlantis/atlantis.yaml:ro
+      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}/repo.yaml:/atlantis/repo.yaml:ro
+      # Project configuration
+      - ${DATA_ATLANTIS_CONFIG:-/opt/data/docker/atlantis/config}:/atlantis/config:ro
+      # Persistent data volumes
+      - vol_atlantis_data:/atlantis/data
+      - vol_atlantis_repos:/home/atlantis/.atlantis/repos
+      # Atlantis Template
+      - ${DATA_ATLANTIS:-/opt/data/docker/atlantis}/template:/home/atlantis/.atlantis/repos/template
+      # SonarQube reports (shared volume)
+      - vol_sonar_reports:/opt/sonar-reports
+    environment:
+      #================================================================================================
+      # GITHUB CONFIGURATION
+      #================================================================================================
+      - ATLANTIS_GH_HOSTNAME=github.com
+      - ATLANTIS_GH_USER=${ATLANTIS_GH_USER:-bgsi-gh-user}
+      - ATLANTIS_GH_TOKEN=${ATLANTIS_GH_TOKEN}
+      - ATLANTIS_GH_WEBHOOK_SECRET=${ATLANTIS_GH_WEBHOOK_SECRET}
+
+      #================================================================================================
+      # GIT CONFIGURATION
+      #================================================================================================
+      - GITHUB_USERNAME=${ATLANTIS_GH_USER:-bgsi-gh-user}
+      - GITHUB_TOKEN=${ATLANTIS_GH_TOKEN}
+      - GIT_USER_NAME=${GIT_USER_NAME:-BGSI DevOps}
+      - GIT_USER_EMAIL=${ATLANTIS_GH_EMAIL:-devops@example.com}
+      - CONFIG_PATH=${ATLANTIS_CONFIG_PATH:-/atlantis/config}
+
+      #================================================================================================
+      # WEB CONFIGURATION
+      #================================================================================================
+      - ATLANTIS_WEB_HOSTNAME=${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
+      - ATLANTIS_WEB_BASIC_AUTH=true
+      - ATLANTIS_PORT=${PORT_ATLANTIS:-4141}
+      - ATLANTIS_ATLANTIS_URL=https://${ATLANTIS_WEB_HOSTNAME:-atlantis.example.com}
+      - ATLANTIS_WEB_BASIC_AUTH=${ATLANTIS_WEB_BASIC_AUTH:-true}
+      - ATLANTIS_WEB_USERNAME=${NGINX_BASIC_AUTH_USER:-bgsi-admin}
+      - ATLANTIS_WEB_PASSWORD=${NGINX_BASIC_AUTH_PASSWORD:-B4s1c-4uth}
+
+      #================================================================================================
+      # DATABASE CONFIGURATION
+      #================================================================================================
+      - ATLANTIS_DB_TYPE=postgres
+      - ATLANTIS_DB_HOST=${CONTAINER_IP_ATLANTIS_DB:-172.150.150.4}
+      - ATLANTIS_DB_PORT=5432
+      - ATLANTIS_DB_NAME=${ATLANTIS_DB_NAME:-bgsi_atlantis_db}
+      - ATLANTIS_DB_USER=${ATLANTIS_DB_USER:-postgres}
+      - ATLANTIS_DB_PASSWORD=${ATLANTIS_DB_PASSWORD}
+      - ATLANTIS_DB_SSL_MODE=disable
+
+      #================================================================================================
+      # DATA DIRECTORY
+      #================================================================================================
+      - ATLANTIS_DATA_DIR=/atlantis/data
+
+      #================================================================================================
+      # AWS CONFIGURATION
+      #================================================================================================
+      - AWS_REGION=${AWS_REGION:-ap-southeast-3}
+      - AWS_DEFAULT_REGION=${AWS_REGION:-ap-southeast-3}
+      - AWS_SHARED_CREDENTIALS_FILE=/home/atlantis/.aws/credentials
+      - AWS_CONFIG_FILE=/home/atlantis/.aws/config
+
+      #================================================================================================
+      # PROJECT CONFIGURATION
+      #================================================================================================
+      - ATLANTIS_CONFIG=/atlantis/atlantis.yaml
+      - ATLANTIS_CONFIG_PATH=/atlantis/config
+      - ATLANTIS_ALLOW_COMMANDS=version,plan,apply,unlock,approve_policies
+      - ATLANTIS_REPO_ALLOWLIST=${ATLANTIS_REPO_ALLOWLIST:-github.com/bgsi-id/satusehat-research/*}
+      - ATLANTIS_REPO_CONFIG=/atlantis/repo.yaml
+      - ATLANTIS_AUTOMERGE=true
+      - ATLANTIS_AUTODISCOVER_MODE=auto
+      - ATLANTIS_DELETE_SOURCE_BRANCH_ON_MERGE=true
+      - ATLANTIS_PARALLEL_PLAN=true
+      - ATLANTIS_PARALLEL_APPLY=true
+      - ATLANTIS_ABORT_ON_EXECUTION_ORDER_FAIL=true
+      - ATLANTIS_CHECKOUT_STRATEGY=merge
+      - ATLANTIS_CHECKOUT_DEPTH=10  # Number of commit hash
+      - ATLANTIS_HIDE_PREV_PLAN_COMMENTS=true
+      - ATLANTIS_TEST_TIMEOUT=${ATLANTIS_TEST_TIMEOUT:-600}
+      - ATLANTIS_LOG_LEVEL=warn
+
+      #================================================================================================
+      # SONARQUBE INTEGRATION CONFIGURATION
+      #================================================================================================
+      # Main SonarQube Controls
+      - ENABLE_SONARQUBE=${ENABLE_SONARQUBE:-true}
+      - SONARQUBE_REQUIRED=${SONARQUBE_REQUIRED:-false}
+      - SONARQUBE_QUALITY_GATE_REQUIRED=${SONARQUBE_QUALITY_GATE_REQUIRED:-false}
+
+      # SonarQube Server Configuration
+      - SONAR_HOST_URL=${SONAR_HOST_URL:-http://sonarqube-web:9000}
+      - SONAR_SCANNER_IMAGE=${SONAR_SCANNER_IMAGE:-sonarsource/sonar-scanner-cli:latest}
+      - SONAR_ANALYSIS_TIMEOUT=${SONAR_ANALYSIS_TIMEOUT:-600}
+
+      # Internal SonarQube Service (when using local SonarQube)
+      - SONAR_INTERNAL_URL=${SONAR_INTERNAL_URL:-http://sonarqube-local:9000}
+      - SONAR_SCANNER_CONTAINER=${SONAR_SCANNER_CONTAINER:-bgsi_sonar_scanner}
+
+      # Security and Testing Controls
+      - SCRIPT_RUN_TEST=${SCRIPT_RUN_TEST:-true}
+      - SCRIPT_RUN_SONAR=${SCRIPT_RUN_SONAR:-true}
+
+      #------------------------------------------------------------------------------------------------
+      # SonarQube Token Variables - Production Environments
+      #------------------------------------------------------------------------------------------------
+      - SONAR_TOKEN_RSCM=${SONAR_TOKEN_RSCM}
+      - SONAR_TOKEN_RSPON=${SONAR_TOKEN_RSPON}
+      - SONAR_TOKEN_SARDJITO=${SONAR_TOKEN_SARDJITO}
+      - SONAR_TOKEN_RSNGOERAH=${SONAR_TOKEN_RSNGOERAH}
+      - SONAR_TOKEN_RSJPD=${SONAR_TOKEN_RSJPD}
+
+      #------------------------------------------------------------------------------------------------
+      # SonarQube Token Variables - UAT Environments
+      #------------------------------------------------------------------------------------------------
+      - SONAR_TOKEN_RSCM_UAT=${SONAR_TOKEN_RSCM_UAT}
+      - SONAR_TOKEN_RSPON_UAT=${SONAR_TOKEN_RSPON_UAT}
+      - SONAR_TOKEN_SARDJITO_UAT=${SONAR_TOKEN_SARDJITO_UAT}
+      - SONAR_TOKEN_RSNGOERAH_UAT=${SONAR_TOKEN_RSNGOERAH_UAT}
+      - SONAR_TOKEN_RSJPD_UAT=${SONAR_TOKEN_RSJPD_UAT}
+
+      #------------------------------------------------------------------------------------------------
+      # SonarQube Project Key Variables - Production Environments
+      #------------------------------------------------------------------------------------------------
+      - SONAR_PROJECT_KEY_RSCM=${SONAR_PROJECT_KEY_RSCM:-bgsi-cicd-gaspi-rscm}
+      - SONAR_PROJECT_KEY_RSPON=${SONAR_PROJECT_KEY_RSPON:-bgsi-cicd-gaspi-rspon}
+      - SONAR_PROJECT_KEY_SARDJITO=${SONAR_PROJECT_KEY_SARDJITO:-bgsi-cicd-gaspi-sardjito}
+      - SONAR_PROJECT_KEY_RSNGOERAH=${SONAR_PROJECT_KEY_RSNGOERAH:-bgsi-cicd-gaspi-rsngoerah}
+      - SONAR_PROJECT_KEY_RSJPD=${SONAR_PROJECT_KEY_RSJPD:-bgsi-cicd-gaspi-rsjpd}
+
+      #------------------------------------------------------------------------------------------------
+      # SonarQube Project Key Variables - UAT Environments
+      #------------------------------------------------------------------------------------------------
+      - SONAR_PROJECT_KEY_RSCM_UAT=${SONAR_PROJECT_KEY_RSCM_UAT:-bgsi-cicd-gaspi-rscm-uat}
+      - SONAR_PROJECT_KEY_RSPON_UAT=${SONAR_PROJECT_KEY_RSPON_UAT:-bgsi-cicd-gaspi-rspon-uat}
+      - SONAR_PROJECT_KEY_SARDJITO_UAT=${SONAR_PROJECT_KEY_SARDJITO_UAT:-bgsi-cicd-gaspi-sardjito-uat}
+      - SONAR_PROJECT_KEY_RSNGOERAH_UAT=${SONAR_PROJECT_KEY_RSNGOERAH_UAT:-bgsi-cicd-gaspi-rsngoerah-uat}
+      - SONAR_PROJECT_KEY_RSJPD_UAT=${SONAR_PROJECT_KEY_RSJPD_UAT:-bgsi-cicd-gaspi-rsjpd-uat}
+
+      #================================================================================================
+      # AWS ACCOUNT CONFIGURATION
+      #================================================================================================
+      # Organization Structure
+      - BGSI_MANAGEMENT_ACCOUNT=${BGSI_MANAGEMENT_ACCOUNT}
+      - BGSI_SECURITY_ACCOUNT=${BGSI_SECURITY_ACCOUNT}
+      - BGSI_LOGS_ACCOUNT=${BGSI_LOGS_ACCOUNT}
+      - BGSI_BILLING_ACCOUNT=${BGSI_BILLING_ACCOUNT}
+
+      # AWS Production Environments
+      - BGSI_RSCM_ACCOUNT=${BGSI_RSCM_ACCOUNT}
+      - BGSI_RSPON_ACCOUNT=${BGSI_RSPON_ACCOUNT}
+      - BGSI_SARDJITO_ACCOUNT=${BGSI_SARDJITO_ACCOUNT}
+      - BGSI_RSNGOERAH_ACCOUNT=${BGSI_RSNGOERAH_ACCOUNT}
+      - BGSI_RSJPD_ACCOUNT=${BGSI_RSJPD_ACCOUNT}
+
+      # AWS UAT Environments
+      - BGSI_RSCM_UAT_ACCOUNT=${BGSI_RSCM_UAT_ACCOUNT}
+      - BGSI_RSPON_UAT_ACCOUNT=${BGSI_RSPON_UAT_ACCOUNT}
+      - BGSI_SARDJITO_UAT_ACCOUNT=${BGSI_SARDJITO_UAT_ACCOUNT}
+      - BGSI_RSNGOERAH_UAT_ACCOUNT=${BGSI_RSNGOERAH_UAT_ACCOUNT}
+      - BGSI_RSJPD_UAT_ACCOUNT=${BGSI_RSJPD_UAT_ACCOUNT}
+
+      #================================================================================================
+      # OTHER CONFIGURATION
+      #================================================================================================
+      - ENABLE_SECURITY_AUDIT=true
+      - LOG_LEVEL=INFO
+      - DEFAULT_CONFTEST_VERSION=${CONFTEST_VERSION:-0.56.0}
+      - TZ=Asia/Jakarta
+      - PYTHONPATH=/usr/local/lib/python3.12/site-packages
+
+    user: "100:100" # atlantis:atlantis
+    privileged: true
+    depends_on:
+      atlantis-db:
+        condition: service_healthy
+    networks:
+      atlantis_net:
+        ipv4_address: ${CONTAINER_IP_ATLANTIS:-172.150.150.6}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${CONTAINER_IP_ATLANTIS:-172.150.150.6}:4141/healthz"]
+      interval: 60s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '2.50'
+          memory: 10G
+        reservations:
+          cpus: '0.30'
+          memory: 256M
+    labels:
+      app: atlantis
+      env: staging
+      team: devops
