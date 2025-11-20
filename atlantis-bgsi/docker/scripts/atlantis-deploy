@@ -744,27 +744,25 @@ initialize_submodules() {
 setup_terraform_config() {
     log_info "Setting up Terraform configuration for $ENVIRONMENT"
 
-    # Create unique working directory to prevent race conditions
-    local timestamp=$(date +%s)
-    local work_dir="/tmp/atlantis-work-${ENVIRONMENT}-$$-${timestamp}"
-
-    log_info "Creating isolated working directory..."
-    if ! mkdir -p "$work_dir"; then
-        log_error "Failed to create working directory: $work_dir"
+    # Verify we're in a git repository
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
+        log_error "Not in a git repository"
         return 1
     fi
 
-    # Store original directory
-    ORIGINAL_WORK_DIR=$(pwd)
+    # Get the repository root
+    local repo_root=$(git rev-parse --show-toplevel)
+    local current_module=$(pwd)
 
-    # Change to isolated working directory
-    if ! cd "$work_dir"; then
-        log_error "Failed to change to working directory: $work_dir"
-        rm -rf "$work_dir"
+    log_info "Repository root: $repo_root"
+    log_info "Current module: $current_module"
+
+    # Ensure we're in the correct module directory
+    if [[ ! -d "${current_module}/.terraform" ]] && [[ ! -f "${current_module}/main.tf" ]]; then
+        log_error "Current directory doesn't appear to be a Terraform module"
+        log_error "Expected to find main.tf or .terraform directory"
         return 1
     fi
-
-    log_success "Working in isolated directory: $work_dir"
 
     # Configuration file paths
     local config_base="${CONFIG_BASE_PATH}/${ENVIRONMENT}"
@@ -772,7 +770,7 @@ setup_terraform_config() {
     local backend_tfvars="${config_base}/backend.tfvars"
     local terraform_tfvars="${config_base}/${ENVIRONMENT}.tfvars"
 
-    # Check files exist
+    # Verify configuration files exist
     local missing_files=()
     for file in "$backend_tf" "$backend_tfvars" "$terraform_tfvars"; do
         if [[ ! -f "$file" ]]; then
@@ -785,31 +783,64 @@ setup_terraform_config() {
         for file in "${missing_files[@]}"; do
             log_error "  - $file"
         done
-        cd "$ORIGINAL_WORK_DIR"
-        rm -rf "$work_dir"
         return 1
     fi
 
-    # Copy configuration files
-    log_info "Copying configuration files..."
+    # Create environment-specific marker to prevent session contamination
+    local session_marker=".atlantis-session-${ENVIRONMENT}-$$"
+
+    # Check if another deployment is in progress for this environment
+    if [[ -f "$session_marker" ]]; then
+        local existing_pid=$(cat "$session_marker")
+        if kill -0 "$existing_pid" 2>/dev/null; then
+            log_error "Another deployment is in progress for $ENVIRONMENT (PID: $existing_pid)"
+            log_error "Please wait for it to complete or clean up stale sessions"
+            return 1
+        else
+            log_warning "Cleaning up stale session marker from PID $existing_pid"
+            rm -f "$session_marker"
+        fi
+    fi
+
+    # Create session marker
+    echo $$ > "$session_marker"
+    export ATLANTIS_SESSION_MARKER="$session_marker"
+
+    # Clean any existing environment-specific config files first
+    log_info "Cleaning previous configuration files..."
+    rm -f backend.tf backend.tfvars "${ENVIRONMENT}.tfvars" 2>/dev/null || true
+
+    # Copy configuration files to current working directory (module directory)
+    log_info "Copying configuration files to working directory..."
     if ! cp "$backend_tf" ./backend.tf || \
        ! cp "$backend_tfvars" ./backend.tfvars || \
        ! cp "$terraform_tfvars" ./"${ENVIRONMENT}.tfvars"; then
         log_error "Failed to copy configuration files"
-        cd "$ORIGINAL_WORK_DIR"
-        rm -rf "$work_dir"
+        rm -f "$session_marker"
         return 1
     fi
 
-    log_success "Configuration files prepared:"
+    # Set restrictive permissions to prevent other sessions from modifying
+    chmod 600 backend.tf backend.tfvars "${ENVIRONMENT}.tfvars"
+
+    log_success "Configuration files prepared in working directory:"
     log_info "  ✓ backend.tf"
     log_info "  ✓ backend.tfvars"
     log_info "  ✓ ${ENVIRONMENT}.tfvars"
-    log_info "  Location: $work_dir"
+    log_info "  Working directory: $(pwd)"
+    log_info "  Session: $$"
 
-    # Export for cleanup
-    export ATLANTIS_WORK_DIR="$work_dir"
-    export ATLANTIS_ORIGINAL_DIR="$ORIGINAL_WORK_DIR"
+    # Verify critical files exist
+    log_info "Verifying working directory contents..."
+    if [[ -f "init.sh" ]]; then
+        log_success "  ✓ init.sh found"
+    fi
+    if [[ -f "main.tf" ]]; then
+        log_success "  ✓ main.tf found"
+    fi
+    if [[ -d ".terraform" ]]; then
+        log_info "  ✓ .terraform directory exists"
+    fi
 
     return 0
 }
@@ -1502,6 +1533,24 @@ cleanup_sensitive_files() {
     return 0
 }
 
+# Add cleanup function
+cleanup_terraform_session() {
+    log_info "Cleaning up Terraform session for $ENVIRONMENT"
+
+    # Remove session marker
+    if [[ -n "${ATLANTIS_SESSION_MARKER}" ]] && [[ -f "${ATLANTIS_SESSION_MARKER}" ]]; then
+        rm -f "${ATLANTIS_SESSION_MARKER}"
+        log_success "Session marker removed"
+    fi
+
+    # Clean up copied configuration files
+    if [[ -f "backend.tf" ]] && [[ -f "backend.tfvars" ]] && [[ -f "${ENVIRONMENT}.tfvars" ]]; then
+        log_info "Removing environment-specific configuration files..."
+        rm -f backend.tf backend.tfvars "${ENVIRONMENT}.tfvars"
+        log_success "Configuration files cleaned up"
+    fi
+}
+
 # Display SonarQube configuration for all environments
 show_sonar_config() {
     log_info "============================================================"
@@ -1789,6 +1838,7 @@ main() {
 
     # Cleanup (always run, ignore errors)
     cleanup_sensitive_files || true
+    cleanup_terraform_session || true
 
     log_success "============================================================"
     log_success "Atlantis $OPERATION completed successfully for $ENVIRONMENT!"
@@ -1802,6 +1852,7 @@ main() {
 # Cleanup function for trap
 cleanup_on_exit() {
     cleanup_sensitive_files || true
+    cleanup_terraform_session || true
 
     if [[ $EXIT_CODE -eq 0 ]]; then
         log_success "Script completed successfully"
