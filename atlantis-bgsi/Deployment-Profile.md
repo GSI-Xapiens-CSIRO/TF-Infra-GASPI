@@ -134,7 +134,7 @@ aws_secret_access_key =
 ```
 # Repository configurations
 repos:
-- id: github.com/bgsi-id/satusehat-research
+- id: github.com/bgsi-id/*
   branch: /.*/
   apply_requirements: [approved, mergeable]
   allowed_overrides: [workflow, plan_requirements, apply_requirements]
