@@ -418,7 +418,7 @@ services:
     #     PYTHON_VERSION: 3.12
     # image: ${ATLANTIS_IMAGE:-YOUR_AWS_ACCOUNT.dkr.ecr.ap-southeast-3.amazonaws.com/bgsi/atlantis-bgsi}:${ATLANTIS_VERSION:-latest}
     # image: devopsxti/atlantis-bgsi:latest
-    image: devopsxti/atlantis-bgsi:2.4.0
+    image: devopsxti/atlantis-bgsi:2.5.0
     container_name: ${CONTAINER_ATLANTIS:-bgsi_atlantis}
     restart: unless-stopped
     ports:
