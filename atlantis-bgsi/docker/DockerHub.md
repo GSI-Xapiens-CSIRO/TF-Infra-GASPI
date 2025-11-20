@@ -481,7 +481,7 @@ services:
       - ATLANTIS_CONFIG=/atlantis/atlantis.yaml
       - ATLANTIS_CONFIG_PATH=/atlantis/config
       - ATLANTIS_ALLOW_COMMANDS=version,plan,apply,unlock,approve_policies
-      - ATLANTIS_REPO_ALLOWLIST=${ATLANTIS_REPO_ALLOWLIST:-github.com/bgsi-id/satusehat-research/*}
+      - ATLANTIS_REPO_ALLOWLIST=${ATLANTIS_REPO_ALLOWLIST:-github.com/bgsi-id/*}
       - ATLANTIS_REPO_CONFIG=/atlantis/repo.yaml
       - ATLANTIS_AUTOMERGE=true
       - ATLANTIS_AUTODISCOVER_MODE=auto
@@ -835,7 +835,7 @@ ATLANTIS_GH_USER=bgsi-gh-user
 ATLANTIS_GH_EMAIL=devops@example.com
 ATLANTIS_WEB_HOSTNAME=atlantis.example.com
 ATLANTIS_WEB_BASIC_AUTH=true
-ATLANTIS_REPO_ALLOWLIST=github.com/bgsi-id/satusehat-research/*
+ATLANTIS_REPO_ALLOWLIST=github.com/bgsi-id/*/*
 ATLANTIS_REPO_CONFIG=/atlantis/repo.yaml
 ATLANTIS_CONFIG_PATH=/atlantis/config
 ATLANTIS_CHECKOUT_STRATEGY=merge
