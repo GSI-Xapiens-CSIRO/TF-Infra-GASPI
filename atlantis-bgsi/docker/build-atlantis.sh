@@ -20,7 +20,7 @@ export IMAGE_ECR="$CI_PROJECT_REGISTRY_ECR/$CI_PROJECT_NAME"
 
 PATH_FOLDER=`pwd`
 
-TAG_VERSION="2.4.0"
+TAG_VERSION="2.5.0"
 TAG_ID=`echo $(date '+%Y%m%d')`
 
 LINE_PRINT="======================================================="
