@@ -1,0 +1,88 @@
+# AWS Credentials - NEVER commit these!
+.aws/
+credentials
+credentials.*
+!credentials.template
+
+# AWS Configuration with secrets
+config
+!config.template
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Log files
+logs/
+*.log
+
+# Terraform sensitive files
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform/
+.terraform.lock.hcl
+
+# Backup files
+*.backup
+*~
+*.bak
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Archive files
+*.zip
+*.tar.gz
+*.tgz
+
+# AWS SAM
+.aws-sam/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+ENV/
+
+# Secrets and keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+.secrets/
+
+# AWS credentials in any directory
+**/.aws/credentials
+**/credentials
