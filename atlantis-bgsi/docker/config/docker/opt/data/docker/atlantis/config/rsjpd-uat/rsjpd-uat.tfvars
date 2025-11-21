@@ -24,7 +24,7 @@ sbeacon-method-max-request-rate = 10
 svep-method-max-request-rate    = 10
 svep-method-queue-size          = 100
 
-ses-source-email = "devops@example.com"
+ses-source-email = "notification@binomika.kemkes.go.id"
 enable-inspector = true
 
 hub_name = "RSJPD"
