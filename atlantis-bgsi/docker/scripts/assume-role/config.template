@@ -1,0 +1,116 @@
+# AWS Config Template
+# Copy this to ~/.aws/config
+#
+# This config references the Temp-TF-Central-Role that will be created
+# by the create-temp-tf-central-roles.sh script
+
+################################################################################
+# PRODUCTION ACCOUNTS
+################################################################################
+
+[profile BGSI-TF-User-Executor-RSCM]
+# RSCM Production
+role_arn = arn:aws:iam::442799077487:role/Temp-TF-Central-Role_442799077487
+source_profile = BGSI-TF-User-Executor-RSCM
+region = ap-southeast-3
+output = json
+# Optional: MFA if required
+# mfa_serial = arn:aws:iam::442799077487:mfa/your-user
+
+[profile BGSI-TF-User-Executor-RSPON]
+# RSPON Production
+role_arn = arn:aws:iam::829990487185:role/Temp-TF-Central-Role_829990487185
+source_profile = BGSI-TF-User-Executor-RSPON
+region = ap-southeast-3
+output = json
+
+[profile BGSI-TF-User-Executor-SARDJITO]
+# SARDJITO Production
+role_arn = arn:aws:iam::938674806253:role/Temp-TF-Central-Role_938674806253
+source_profile = BGSI-TF-User-Executor-SARDJITO
+region = ap-southeast-3
+output = json
+
+[profile BGSI-TF-User-Executor-RSNGOERAH]
+# RSNGOERAH Production
+role_arn = arn:aws:iam::136839993415:role/Temp-TF-Central-Role_136839993415
+source_profile = BGSI-TF-User-Executor-RSNGOERAH
+region = ap-southeast-3
+output = json
+
+[profile BGSI-TF-User-Executor-RSJPD]
+# RSJPD Production
+role_arn = arn:aws:iam::602006056899:role/Temp-TF-Central-Role_602006056899
+source_profile = BGSI-TF-User-Executor-RSJPD
+region = ap-southeast-3
+output = json
+
+################################################################################
+# UAT ACCOUNTS
+################################################################################
+
+[profile BGSI-TF-User-Executor-RSCM-UAT]
+# RSCM UAT
+role_arn = arn:aws:iam::695094375681:role/Temp-TF-Central-Role_695094375681
+source_profile = BGSI-TF-User-Executor-RSCM-UAT
+region = ap-southeast-3
+output = json
+
+[profile BGSI-TF-User-Executor-RSPON-UAT]
+# RSPON UAT
+role_arn = arn:aws:iam::741464515101:role/Temp-TF-Central-Role_741464515101
+source_profile = BGSI-TF-User-Executor-RSPON-UAT
+region = ap-southeast-3
+output = json
+
+[profile BGSI-TF-User-Executor-SARDJITO-UAT]
+# SARDJITO UAT
+role_arn = arn:aws:iam::819520291687:role/Temp-TF-Central-Role_819520291687
+source_profile = BGSI-TF-User-Executor-SARDJITO-UAT
+region = ap-southeast-3
+output = json
+
+[profile BGSI-TF-User-Executor-RSNGOERAH-UAT]
+# RSNGOERAH UAT
+role_arn = arn:aws:iam::899630542732:role/Temp-TF-Central-Role_899630542732
+source_profile = BGSI-TF-User-Executor-RSNGOERAH-UAT
+region = ap-southeast-3
+output = json
+
+[profile BGSI-TF-User-Executor-RSJPD-UAT]
+# RSJPD UAT
+role_arn = arn:aws:iam::148450585096:role/Temp-TF-Central-Role_148450585096
+source_profile = BGSI-TF-User-Executor-RSJPD-UAT
+region = ap-southeast-3
+output = json
+
+################################################################################
+# NOTES
+################################################################################
+#
+# 1. This config assumes the Temp-TF-Central-Role already exists
+#    Run create-temp-tf-central-roles.sh first!
+#
+# 2. Store this file at: ~/.aws/config
+#
+# 3. File permissions should be: 600 (read/write for owner only)
+#    Run: chmod 600 ~/.aws/config
+#
+# 4. Test role assumption with:
+#    aws sts get-caller-identity --profile BGSI-TF-User-Executor-RSCM
+#
+# 5. For Terraform, you can use profiles directly:
+#    provider "aws" {
+#      profile = "BGSI-TF-User-Executor-RSCM"
+#      region  = "ap-southeast-3"
+#    }
+#
+# 6. Or use assume_role block in provider (recommended):
+#    provider "aws" {
+#      region = "ap-southeast-3"
+#      assume_role {
+#        role_arn = "arn:aws:iam::442799077487:role/Temp-TF-Central-Role_442799077487"
+#      }
+#    }
+#
+################################################################################
