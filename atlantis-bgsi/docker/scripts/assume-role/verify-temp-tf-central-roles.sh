@@ -151,7 +151,7 @@ verify_role() {
 
 main() {
     log_info "╔══════════════════════════════════════════════════════════════╗"
-    log_info "║   AWS Temp TF Central Role Verification                     ║"
+    log_info "║   AWS Temp TF Central Role Verification                      ║"
     log_info "║   Version 1.0.0                                              ║"
     log_info "╚══════════════════════════════════════════════════════════════╝"
     echo ""

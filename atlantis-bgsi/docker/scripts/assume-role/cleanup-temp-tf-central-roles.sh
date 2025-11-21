@@ -167,7 +167,7 @@ cleanup_role() {
 
 main() {
     log_error "╔══════════════════════════════════════════════════════════════╗"
-    log_error "║          ⚠️  TEMPORARY ROLE CLEANUP SCRIPT  ⚠️              ║"
+    log_error "║          ⚠️  TEMPORARY ROLE CLEANUP SCRIPT  ⚠️               ║"
     log_error "║                      Version 1.0.0                           ║"
     log_error "╚══════════════════════════════════════════════════════════════╝"
     echo ""
