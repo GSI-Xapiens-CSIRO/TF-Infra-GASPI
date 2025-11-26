@@ -133,14 +133,8 @@ module "s3_snapshot" {
   enable_notifications            = var.enable_notifications
   sns_topic_arn                   = var.sns_topic_arn
   enable_replication              = var.enable_replication
-  replication_role_arn            = [
-    "gxc-developer_${var.aws_account_id_destination}_${local.env}",
-    "gxc-administrator_${var.aws_account_id_destination}_${local.env}"
-  ]
-  destination_bucket_arn          = [
-    "gxc-developer_${var.aws_account_id_destination}_${local.env}",
-    "gxc-administrator_${var.aws_account_id_destination}_${local.env}"
-  ]
+  replication_role_arn            = "gxc-administrator_${var.aws_account_id_destination}_${local.env}"
+  destination_bucket_arn          = "gxc-administrator_${var.aws_account_id_destination}_${local.env}"
   bucket_enable_lifecycle         = var.bucket_enable_lifecycle
   group_awscloud_developer        = "gxc-developer_${var.aws_account_id_destination}_${local.env}"
   group_awscloud_administrator    = "gxc-administrator_${var.aws_account_id_destination}_${local.env}"
