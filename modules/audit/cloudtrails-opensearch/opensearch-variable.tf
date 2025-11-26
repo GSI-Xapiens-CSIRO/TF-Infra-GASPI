@@ -2,13 +2,13 @@
 variable "opensearch_instance_type" {
   description = "Instance type for OpenSearch cluster"
   type        = string
-  default     = "m6g.large.search"
+  default     = "m5.large.search"
 }
 
 variable "opensearch_instance_count" {
   description = "Number of instances in the OpenSearch cluster"
   type        = number
-  default     = 2
+  default     = 3
 }
 
 variable "opensearch_volume_size" {
