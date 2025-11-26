@@ -1,6 +1,6 @@
 resource "aws_opensearch_domain" "cloudtrail" {
   domain_name    = "opensearch-${var.aws_account_id_destination}"
-  engine_version = "OpenSearch_2.9"
+  engine_version = "OpenSearch_3.3"
 
   cluster_config {
     instance_type          = var.opensearch_instance_type
