@@ -27,12 +27,12 @@ PUT _plugins/_security/api/roles/cloudtrail_writer
 PUT _plugins/_security/api/rolesmapping/cloudtrail_writer
 {
   "backend_roles": [
-    "arn:aws:iam::938674806253:role/genomic-cloudtrail-lambda-transform-938674806253"
+    "arn:aws:iam::602006056899:role/genomic-cloudtrail-lambda-transform-602006056899"
   ],
   "hosts": [],
   "users": [
-    "gxc-admin",
-    "arn:aws:iam::938674806253:role/genomic-cloudtrail-lambda-transform-938674806253"
+    "bgsi-master",
+    "arn:aws:iam::602006056899:role/genomic-cloudtrail-lambda-transform-602006056899"
   ]
 }
 
@@ -41,19 +41,19 @@ PUT _plugins/_security/api/rolesmapping/cloudtrail_writer
 PUT _plugins/_security/api/rolesmapping/all_access
 {
   "backend_roles": [
-    "arn:aws:iam::938674806253:role/genomic-cloudtrail-cloudwatch-logs-role",
-    "arn:aws:iam::938674806253:role/genomic-cloudtrail-cloudwatch-role",
-    "arn:aws:iam::938674806253:role/genomic-cloudtrail-firehose-vpc-role-938674806253",
-    "arn:aws:iam::938674806253:role/genomic-cloudtrail-kinesis-firehose-opensearch-role",
-    "arn:aws:iam::938674806253:role/genomic-cloudtrail-kinesis-firehose-to-s3-role",
-    "arn:aws:iam::938674806253:role/genomic-cloudtrail-lambda-transform-938674806253",
-    "arn:aws:iam::938674806253:role/genomic-cloudtrail-role-938674806253",
-    "arn:aws:iam::938674806253:role/genomic-cloudwatch-role-938674806253"
+    "arn:aws:iam::602006056899:role/genomic-cloudtrail-cloudwatch-logs-role",
+    "arn:aws:iam::602006056899:role/genomic-cloudtrail-cloudwatch-role",
+    "arn:aws:iam::602006056899:role/genomic-cloudtrail-firehose-vpc-role-602006056899",
+    "arn:aws:iam::602006056899:role/genomic-cloudtrail-kinesis-firehose-opensearch-role",
+    "arn:aws:iam::602006056899:role/genomic-cloudtrail-kinesis-firehose-to-s3-role",
+    "arn:aws:iam::602006056899:role/genomic-cloudtrail-lambda-transform-602006056899",
+    "arn:aws:iam::602006056899:role/genomic-cloudtrail-role-602006056899",
+    "arn:aws:iam::602006056899:role/genomic-cloudwatch-role-602006056899"
   ],
   "hosts": [],
   "users": [
-    "gxc-admin",
-    "arn:aws:iam::938674806253:role/genomic-cloudtrail-lambda-transform-938674806253"
+    "bgsi-master",
+    "arn:aws:iam::602006056899:role/genomic-cloudtrail-lambda-transform-602006056899"
   ]
 }
 
