@@ -65,8 +65,8 @@ module "cloudtrail" {
   ]
   opensearch_instance_type   = local.env == "prod" ? "m5.large.search" : "t3.medium.search"
   opensearch_instance_count  = local.env == "prod" ? 3 : 2
-  opensearch_master_user     = "gxc-admin"
-  opensearch_master_email    = "test@email.com"
+  opensearch_master_user     = "bgsi-master"
+  opensearch_master_email    = "rscm@binomika.kemenkes.go.id"
   opensearch_master_password = ""
   opensearch_volume_size     = local.env == "prod" ? 300 : 150
 
@@ -79,29 +79,29 @@ module "cloudtrail" {
 
   cognito_users = [
     {
-      username = "gxc-admin"
+      username = "bgsi-admin"
       password = ""
       groups   = ["Administrators"]
       attributes = {
-        email          = "test@email.com"
+        email          = "bgsi.admin01@binomika.kemkes.go.id"
         email_verified = "true"
       }
     },
     {
-      username = "xti-user01"
+      username = "bgsi-user01"
       password = ""
       groups   = ["Administrators"]
       attributes = {
-        email          = "user01@email.com"
+        email          = "bgsi.developer01@binomika.kemkes.go.id"
         email_verified = "true"
       }
     },
     {
-      username = "xti-user02"
+      username = "bgsi-user02"
       password = ""
       groups   = ["Administrators"]
       attributes = {
-        email          = "user02@email.com"
+        email          = "bgsi.developer02@binomika.kemkes.go.id"
         email_verified = "true"
       }
     }
@@ -125,13 +125,22 @@ module "s3_snapshot" {
   kms_key                         = var.kms_key
   kms_env                         = var.kms_env
   prefix_name                     = var.prefix_name
-  allowed_role_arns               = var.allowed_role_arns
+  allowed_role_arns               = [
+    "gxc-developer_${var.aws_account_id_destination}_${local.env}",
+    "gxc-administrator_${var.aws_account_id_destination}_${local.env}"
+  ]
   log_retention_days              = var.log_retention_days
   enable_notifications            = var.enable_notifications
   sns_topic_arn                   = var.sns_topic_arn
   enable_replication              = var.enable_replication
-  replication_role_arn            = var.replication_role_arn
-  destination_bucket_arn          = var.destination_bucket_arn
+  replication_role_arn            = [
+    "gxc-developer_${var.aws_account_id_destination}_${local.env}",
+    "gxc-administrator_${var.aws_account_id_destination}_${local.env}"
+  ]
+  destination_bucket_arn          = [
+    "gxc-developer_${var.aws_account_id_destination}_${local.env}",
+    "gxc-administrator_${var.aws_account_id_destination}_${local.env}"
+  ]
   bucket_enable_lifecycle         = var.bucket_enable_lifecycle
   group_awscloud_developer        = "gxc-developer_${var.aws_account_id_destination}_${local.env}"
   group_awscloud_administrator    = "gxc-administrator_${var.aws_account_id_destination}_${local.env}"
