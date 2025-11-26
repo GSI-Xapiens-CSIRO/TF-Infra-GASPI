@@ -1,8 +1,8 @@
 region = "ap-southeast-3"
-  common-tags = {
-    "Owner"       = "bgsi"
-    "Environment" = "uat"
-    "Workflow"    = "SARDJITO"
+common-tags = {
+  "Owner"       = "bgsi"
+  "Environment" = "uat"
+  "Workflow"    = "SARDJITO"
 }
 
 # cognito users
@@ -28,18 +28,13 @@ ses-source-email = "notification@binomika.kemkes.go.id"
 enable-inspector = true
 
 hub_name = "RSSARDJITO"
-max-request-rate-per-5mins = 1000
-sbeacon-method-queue-size = 100
-sbeacon-method-max-request-rate = 10
-svep-method-max-request-rate = 10
-svep-method-queue-size = 100
 svep-warning-thresholds = {
-  dp = 10
+  dp     = 10
   filter = "PASS"
-  gq = 15
-  mq = 30
-  qd = 20
-  qual = 20
+  gq     = 15
+  mq     = 30
+  qd     = 20
+  qual   = 20
 }
 svep-filters = {
   clinvar_exclude = [
@@ -50,7 +45,7 @@ svep-filters = {
   ]
   consequence_rank = 14
   max_maf          = 0.05
-  genes            = [
+  genes = [
     "ABCC8",
     "ABCC9",
     "ACAD9",

@@ -234,11 +234,6 @@
   enable-inspector = true
 
   hub_name = "RSSARDJITO"
-  max-request-rate-per-5mins = 1000
-  sbeacon-method-queue-size = 100
-  sbeacon-method-max-request-rate = 10
-  svep-method-max-request-rate = 10
-  svep-method-queue-size = 100
   svep-warning-thresholds = {
     dp = 10
     filter = "PASS"
