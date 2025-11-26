@@ -31,7 +31,7 @@ PUT _plugins/_security/api/rolesmapping/cloudtrail_writer
   ],
   "hosts": [],
   "users": [
-    "gxc-admin",
+    "bgsi-master",
     "arn:aws:iam::602006056899:role/genomic-cloudtrail-lambda-transform-602006056899"
   ]
 }
@@ -52,7 +52,7 @@ PUT _plugins/_security/api/rolesmapping/all_access
   ],
   "hosts": [],
   "users": [
-    "gxc-admin",
+    "bgsi-master",
     "arn:aws:iam::602006056899:role/genomic-cloudtrail-lambda-transform-602006056899"
   ]
 }

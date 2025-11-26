@@ -1,9 +1,13 @@
 #!/bin/bash
 
+AWS_ACCOUNT_ID="136839993415"
+KMS_KEY_ID="b46d9bbe-bb2a-4755-a9cd-9752d4d5e0f0"
+KMS_KEY_ARN="arn:aws:kms:ap-southeast-3:$AWS_ACCOUNT_ID:key/$KMS_KEY_ID"
+
 # Save the trust policy to a file
 # ==============================================================================
 echo "Saving the trust policy to a file..."
-cat > trust-policy.json << 'EOF'
+cat > trust-policy.json << EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -17,14 +21,14 @@ cat > trust-policy.json << 'EOF'
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:sts::480756163420:assumed-role/cp-sts-grant-role/swift-ap-southeast-3-prod-136839993415"
+        "AWS": "arn:aws:sts::480756163420:assumed-role/cp-sts-grant-role/swift-ap-southeast-3-prod-$AWS_ACCOUNT_ID"
       },
       "Action": "sts:AssumeRole"
     },
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::136839993415:root"
+        "AWS": "arn:aws:iam::$AWS_ACCOUNT_ID:root"
       },
       "Action": "sts:AssumeRole"
     }
@@ -44,7 +48,7 @@ aws iam update-assume-role-policy \
   --policy-document file://trust-policy.json
 
 # Add additional permissions to the role policy
-cat > role-policy.json << 'EOF'
+cat > role-policy.json << EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -56,7 +60,7 @@ cat > role-policy.json << 'EOF'
         "s3:ListBucketMultipartUploads",
         "s3:ListBucketVersions"
       ],
-      "Resource": "arn:aws:s3:::genomic-snapshot-136839993415"
+      "Resource": "arn:aws:s3:::genomic-snapshot-$AWS_ACCOUNT_ID"
     },
     {
       "Effect": "Allow",
@@ -67,7 +71,18 @@ cat > role-policy.json << 'EOF'
         "s3:AbortMultipartUpload",
         "s3:ListMultipartUploadParts"
       ],
-      "Resource": "arn:aws:s3:::genomic-snapshot-136839993415/*"
+      "Resource": "arn:aws:s3:::genomic-snapshot-$AWS_ACCOUNT_ID/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+        "kms:ReEncrypt*",
+        "kms:DescribeKey"
+      ],
+      "Resource": "$KMS_KEY_ARN"
     }
   ]
 }
