@@ -139,13 +139,11 @@ variable "enable_replication" {
 variable "replication_role_arn" {
   description = "ARN of IAM role for replication"
   type        = string
-  default     = null
 }
 
 variable "destination_bucket_arn" {
   description = "ARN of destination bucket for replication"
   type        = string
-  default     = null
 }
 
 variable "enable_object_lock" {
