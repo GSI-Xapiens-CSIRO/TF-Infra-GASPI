@@ -4,16 +4,16 @@ resource "aws_opensearch_domain" "cloudtrail" {
 
   cluster_config {
     instance_type          = var.opensearch_instance_type
-    instance_count         = var.opensearch_instance_count
+    instance_count         = var.environment[local.env] == "prod" ? 3 : 2
     zone_awareness_enabled = true
 
     zone_awareness_config {
-      availability_zone_count = 2
+      availability_zone_count = var.environment[local.env] == "prod" ? 3 : 2
     }
 
     dedicated_master_enabled = var.environment[local.env] == "prod" ? true : false
-    dedicated_master_type    = var.environment[local.env] == "prod" ? "m6g.large.search" : "t3.small.search"
-    dedicated_master_count   = var.environment[local.env] == "prod" ? 3 : 2
+    dedicated_master_type    = var.environment[local.env] == "prod" ? "m5.large.search" : "t3.small.search"
+    dedicated_master_count   = var.environment[local.env] == "prod" ? 3 : 0
   }
 
   # vpc_options {
