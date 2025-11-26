@@ -169,6 +169,8 @@ services:
       - ${DATA_ATLANTIS:-/opt/data/docker/atlantis}/template:/home/atlantis/.atlantis/repos/template
       # SonarQube reports (shared volume)
       - vol_sonar_reports:/opt/sonar-reports
+      - /opt/data/docker/atlantis/.docker:/home/atlantis/.docker
+
     environment:
       #================================================================================================
       # GITHUB CONFIGURATION
