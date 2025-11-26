@@ -65,9 +65,9 @@ module "cloudtrail" {
   ]
   opensearch_instance_type   = local.env == "prod" ? "m5.large.search" : "t3.medium.search"
   opensearch_instance_count  = local.env == "prod" ? 3 : 2
-  opensearch_master_user     = "gxc-master"
-  opensearch_master_email    = "stg-rscm@binomika.kemkes.go.id"
-  opensearch_master_password = ""
+  opensearch_master_user     = "bgsi-master"
+  opensearch_master_email    = "rscm@binomika.kemenkes.go.id"
+  opensearch_master_password = "SuperAdmin!123456"
   opensearch_volume_size     = local.env == "prod" ? 300 : 150
 
   allowed_ips = [
@@ -80,7 +80,7 @@ module "cloudtrail" {
   cognito_users = [
     {
       username = "bgsi-admin"
-      password = ""
+      password = "Admin!123456"
       groups   = ["Administrators"]
       attributes = {
         email          = "bgsi.admin01@binomika.kemkes.go.id"
@@ -89,7 +89,7 @@ module "cloudtrail" {
     },
     {
       username = "bgsi-user01"
-      password = ""
+      password = "User01!123456"
       groups   = ["Administrators"]
       attributes = {
         email          = "bgsi.developer01@binomika.kemkes.go.id"
@@ -98,7 +98,7 @@ module "cloudtrail" {
     },
     {
       username = "bgsi-user02"
-      password = ""
+      password = "User02!123456"
       groups   = ["Administrators"]
       attributes = {
         email          = "bgsi.developer02@binomika.kemkes.go.id"
