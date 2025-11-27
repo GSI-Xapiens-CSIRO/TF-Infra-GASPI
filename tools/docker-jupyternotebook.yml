@@ -1,0 +1,48 @@
+version: '3.9'
+
+networks:
+  jupyter_net:
+    name: jupyter_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.151.0.0/16
+
+volumes:
+  vol_jupyter_notebooks:
+    driver: ${VOLUMES_DRIVER:-local}
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DATA_JUPYTER_NOTEBOOKS:-/opt/data/docker/jupyter/notebooks}
+
+services:
+  jupyter:
+    image: jupyter/scipy-notebook:${JUPYTER_VERSION:-latest}
+    container_name: ${CONTAINER_JUPYTER:-gaspi_jupyter}
+    restart: unless-stopped
+    ports:
+      - "${PORT_JUPYTER:-8888}:8888"
+    volumes:
+      - vol_jupyter_notebooks:/home/jovyan/work
+      - ${DATA_JUPYTER_AWS:-/opt/data/docker/jupyter/aws}/credentials:/home/jovyan/.aws/credentials:ro
+      - ${DATA_JUPYTER_AWS:-/opt/data/docker/jupyter/aws}/config:/home/jovyan/.aws/config:ro
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - AWS_REGION=${AWS_REGION:-ap-southeast-3}
+      - AWS_DEFAULT_REGION=${AWS_REGION:-ap-southeast-3}
+      - AWS_SHARED_CREDENTIALS_FILE=/home/jovyan/.aws/credentials
+      - AWS_CONFIG_FILE=/home/jovyan/.aws/config
+    command: >
+      bash -c "
+      pip install boto3 awscli &&
+      start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+      "
+    networks:
+      jupyter_net:
+        ipv4_address: ${CONTAINER_IP_JUPYTER:-172.151.151.10}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
