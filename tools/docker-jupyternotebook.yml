@@ -11,15 +11,40 @@ networks:
 volumes:
   vol_jupyter_notebooks:
     driver: ${VOLUMES_DRIVER:-local}
-    driver_opts:
-      o: bind
-      type: none
-      device: ${DATA_JUPYTER_NOTEBOOKS:-/opt/data/docker/jupyter/notebooks}
 
 services:
+  #================================================================================================
+  # PORTAINER
+  #================================================================================================
+  portainer:
+    image: portainer/portainer-ce:${PORTAINER_VERSION:-2.33.5-alpine}
+    container_name: ${CONTAINER_PORTAINER:-bgsi_portainer}
+    restart: unless-stopped
+    ports:
+      - "${PORT_PORTAINER:-5212}:9000"
+    volumes:
+    # - /etc/localtime:/etc/localtime:ro          ## Do not use it in mac
+      - /var/run/docker.sock:/var/run/docker.sock ## Do not use it in k8s
+      - /opt/data/docker/portainer2.20:/data
+    environment:
+      - PORTAINER_TEMPLATE=generic
+      - PORTAINER_VERSION=${PORTAINER_VERSION:-2.33.5-alpine}
+    privileged: true
+    networks:
+      jupyter_net:
+        ipv4_address: ${CONTAINER_IP_PORTAINER:-172.151.151.5}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${CONTAINER_IP_PORTAINER:-172.151.151.5}:5212/api/status"]
+      interval: 60s
+      timeout: 5s
+      retries: 5
+
+  #================================================================================================
+  # JUPYTER NOTEBOOK
+  #================================================================================================
   jupyter:
     image: jupyter/scipy-notebook:${JUPYTER_VERSION:-latest}
-    container_name: ${CONTAINER_JUPYTER:-gaspi_jupyter}
+    container_name: ${CONTAINER_JUPYTER:-bgsi_jupyter}
     restart: unless-stopped
     ports:
       - "${PORT_JUPYTER:-8888}:8888"
