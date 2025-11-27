@@ -1,4 +1,4 @@
-# Juputer Notebook Tools
+# Jupyter Notebook Tools for GASPI
 
 Development tools for GASPI infrastructure management.
 
