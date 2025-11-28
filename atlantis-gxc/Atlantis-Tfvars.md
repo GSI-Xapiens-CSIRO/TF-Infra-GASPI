@@ -37,12 +37,12 @@
   }
 
   # cognito users
-  gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
+  gaspi-guest-username = "guest@example.com"
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
 
-  # notification recipient
+  # notification recipient (lambda notification)
   gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
   # buckets
@@ -57,6 +57,7 @@
   svep-method-max-request-rate    = 10
   svep-method-queue-size          = 100
 
+  # operation email (`noreply`)
   ses-source-email = "notification@binomika.kemkes.go.id"
   enable-inspector = true
 
@@ -125,12 +126,12 @@
   }
 
   # cognito users
-  gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
+  gaspi-guest-username = "guest@example.com"
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
 
-  # notification recipient
+  # notification recipient (lambda notification)
   gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
   # buckets
@@ -145,6 +146,7 @@
   svep-method-max-request-rate    = 10
   svep-method-queue-size          = 100
 
+  # operation email (`noreply`)
   ses-source-email = "notification@binomika.kemkes.go.id"
   enable-inspector = true
 
@@ -216,12 +218,12 @@
   }
 
   # cognito users
-  gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
+  gaspi-guest-username = "guest@example.com"
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
 
-  # notification recipient
+  # notification recipient (lambda notification)
   gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
   # buckets
@@ -236,6 +238,7 @@
   svep-method-max-request-rate    = 10
   svep-method-queue-size          = 100
 
+  # operation email (`noreply`)
   ses-source-email = "notification@binomika.kemkes.go.id"
   enable-inspector = true
 
@@ -501,12 +504,12 @@
   }
 
   # cognito users
-  gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
+  gaspi-guest-username = "guest@example.com"
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
 
-  # notification recipient
+  # notification recipient (lambda notification)
   gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
   # buckets
@@ -521,6 +524,7 @@
   svep-method-max-request-rate    = 10
   svep-method-queue-size          = 100
 
+  # operation email (`noreply`)
   ses-source-email = "notification@binomika.kemkes.go.id"
   enable-inspector = true
 
@@ -572,12 +576,12 @@
   }
 
   # cognito users
-  gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
+  gaspi-guest-username = "guest@example.com"
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
 
-  # notification recipient
+  # notification recipient (lambda notification)
   gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
   # buckets
@@ -592,6 +596,7 @@
   svep-method-max-request-rate    = 10
   svep-method-queue-size          = 100
 
+  # operation email (`noreply`)
   ses-source-email = "notification@binomika.kemkes.go.id"
   enable-inspector = true
 
