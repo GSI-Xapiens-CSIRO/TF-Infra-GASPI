@@ -31,6 +31,15 @@ ses-source-email = "notification@binomika.kemkes.go.id"
 enable-inspector = true
 
 hub_name = "RSIGNG"
+clinic-warning-thresholds = {
+  dp     = 10
+  filter = "PASS"
+  gq     = 15
+  mq     = 30
+  qd     = 20
+  qual   = 20
+}
+
 lookup_configuration = {
   assoc_matrix_filename = "RSIGNG_association_matrix.csv"
   chr_header            = "chr"

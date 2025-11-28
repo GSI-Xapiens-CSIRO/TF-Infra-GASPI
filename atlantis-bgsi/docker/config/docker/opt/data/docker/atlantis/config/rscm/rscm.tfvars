@@ -31,7 +31,7 @@ ses-source-email = "notification@binomika.kemkes.go.id"
 enable-inspector = true
 
 hub_name = "RSCM"
-svep-warning-thresholds = {
+clinic-warning-thresholds = {
   dp     = 10
   filter = "PASS"
   gq     = 15
@@ -39,6 +39,7 @@ svep-warning-thresholds = {
   qd     = 20
   qual   = 20
 }
+
 svep-filters = {
   clinvar_exclude = [
     "Benign",

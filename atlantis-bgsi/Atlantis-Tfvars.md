@@ -62,7 +62,7 @@
   enable-inspector = true
 
   hub_name = "RSCM"
-  svep-warning-thresholds = {
+  clinic-warning-thresholds = {
     dp = 10
     filter = "PASS"
     gq = 15
@@ -70,6 +70,7 @@
     qd = 20
     qual = 20
   }
+
   svep-filters = {
     clinvar_exclude  = [
       "Benign",
@@ -151,6 +152,15 @@
   enable-inspector = true
 
   hub_name         = "RSPON"
+  clinic-warning-thresholds = {
+    dp = 10
+    filter = "PASS"
+    gq = 15
+    mq = 30
+    qd = 20
+    qual = 20
+  }
+
   pharmcat_configuration = {
     ORGANISATIONS = [
       {
@@ -243,7 +253,7 @@
   enable-inspector = true
 
   hub_name = "RSSARDJITO"
-  svep-warning-thresholds = {
+  clinic-warning-thresholds = {
     dp = 10
     filter = "PASS"
     gq = 15
@@ -251,6 +261,7 @@
     qd = 20
     qual = 20
   }
+
   svep-filters = {
     clinvar_exclude = [
       "Benign",
@@ -529,6 +540,15 @@
   enable-inspector = true
 
   hub_name         = "RSNGOERAH"
+  clinic-warning-thresholds = {
+    dp = 10
+    filter = "PASS"
+    gq = 15
+    mq = 30
+    qd = 20
+    qual = 20
+  }
+
   lookup_configuration = {
     assoc_matrix_filename = "RSNGOERAH_association_matrix.csv"
     chr_header            = "chr"
@@ -601,6 +621,15 @@
   enable-inspector = true
 
   hub_name         = "RSJPD"
+  clinic-warning-thresholds = {
+    dp = 10
+    filter = "PASS"
+    gq = 15
+    mq = 30
+    qd = 20
+    qual = 20
+  }
+
   pharmcat_configuration = {
     ORGANISATIONS = [
       {
