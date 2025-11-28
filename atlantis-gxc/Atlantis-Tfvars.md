@@ -41,7 +41,9 @@
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
-  gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
+
+  # notification recipient
+  gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
   # buckets
   variants-bucket-prefix      = "gaspi-variants-"
@@ -127,7 +129,9 @@
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
-  gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
+
+  # notification recipient
+  gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
   # buckets
   variants-bucket-prefix      = "gaspi-variants-"
@@ -216,7 +220,9 @@
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
-  gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
+
+  # notification recipient
+  gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
   # buckets
   variants-bucket-prefix      = "gaspi-variants-"
@@ -499,7 +505,9 @@
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
-  gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
+
+  # notification recipient
+  gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
   # buckets
   variants-bucket-prefix      = "gaspi-variants-"
@@ -568,7 +576,9 @@
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
-  gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
+
+  # notification recipient
+  gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
   # buckets
   variants-bucket-prefix      = "gaspi-variants-"
