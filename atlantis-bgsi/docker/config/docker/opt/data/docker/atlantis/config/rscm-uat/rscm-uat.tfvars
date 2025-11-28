@@ -6,11 +6,11 @@ common-tags = {
 }
 
 # cognito users
-gaspi-guest-username = "guest@example.com"
+gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
 gaspi-guest-password = "Guest@Example123!"
 gaspi-admin-username = "admin@example.com"
 gaspi-admin-password = "Admin@Example123!"
-gaspi-admin-email    = "devops@example.com"
+gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
 
 # buckets
 variants-bucket-prefix      = "gaspi-variants-"

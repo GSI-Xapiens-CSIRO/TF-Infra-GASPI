@@ -37,11 +37,11 @@
   }
 
   # cognito users
-  gaspi-guest-username = "guest@example.com"
+  gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
-  gaspi-admin-email    = "devops@example.com"
+  gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
 
   # buckets
   variants-bucket-prefix      = "gaspi-variants-"
@@ -55,7 +55,7 @@
   svep-method-max-request-rate    = 10
   svep-method-queue-size          = 100
 
-  ses-source-email = "devops@example.com"
+  ses-source-email = "notification@binomika.kemkes.go.id"
   enable-inspector = true
 
   hub_name = "RSCM"
@@ -123,11 +123,11 @@
   }
 
   # cognito users
-  gaspi-guest-username = "guest@example.com"
+  gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
-  gaspi-admin-email    = "devops@example.com"
+  gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
 
   # buckets
   variants-bucket-prefix      = "gaspi-variants-"
@@ -141,7 +141,7 @@
   svep-method-max-request-rate    = 10
   svep-method-queue-size          = 100
 
-  ses-source-email = "devops@example.com"
+  ses-source-email = "notification@binomika.kemkes.go.id"
   enable-inspector = true
 
   hub_name         = "RSPON"
@@ -212,11 +212,11 @@
   }
 
   # cognito users
-  gaspi-guest-username = "guest@example.com"
+  gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
-  gaspi-admin-email    = "devops@example.com"
+  gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
 
   # buckets
   variants-bucket-prefix      = "gaspi-variants-"
@@ -230,7 +230,7 @@
   svep-method-max-request-rate    = 10
   svep-method-queue-size          = 100
 
-  ses-source-email = "devops@example.com"
+  ses-source-email = "notification@binomika.kemkes.go.id"
   enable-inspector = true
 
   hub_name = "RSSARDJITO"
@@ -495,11 +495,11 @@
   }
 
   # cognito users
-  gaspi-guest-username = "guest@example.com"
+  gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
-  gaspi-admin-email    = "devops@example.com"
+  gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
 
   # buckets
   variants-bucket-prefix      = "gaspi-variants-"
@@ -513,7 +513,7 @@
   svep-method-max-request-rate    = 10
   svep-method-queue-size          = 100
 
-  ses-source-email = "devops@example.com"
+  ses-source-email = "notification@binomika.kemkes.go.id"
   enable-inspector = true
 
   hub_name         = "RSNGOERAH"
@@ -564,11 +564,11 @@
   }
 
   # cognito users
-  gaspi-guest-username = "guest@example.com"
+  gaspi-guest-username = "devsecops@binomik.kemkes.go.id"
   gaspi-guest-password = "Guest@Example123!"
   gaspi-admin-username = "admin@example.com"
   gaspi-admin-password = "Admin@Example123!"
-  gaspi-admin-email    = "devops@example.com"
+  gaspi-admin-email    = "superadmin@binomika.kemkes.go.id"
 
   # buckets
   variants-bucket-prefix      = "gaspi-variants-"
@@ -582,7 +582,7 @@
   svep-method-max-request-rate    = 10
   svep-method-queue-size          = 100
 
-  ses-source-email = "devops@example.com"
+  ses-source-email = "notification@binomika.kemkes.go.id"
   enable-inspector = true
 
   hub_name         = "RSJPD"
