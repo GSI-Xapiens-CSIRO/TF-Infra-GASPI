@@ -31,6 +31,15 @@ ses-source-email = "notification@binomika.kemkes.go.id"
 enable-inspector = true
 
 hub_name = "RSPON"
+clinic-warning-thresholds = {
+  dp     = 10
+  filter = "PASS"
+  gq     = 15
+  mq     = 30
+  qd     = 20
+  qual   = 20
+}
+
 pharmcat_configuration = {
   ORGANISATIONS = [
     {

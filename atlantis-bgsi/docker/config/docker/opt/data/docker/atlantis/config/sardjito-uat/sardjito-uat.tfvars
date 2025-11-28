@@ -31,7 +31,7 @@ ses-source-email = "notification@binomika.kemkes.go.id"
 enable-inspector = true
 
 hub_name = "RSSARDJITO"
-svep-warning-thresholds = {
+clinic-warning-thresholds = {
   dp     = 10
   filter = "PASS"
   gq     = 15
