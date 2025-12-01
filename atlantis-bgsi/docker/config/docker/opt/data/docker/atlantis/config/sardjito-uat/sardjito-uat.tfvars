@@ -1,7 +1,7 @@
 region = "ap-southeast-3"
 common-tags = {
   "Owner"       = "bgsi"
-  "Environment" = "uat"
+  "Environment" = " uat"
   "Workflow"    = "SARDJITO"
 }
 
@@ -10,9 +10,6 @@ gaspi-guest-username = "guest@example.com"
 gaspi-guest-password = "Guest@Example123!"
 gaspi-admin-username = "admin@example.com"
 gaspi-admin-password = "Admin@Example123!"
-
-# notification recipient (lambda notification)
-gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
 
 # buckets
 variants-bucket-prefix      = "gaspi-variants-"
@@ -26,11 +23,14 @@ sbeacon-method-max-request-rate = 10
 svep-method-max-request-rate    = 10
 svep-method-queue-size          = 100
 
-# operation email (`noreply`)
+# notification recipient (lambda notification)
+gaspi-admin-email = "platform-infra@binomika.kemkes.go.id"
+# operational email (noreply)
 ses-source-email = "notification@binomika.kemkes.go.id"
 enable-inspector = true
 
 hub_name = "RSSARDJITO"
+
 clinic-warning-thresholds = {
   dp     = 10
   filter = "PASS"
@@ -39,6 +39,7 @@ clinic-warning-thresholds = {
   qd     = 20
   qual   = 20
 }
+
 svep-filters = {
   clinvar_exclude = [
     "Benign",
@@ -46,7 +47,7 @@ svep-filters = {
     "Likely benign",
     "not provided",
   ]
-  consequence_rank = 14
+  consequence_rank = 12
   max_maf          = 0.05
   genes = [
     "ABCC8",
