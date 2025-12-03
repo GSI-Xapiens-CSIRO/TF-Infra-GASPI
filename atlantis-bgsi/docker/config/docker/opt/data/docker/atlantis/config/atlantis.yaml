@@ -129,3 +129,13 @@ projects:
   autoplan:
     when_modified: *tf_files
   workflow: rsjpd-uat-workflow
+
+- name: bgsi-central
+  branch: /central/
+  dir: .
+  workspace: default
+  terraform_version: *tf_version
+  execution_order_group: 12
+  autoplan:
+    when_modified: *tf_files
+  workflow: central-workflow

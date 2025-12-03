@@ -99,3 +99,12 @@ workflows:
     apply:
       steps:
       - run: atlantis-deploy rsjpd-uat apply
+
+  # CENTRAL Workflows
+  central-workflow:
+    plan:
+      steps:
+      - run: atlantis-deploy central plan
+    apply:
+      steps:
+      - run: atlantis-deploy central apply

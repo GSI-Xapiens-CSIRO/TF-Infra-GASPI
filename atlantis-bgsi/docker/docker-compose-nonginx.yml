@@ -273,6 +273,7 @@ services:
       - SONAR_TOKEN_SARDJITO=${SONAR_TOKEN_SARDJITO}
       - SONAR_TOKEN_RSNGOERAH=${SONAR_TOKEN_RSNGOERAH}
       - SONAR_TOKEN_RSJPD=${SONAR_TOKEN_RSJPD}
+      - SONAR_TOKEN_CENTRAL=${SONAR_TOKEN_CENTRAL}
 
       #------------------------------------------------------------------------------------------------
       # SonarQube Token Variables - UAT Environments
@@ -291,6 +292,7 @@ services:
       - SONAR_PROJECT_KEY_SARDJITO=${SONAR_PROJECT_KEY_SARDJITO:-bgsi-cicd-gaspi-sardjito}
       - SONAR_PROJECT_KEY_RSNGOERAH=${SONAR_PROJECT_KEY_RSNGOERAH:-bgsi-cicd-gaspi-rsngoerah}
       - SONAR_PROJECT_KEY_RSJPD=${SONAR_PROJECT_KEY_RSJPD:-bgsi-cicd-gaspi-rsjpd}
+      - SONAR_PROJECT_KEY_CENTRAL=${SONAR_PROJECT_KEY_CENTRAL:-bgsi-cicd-gaspi-central}
 
       #------------------------------------------------------------------------------------------------
       # SonarQube Project Key Variables - UAT Environments
@@ -316,6 +318,7 @@ services:
       - BGSI_SARDJITO_ACCOUNT=${BGSI_SARDJITO_ACCOUNT}
       - BGSI_RSNGOERAH_ACCOUNT=${BGSI_RSNGOERAH_ACCOUNT}
       - BGSI_RSJPD_ACCOUNT=${BGSI_RSJPD_ACCOUNT}
+      - BGSI_CENTRAL_ACCOUNT=${BGSI_CENTRAL_ACCOUNT}
 
       # AWS UAT Environments
       - BGSI_RSCM_UAT_ACCOUNT=${BGSI_RSCM_UAT_ACCOUNT}

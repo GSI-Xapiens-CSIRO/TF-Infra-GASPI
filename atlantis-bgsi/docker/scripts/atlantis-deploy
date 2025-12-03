@@ -32,18 +32,37 @@ log_error() {
 }
 
 # Script metadata
-SCRIPT_VERSION="2.5.0-BGSI-SECURE-MULTI-SONAR"
+SCRIPT_VERSION="2.6.0-BGSI-SECURE-MULTI-SONAR"
 SCRIPT_NAME="atlantis-deploy"
 SCRIPT_AUTHOR="BGSI DevOps-Team"
 SCRIPT_EMAIL="devops@bgsi.com"
 SCRIPT_COMPANY="BGSI SatuSehat"
 SCRIPT_LICENSE="Apache v2"
-SCRIPT_DATE="September, 2025"
+SCRIPT_DATE="December, 2025"
 SCRIPT_PATTERN="BGSI"
 SCRIPT_GH_USER="bgsi-devops"
 SCRIPT_GH_REPO="bgsi-id"
+
+# --------------------------------------------------------
+# CURRENT STATE
+# --------------------------------------------------------
 SCRIPT_RUN_TEST="${SCRIPT_RUN_TEST:-true}"
 SCRIPT_RUN_SONAR="${SCRIPT_RUN_SONAR:-true}"
+
+# --------------------------------------------------------
+# FUTURE IMPLEMENTATION
+# --------------------------------------------------------
+# Check if environment is PROD (bypass test and sonar for production)
+# case "${1:-}" in
+#     rscm|rspon|sardjito|rsngoerah|rsjpd|central)
+#         SCRIPT_RUN_TEST="${SCRIPT_RUN_TEST:-false}"
+#         SCRIPT_RUN_SONAR="${SCRIPT_RUN_SONAR:-false}"
+#         ;;
+#     *)
+#         SCRIPT_RUN_TEST="${SCRIPT_RUN_TEST:-true}"
+#         SCRIPT_RUN_SONAR="${SCRIPT_RUN_SONAR:-true}"
+#         ;;
+# esac
 
 # Security configuration
 ENABLE_SECURITY_AUDIT="${ENABLE_SECURITY_AUDIT:-true}"
@@ -68,17 +87,21 @@ SONAR_TOKEN_RSPON="${SONAR_TOKEN_RSPON:-}"
 SONAR_TOKEN_SARDJITO="${SONAR_TOKEN_SARDJITO:-}"
 SONAR_TOKEN_RSNGOERAH="${SONAR_TOKEN_RSNGOERAH:-}"
 SONAR_TOKEN_RSJPD="${SONAR_TOKEN_RSJPD:-}"
+SONAR_TOKEN_CENTRAL="${SONAR_TOKEN_CENTRAL:-}"
 SONAR_TOKEN_RSCM_UAT="${SONAR_TOKEN_RSCM_UAT:-}"
 SONAR_TOKEN_RSPON_UAT="${SONAR_TOKEN_RSPON_UAT:-}"
 SONAR_TOKEN_SARDJITO_UAT="${SONAR_TOKEN_SARDJITO_UAT:-}"
 SONAR_TOKEN_RSNGOERAH_UAT="${SONAR_TOKEN_RSNGOERAH_UAT:-}"
 SONAR_TOKEN_RSJPD_UAT="${SONAR_TOKEN_RSJPD_UAT:-}"
+
 # Environment-specific SonarQube project keys
 SONAR_PROJECT_KEY_RSCM="${SONAR_PROJECT_KEY_RSCM:-bgsi-cicd-gaspi-rscm}"
 SONAR_PROJECT_KEY_RSPON="${SONAR_PROJECT_KEY_RSPON:-bgsi-cicd-gaspi-rspon}"
 SONAR_PROJECT_KEY_SARDJITO="${SONAR_PROJECT_KEY_SARDJITO:-bgsi-cicd-gaspi-sardjito}"
 SONAR_PROJECT_KEY_RSNGOERAH="${SONAR_PROJECT_KEY_RSNGOERAH:-bgsi-cicd-gaspi-rsngoerah}"
 SONAR_PROJECT_KEY_RSJPD="${SONAR_PROJECT_KEY_RSJPD:-bgsi-cicd-gaspi-rsjpd}"
+SONAR_PROJECT_KEY_CENTRAL="${SONAR_PROJECT_KEY_CENTRAL:-bgsi-cicd-gaspi-central}"
+
 SONAR_PROJECT_KEY_RSCM_UAT="${SONAR_PROJECT_KEY_RSCM_UAT:-bgsi-cicd-gaspi-rscm-uat}"
 SONAR_PROJECT_KEY_RSPON_UAT="${SONAR_PROJECT_KEY_RSPON_UAT:-bgsi-cicd-gaspi-rspon-uat}"
 SONAR_PROJECT_KEY_SARDJITO_UAT="${SONAR_PROJECT_KEY_SARDJITO_UAT:-bgsi-cicd-gaspi-sardjito-uat}"
@@ -140,6 +163,8 @@ get_expected_account_id() {
         sardjito-uat)   echo "819520291687" ;;
         rsngoerah-uat)  echo "899630542732" ;;
         rsjpd-uat)      echo "148450585096" ;;
+        ### BGSI-Central using AWS RSCM-UAT (temporary) ###
+        central)        echo "695094375681" ;;
         *)
             log_error "Unknown environment: $1"
             return 1
@@ -186,6 +211,7 @@ show_version() {
     echo -e "${BLUE}Supports environments:${NC}"
     echo -e "${BLUE} -) HUB: rscm, rspon, sardjito, rsngoerah, rsjpd${NC}"
     echo -e "${BLUE} -) UAT: rscm-uat, rspon-uat, sardjito-uat, rsngoerah-uat, rsjpd-uat${NC}"
+    echo -e "${BLUE} -) MAIN: central${NC}"
     echo ""
     exit 0
 }
@@ -231,6 +257,7 @@ SONARQUBE INTEGRATION (Multi-Project Support):
     SONAR_TOKEN_SARDJITO_UAT           SonarQube token for sardjito-uat environment
     SONAR_TOKEN_RSNGOERAH_UAT          SonarQube token for rsngoerah-uat environment
     SONAR_TOKEN_RSJPD_UAT              SonarQube token for rsjpd-uat environment
+    SONAR_TOKEN_CENTRAL                SonarQube token for bgsi-central environment
 
     # Environment-specific project keys (optional)
     SONAR_PROJECT_KEY_RSCM             Project key for rscm (default: bgsi-cicd-gaspi-rscm)
@@ -243,6 +270,7 @@ SONARQUBE INTEGRATION (Multi-Project Support):
     SONAR_PROJECT_KEY_SARDJITO_UAT     Project key for sardjito-uat (default: bgsi-cicd-gaspi-sardjito-uat)
     SONAR_PROJECT_KEY_RSNGOERAH_UAT    Project key for rsngoerah-uat (default: bgsi-cicd-gaspi-rsngoerah-uat)
     SONAR_PROJECT_KEY_RSJPD_UAT        Project key for rsjpd-uat (default: bgsi-cicd-gaspi-rsjpd-uat)
+    SONAR_PROJECT_KEY_CENTRAL          Project key for bgsi-central (default: bgsi-cicd-gaspi-central)
 
     # Fallback general configuration
     SONAR_TOKEN                        General SonarQube token (fallback if environment-specific not set)
@@ -261,6 +289,7 @@ SECURITY CONTROLS:
 SUPPORTED ENVIRONMENTS:
     HUB environments: rscm, rspon, sardjito, rsngoerah, rsjpd
     UAT environments: rscm-uat, rspon-uat, sardjito-uat, rsngoerah-uat, rsjpd-uat
+    MAIN environment: central
 
 OPTIONS:
     -h, --help                Show this help message
@@ -363,6 +392,7 @@ safe_log_command() {
         "${SONAR_TOKEN_SARDJITO:-}"
         "${SONAR_TOKEN_RSNGOERAH:-}"
         "${SONAR_TOKEN_RSJPD:-}"
+        "${SONAR_TOKEN_CENTRAL:-}"
         "${SONAR_TOKEN_RSCM_UAT:-}"
         "${SONAR_TOKEN_RSPON_UAT:-}"
         "${SONAR_TOKEN_SARDJITO_UAT:-}"
@@ -399,6 +429,7 @@ validate_environment() {
             echo "Supported environments:"
             echo "-) HUB: rscm, rspon, sardjito, rsngoerah, rsjpd"
             echo "-) UAT: rscm-uat, rspon-uat, sardjito-uat, rsngoerah-uat, rsjpd-uat"
+            echo "-) MAIN: central"
             return 1
             ;;
     esac
