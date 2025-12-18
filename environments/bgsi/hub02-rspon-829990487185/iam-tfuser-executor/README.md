@@ -18,7 +18,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_iam-tfuser"></a> [iam-tfuser](#module\_iam-tfuser) | ../../../../modules//iam-tfuser-executor | n/a |
+| <a name="module_iam-tfuser"></a> [iam-tfuser](#module\_iam-tfuser) | ../../../../../modules//iam-tfuser-executor | n/a |
 
 ## Resources
 

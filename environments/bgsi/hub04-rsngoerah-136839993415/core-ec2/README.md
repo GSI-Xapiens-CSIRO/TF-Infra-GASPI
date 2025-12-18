@@ -18,7 +18,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_core"></a> [core](#module\_core) | ../../../../modules//core-igw-ec2 | n/a |
+| <a name="module_core"></a> [core](#module\_core) | ../../../../../modules//core-igw-ec2 | n/a |
 
 ## Resources
 

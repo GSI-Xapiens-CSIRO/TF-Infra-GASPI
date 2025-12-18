@@ -132,7 +132,7 @@ module "cloudtrail" {
 }
 
 module "s3_snapshot" {
-  source = "../../../../modules//storage-s3"
+  source = "../../../../../modules//storage-s3"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source

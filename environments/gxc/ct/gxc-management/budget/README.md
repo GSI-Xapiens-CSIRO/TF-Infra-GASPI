@@ -18,7 +18,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_budget"></a> [budget](#module\_budget) | ../../../../modules//budget | n/a |
+| <a name="module_budget"></a> [budget](#module\_budget) | ../../../../../../modules//budget | n/a |
 
 ## Resources
 
