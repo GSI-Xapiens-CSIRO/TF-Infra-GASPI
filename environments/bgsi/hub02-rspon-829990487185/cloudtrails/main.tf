@@ -28,7 +28,7 @@ locals {
 }
 
 module "cloudtrail" {
-  source = "../../../../modules/audit//cloudtrails-opensearch"
+  source = "../../../../../modules//audit//cloudtrails-opensearch"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source
