@@ -31,7 +31,7 @@ locals {
 #  Reuse Module: IAM Logging
 # --------------------------------------------------------------------------
 module "hub_logging_roles" {
-  source = "../../../modules/iam-logging"
+  source = "../../../../modules/iam-logging"
 
   aws_region                      = var.aws_region
   aws_account_id_source           = var.aws_account_id_source
